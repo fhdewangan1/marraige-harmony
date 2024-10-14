@@ -34,11 +34,20 @@ const AppContent = () => {
           width: "100vw", // Set to full viewport width
           overflow: "auto",
           backgroundColor:
-            isLandingPage || isRegisterPage || isLoginPage || isForgotPage || isChangePass
+            isLandingPage ||
+            isRegisterPage ||
+            isLoginPage ||
+            isForgotPage ||
+            isChangePass
               ? "transparent"
-              : "#001d4a",
+              : "var(--background-color)",
+          color: "var(--text-color)",
           backgroundImage:
-            isLandingPage || isRegisterPage || isLoginPage || isForgotPage || isChangePass
+            isLandingPage ||
+            isRegisterPage ||
+            isLoginPage ||
+            isForgotPage ||
+            isChangePass
               ? `url(${landingImage})`
               : "none",
           backgroundSize: "cover",

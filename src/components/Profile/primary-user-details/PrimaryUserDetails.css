@@ -1,0 +1,84 @@
+.card-container {
+  display: flex;
+  position: relative;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 1050px;
+  background-color: #fcd5ce;
+  padding: 20px;
+}
+
+.button-container {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+}
+
+.content-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: -5px;
+  max-height: 270px;
+  overflow-y: auto;
+}
+
+.field {
+  padding: 10px;
+  border-radius: 4px;
+  color: #1f7a8c;
+  font-size: 20px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 50%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  margin-bottom: 15px;
+}
+
+.form-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-field {
+  margin-bottom: 15px;
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+}
+
+.message {
+  color: #f44336; /* Red */
+}
+
+.btn {
+  width: 100%;
+  padding: 10px;
+}

@@ -29,7 +29,6 @@ const ImageWrapper = styled.div`
   background-position: center 20%; // Adjust this value as needed
 `;
 
-
 const ContentWrapper = styled.div`
   flex: 2;
   padding: 20px;
@@ -105,9 +104,9 @@ const SearchContainer = styled.div`
   margin: 10px;
   width: 100%;
   margin-top: 70px;
-   @media (max-width: 768px) {
-    margin-top: 130px
-   }
+  @media (max-width: 768px) {
+    margin-top: 130px;
+  }
 `;
 
 const ScrollableContainer = styled(Box)`
@@ -143,7 +142,7 @@ const FramerCard = () => {
 
   const session = AuthHook();
   const userGender = session.gender; // Get the logged-in user's gender
-  const oppositeGender = userGender === 'male' ? 'female' : 'male'; // Determine the opposite gender
+  const oppositeGender = userGender === "male" ? "female" : "male"; // Determine the opposite gender
 
   const handleMoreDetailsClick = (item) => {
     setLoading(true);
@@ -157,7 +156,11 @@ const FramerCard = () => {
     try {
       setLoading(true);
       // Pass the opposite gender to the API
-      const details = await getAllProfiles({ page, size: pageSize, gender: userGender });
+      const details = await getAllProfiles({
+        page,
+        size: pageSize,
+        gender: userGender,
+      });
       setUserDetails(details?.result || []);
       setAllUserDetails(details?.result || []);
       setTotalPages(details?.totalPages || 1);
@@ -216,10 +219,17 @@ const FramerCard = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Button onClick={handleSearch} variant="contained" sx={{ ml: 1, mr: 1 }}>
+        <Button
+          onClick={handleSearch}
+          variant="contained"
+          sx={{ ml: 1, mr: 1 }}
+        >
           Search
         </Button>
-        <Button onClick={handleClearSearch} sx={{ ml: 1, mr: 2, color:'brown', bgcolor:'pink' }}>
+        <Button
+          onClick={handleClearSearch}
+          sx={{ ml: 1, mr: 2, color: "brown", bgcolor: "pink" }}
+        >
           Clear
         </Button>
       </SearchContainer>
@@ -249,7 +259,9 @@ const FramerCard = () => {
                     <Title>
                       {item.firstName} {item.lastName}
                     </Title>
-                    <MoreDetailsButton onClick={() => handleMoreDetailsClick(item)}>
+                    <MoreDetailsButton
+                      onClick={() => handleMoreDetailsClick(item)}
+                    >
                       More Details
                     </MoreDetailsButton>
                     {fields.map((field, index) => (

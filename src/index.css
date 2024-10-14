@@ -1,17 +1,26 @@
 :root {
-  --primary: #780000;
-  --secondary: #c1121f;
-  --third: #fdf0d5;
-  --fourth: #003049;
-  --fifth: #669bbc;
+  --primary: #780000; /* Original primary color */
+  --secondary: #c1121f; /* Original secondary color */
+  --third: #fdf0d5; /* Original third color */
+  --fourth: #003049; /* Original fourth color */
+  --fifth: #669bbc; /* Original fifth color */
+
+  /* New vibrant colors */
+  --button-primary: #ff6b6b; /* Vibrant Red */
+  --button-secondary: #ff9f00; /* Bright Orange */
+  --button-success: #4caf50; /* Bright Green */
+  --button-info: #2196f3; /* Vibrant Blue */
+  --button-warning: #ff9800; /* Warm Orange */
+  --button-danger: #f44336; /* Strong Red */
+  --button-light: #ffffff; /* White for text on colored buttons */
 
   --background-color: var(--third);
   --text-color: var(--fourth);
-
   --font-family: "Poppins", sans-serif;
 }
 
 * {
   padding: 0;
   margin: 0;
+  box-sizing: border-box;
 }

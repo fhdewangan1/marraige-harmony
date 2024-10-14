@@ -1,0 +1,11 @@
+.demo-card-details {
+  margin-top: 10vh;
+  padding: 0 50px;
+}
+
+@media (max-width: 768px) {
+  .demo-card-details {
+    padding: 0;
+    margin-top: 80px;
+  }
+}

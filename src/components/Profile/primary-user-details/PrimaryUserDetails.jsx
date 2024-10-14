@@ -1,179 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import styled from "styled-components";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { RingLoader } from "react-spinners";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-
-// Styled components
-const CardContainer = styled(motion.div)`
-  display: flex;
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 1050px;
-  background-color: #fcd5ce;
-  max-height: 300px;
-  overflow-y: auto; /* Make the card content scrollable */
-
-  @media (max-width: 768px) {
-    padding: 14px;
-    margin-bottom: 20px;
-  }
-`;
-
-const ContentWrapper = styled.div`
-  flex: 2;
-  padding: 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto 1fr;
-  gap: -5px;
-  max-height: 270px; /* Adjust this height based on your design */
-  overflow-y: fixed; /* Make the content scrollable */
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(
-      auto-fill,
-      minmax(120px, 1fr)
-    ); /* Responsive for mobile */
-  }
-`;
-
-const Field = styled.div`
-  padding: 10px;
-  border-radius: 4px;
-  color: #1f7a8c;
-  font-size: 20px;
-  @media (max-width: 768px) {
-    font-size: 16px;
-  }
-`;
-
-const ButtonContainer = styled.div`
-  position: absolute;
-  top: 20px;
-  right: 10px;
-
-  font-size: 16px;
-    padding: 8px 16px;
-          @media (max-width: 768px) {
-    font-size: 16px;
-    padding: 1px 1px;
-  }
-  }
-`;
-
-const Button = styled.button`
-  background-color: #003566;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  font-size: 18px;
-  cursor: pointer;
-  width: auto;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    margin: 5px 0;
-  width:'20px',
-  position:fixed
-  }
-
-  &:hover {
-    background-color: #1f7a8c;
-  }
-`;
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 800px;
-  max-height: 90vh; /* Limit the height */
-  overflow-y: auto; /* Allow scrolling */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1001;
-
-  @media (max-width: 768px) {
-    top:'2rem',
-    width: 40%;
-    padding: 20px;
-  }
-`;
-
-const ModalHeader = styled.h2`
-  margin: 0;
-  margin-bottom: 20px;
-`;
-
-const FormWrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(
-      auto-fill,
-      minmax(120px, 1fr)
-    ); /* Responsive for mobile */
-  }
-`;
-
-const InputField = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Label = styled.label`
-  margin-bottom: 5px;
-  color: #333;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-`;
-
-const StyledSelect = styled(Select)`
-  height: 41px;
-  padding: 0 14px;
-`;
-
-const FileInput = styled.input`
-  margin-top: 5px;
-`;
-
-const Message = styled.div`
-  margin-top: 15px;
-  font-size: 16px;
-  color: ${({ success }) => (success ? "green" : "red")};
-
-  @media (max-width: 768px) {
-    font-size: 14px;
-  }
-`;
-
+import "./PrimaryUserDetails.css";
+import ImageCard from "./ImageCard";
 // Fields array
 export const fields = [
   { label: "First Name", key: "firstName" },
@@ -186,7 +18,7 @@ export const fields = [
   { label: "Date of Birth", key: "dob" },
   { label: "Residence", key: "residence" },
   { label: "Mobile No", key: "mobileNumber", isDisabled: true },
-  { label: "Email Id", key: "mailId"},
+  { label: "Email Id", key: "mailId" },
 ];
 
 // Main Component
@@ -257,7 +89,6 @@ const PrimaryUserDetails = ({
             "success"
           ).then(() => {
             setIsModalOpen(false);
-            // Reload the page after closing the modal
             window.location.reload();
           });
         } else {
@@ -280,20 +111,24 @@ const PrimaryUserDetails = ({
 
   return (
     <>
-      <CardContainer
+      <ImageCard setStatus={setStatus} mobileNumber={mobileNumber} />
+      <motion.div
+        className="card-container"
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
         {mobileNumber === session?.userName && (
-          <ButtonContainer>
-            <Button onClick={toggleModal}>Update</Button>
-          </ButtonContainer>
+          <div className="button-container">
+            <button className="btn btn-primary" onClick={toggleModal}>
+              Update
+            </button>
+          </div>
         )}
 
-        <ContentWrapper>
+        <div className="content-wrapper">
           {fields.map((field, index) => (
-            <Field key={index}>
+            <div className="field" key={index}>
               <strong>{field.label}:</strong>{" "}
               <span style={{ color: "#003566" }}>
                 {response && response[field.key] !== undefined
@@ -302,86 +137,56 @@ const PrimaryUserDetails = ({
                     : response[field.key]
                   : "N/A"}
               </span>
-            </Field>
+            </div>
           ))}
-        </ContentWrapper>
-      </CardContainer>
+        </div>
+      </motion.div>
 
       {isModalOpen && (
-        <ModalOverlay>
-          <ModalContent>
-            <ModalHeader>Update Profile</ModalHeader>
-            <FormWrapper>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2 className="modal-header">Update Profile</h2>
+            <div className="form-wrapper">
               {fields.map((field, index) => (
-                <InputField key={index}>
-                  <Label>{field.label}</Label>
+                <div className="input-field" key={index}>
+                  <label>{field.label}</label>
                   {field.key === "religion" || field.key === "community" ? (
-                    <FormControl fullWidth size="small">
-                      <StyledSelect
-                        value={updatedProfile[field.key] || ""}
-                        onChange={(e) =>
-                          handleFieldChange(field.key, e.target.value)
-                        }
-                        size="small"
-                        MenuProps={{
-                          PaperProps: {
-                            style: {
-                              maxHeight: 300,
-                            },
-                          },
-                        }}
-                      >
-                        {field.key === "religion" && [
-                          <MenuItem key="Hindu" value="Hindu">
-                            Hindu
-                          </MenuItem>,
-                          <MenuItem key="Muslim" value="Muslim">
-                            Muslim
-                          </MenuItem>,
-                          <MenuItem key="Christian" value="Christian">
-                            Christian
-                          </MenuItem>,
-                          <MenuItem key="Sikh" value="Sikh">
-                            Sikh
-                          </MenuItem>,
-                          <MenuItem key="Parsi" value="Parsi">
-                            Parsi
-                          </MenuItem>,
-                          <MenuItem key="Jain" value="Jain">
-                            Jain
-                          </MenuItem>,
-                          <MenuItem key="Buddhist" value="Buddhist">
-                            Buddhist
-                          </MenuItem>,
-                          <MenuItem key="Jewish" value="Jewish">
-                            Jewish
-                          </MenuItem>,
-                          <MenuItem key="No Religion" value="No Religion">
-                            No Religion
-                          </MenuItem>,
-                        ]}
-                        {field.key === "community" && [
-                          <MenuItem key="English" value="English">
-                            English
-                          </MenuItem>,
-                          <MenuItem key="Hindi" value="Hindi">
-                            Hindi
-                          </MenuItem>,
-                          <MenuItem key="Urdu" value="Urdu">
-                            Urdu
-                          </MenuItem>,
-                          <MenuItem key="Telugu" value="Telugu">
-                            Telugu
-                          </MenuItem>,
-                          <MenuItem key="Tamil" value="Tamil">
-                            Tamil
-                          </MenuItem>,
-                        ]}
-                      </StyledSelect>
-                    </FormControl>
+                    <select
+                      className="form-control"
+                      value={updatedProfile[field.key] || ""}
+                      onChange={(e) =>
+                        handleFieldChange(field.key, e.target.value)
+                      }
+                    >
+                      {field.key === "religion" && (
+                        <>
+                          <option value="">Select Religion</option>
+                          <option value="Hindu">Hindu</option>
+                          <option value="Muslim">Muslim</option>
+                          <option value="Christian">Christian</option>
+                          <option value="Sikh">Sikh</option>
+                          <option value="Parsi">Parsi</option>
+                          <option value="Jain">Jain</option>
+                          <option value="Buddhist">Buddhist</option>
+                          <option value="Jewish">Jewish</option>
+                          <option value="No Religion">No Religion</option>
+                        </>
+                      )}
+                      {field.key === "community" && (
+                        <>
+                          <option value="">Select Community</option>
+                          <option value="English">English</option>
+                          <option value="Hindi">Hindi</option>
+                          <option value="Urdu">Urdu</option>
+                          <option value="Telugu">Telugu</option>
+                          <option value="Tamil">Tamil</option>
+                        </>
+                      )}
+                    </select>
                   ) : (
-                    <Input
+                    <input
                       type={field.key === "mobileNumber" ? "text" : "text"}
+                      className="form-control"
                       value={updatedProfile[field.key] || ""}
                       onChange={(e) =>
                         handleFieldChange(field.key, e.target.value)
@@ -389,42 +194,44 @@ const PrimaryUserDetails = ({
                       disabled={field.isDisabled}
                     />
                   )}
-                </InputField>
+                </div>
               ))}
               {/* Image Upload Input */}
-              <InputField>
-                <Label>Profile Image:</Label>
-                <FileInput
+              <div className="input-field">
+                <label>Profile Image:</label>
+                <input
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
+                  className="form-control"
                 />
-              </InputField>
-            </FormWrapper>
+              </div>
+            </div>
 
             {loading ? (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100px",
-                }}
-              >
+              <div className="loader-container">
                 <RingLoader color="#003566" size={60} />
               </div>
             ) : (
-              <Message>{/* Optionally display messages here */}</Message>
+              <div className="message"></div>
             )}
             <br />
-            <Button onClick={handleSubmit} disabled={loading}>
+            <button
+              className="btn btn-success"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
               Save Changes
-            </Button>
-            <Button onClick={toggleModal} style={{ marginLeft: "5px" }}>
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={toggleModal}
+              style={{ marginLeft: "5px" }}
+            >
               Cancel
-            </Button>
-          </ModalContent>
-        </ModalOverlay>
+            </button>
+          </div>
+        </div>
       )}
     </>
   );

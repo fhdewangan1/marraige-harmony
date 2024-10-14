@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import styled from "styled-components";
 import { getProfileImage } from "../../../services/userAllDetailsService";
@@ -24,7 +24,7 @@ const ImageWrapper = styled.div`
   background-position: center 20%; // Adjust this value as needed
 `;
 
-const ImageCard = ({ mobileNumber, refresAfterUpdate, setStatus, status }) => {
+const ImageCard = ({ setStatus, mobileNumber }) => {
   const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,24 +33,28 @@ const ImageCard = ({ mobileNumber, refresAfterUpdate, setStatus, status }) => {
     setLoading(true);
     setError(null); // Reset error on new fetch
     try {
-      const { imageUrl, status: responseStatus } = await getProfileImage(mobileNumber);
-      console.log('resimageUrl', imageUrl);
-      console.log('imgsta', responseStatus);
-      
+      const { imageUrl, status: responseStatus } = await getProfileImage(
+        mobileNumber
+      );
+      console.log("resimageUrl", imageUrl);
+      console.log("imgsta", responseStatus);
+
       if (responseStatus === 200) {
         setProfileImage(imageUrl);
-        setStatus('Image loaded successfully');
-        refresAfterUpdate && refresAfterUpdate(true);
+        setStatus("Image loaded successfully");
       } else {
-        setError(`Failed to load profile image. Status code: ${responseStatus}`);
+        setError(
+          `Failed to load profile image. Status code: ${responseStatus}`
+        );
       }
     } catch (err) {
+      console.log("err :", err);
       setError("Failed to load profile image");
     } finally {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchUserData();
   }, [mobileNumber]); // Ensure it runs again if mobileNumber changes
@@ -64,7 +68,8 @@ const ImageCard = ({ mobileNumber, refresAfterUpdate, setStatus, status }) => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <ImageWrapper src={profileImage || 'defaultImageUrl.jpg'} /> {/* Fallback image */}
+      <ImageWrapper src={profileImage || "defaultImageUrl.jpg"} />{" "}
+      {/* Fallback image */}
     </CardContainer>
   );
 };

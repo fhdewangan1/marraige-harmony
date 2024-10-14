@@ -18,6 +18,7 @@ import { motion } from "framer-motion";
 import styled from "styled-components";
 import AuthHook from "../../auth/AuthHook";
 import logo from "../../images/Logo.png"; // Import the logo
+import "../../App.css";
 
 const Loader = styled(motion.div)`
   position: fixed;
@@ -155,7 +156,14 @@ function Navbar() {
 
   return (
     <>
-      <AppBar sx={{ padding: 0, backgroundColor: "pink", color: "gray" }} position="fixed">
+      <AppBar
+        sx={{
+          padding: 0,
+          backgroundColor: "var(--primary)",
+          color: "var(--third)",
+        }}
+        position="fixed"
+      >
         <Toolbar>
           <Typography
             variant="h6"
@@ -164,7 +172,7 @@ function Navbar() {
               fontFamily: "serif",
               fontWeight: "bold",
               fontSize: { xs: "1.5rem", md: "2rem" }, // Responsive font size
-              color: "#f50057",
+              color: "--var(third)",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
               textShadow: "1px 1px 2px rgba(0, 0, 0, 0.3)",
@@ -178,7 +186,11 @@ function Navbar() {
 
           {isMobile ? (
             <>
-              <IconButton color="inherit" aria-label="menu" onClick={toggleDrawer(true)}>
+              <IconButton
+                color="inherit"
+                aria-label="menu"
+                onClick={toggleDrawer(true)}
+              >
                 <MenuIcon />
               </IconButton>
               <Drawer
@@ -200,8 +212,12 @@ function Navbar() {
                   <Button color="inherit" component={Link} to="/profiles">
                     Dashboard
                   </Button>
-                  <Button color="inherit" component={Link} to="/change-password">
-                  Change Password
+                  <Button
+                    color="inherit"
+                    component={Link}
+                    to="/change-password"
+                  >
+                    Change Password
                   </Button>
                   <Button color="inherit" onClick={handleLogout}>
                     Logout

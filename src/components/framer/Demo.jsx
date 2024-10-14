@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import styled from 'styled-components';
+import React from "react";
+import { motion } from "framer-motion";
+import styled from "styled-components";
 
 const CardContainer = styled(motion.div)`
   display: flex;
@@ -51,7 +51,7 @@ const Field = styled.div`
   font-size: 19px;
 `;
 
-const Demo = ({title, fields }) => {
+const Demo = ({ title, fields }) => {
   return (
     <CardContainer
       initial={{ opacity: 0, x: -100 }}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   TextField,
   Button,
@@ -8,7 +8,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import qs from "qs"; // Import qs for URL encoding
 import { AxiosConfig } from "../../config/AxiosConfig"; // Adjust the path as needed
 import Swal from "sweetalert2"; // Import SweetAlert
@@ -50,7 +49,7 @@ const ForgotPassword = () => {
         qs.stringify(formattedData), // Stringify the data
         {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       );

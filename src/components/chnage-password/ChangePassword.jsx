@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   TextField,
   Button,
@@ -12,7 +12,6 @@ import { AxiosConfig } from "../../config/AxiosConfig";
 import Swal from "sweetalert2"; // Import SweetAlert
 import AuthHook from "../../auth/AuthHook";
 
-
 function ChangePassword() {
   const [formData, setFormData] = useState({
     oldPassword: "",
@@ -25,7 +24,7 @@ function ChangePassword() {
   // Get the user session
   const session = AuthHook();
   const mobileNumber = session?.userName; // Use the userName from the session
-//   const mobileNumber = 1234567890; // Use the userName from the session
+  //   const mobileNumber = 1234567890; // Use the userName from the session
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,10 +50,13 @@ function ChangePassword() {
     }
 
     try {
-      const response = await AxiosConfig.put(`/user/${mobileNumber}/change-password`, {
-        oldPassword: formData.oldPassword,
-        newPassword: formData.newPassword,
-      });
+      const response = await AxiosConfig.put(
+        `/user/${mobileNumber}/change-password`,
+        {
+          oldPassword: formData.oldPassword,
+          newPassword: formData.newPassword,
+        }
+      );
 
       if (response.status === 200) {
         // Show SweetAlert success notification

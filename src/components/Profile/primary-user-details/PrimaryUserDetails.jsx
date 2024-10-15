@@ -4,13 +4,7 @@ import Swal from "sweetalert2";
 import { Modal } from "react-bootstrap";
 import { FaRegEdit } from "react-icons/fa";
 
-const PrimaryUserDetails = ({
-  status,
-  setStatus,
-  response,
-  mobileNumber,
-  imageUrl,
-}) => {
+const PrimaryUserDetails = ({ status, setStatus, response, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState({
     firstName: "",

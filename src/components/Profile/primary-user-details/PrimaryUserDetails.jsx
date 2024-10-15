@@ -117,17 +117,24 @@ const PrimaryUserDetails = ({
           </span>
         </div>
       </div>
-      <div className="other-information">
-        <div className="name-wrap">
-          <h3 className="name"> Age: {response?.age}</h3>
-          <h3 className="name"> Gender: {response?.gender}</h3>
-          <h3 className="name"> Language Known: {response?.languageKnown}</h3>
-          <h3 className="name"> Religion : {response?.religion}</h3>
-          <h3 className="name"> Community : {response?.community}</h3>
-          <h3 className="name"> Date of Birth: {response?.dob}</h3>
-          <h3 className="name"> Address: {response?.residence}</h3>
-          <h3 className="name"> Mobile No: {response?.mobileNumber}</h3>
-          <h3 className="name"> Email: {response?.mailId}</h3>
+      <div className="other-information-wrap">
+        <div className="other-information">
+          {[
+            { label: "Age", value: response?.age },
+            { label: "Gender", value: response?.gender },
+            { label: "Language Known", value: response?.languageKnown },
+            { label: "Religion", value: response?.religion },
+            { label: "Community", value: response?.community },
+            { label: "Date of Birth", value: response?.dob },
+            { label: "Address", value: response?.residence },
+            { label: "Mobile No", value: response?.mobileNumber },
+            { label: "Email", value: response?.mailId },
+          ].map(({ label, value }, index) => (
+            <div className="info-item" key={index}>
+              <span className="label">{label}:</span>
+              <span className="value">{value || "N/A"}</span>
+            </div>
+          ))}
         </div>
       </div>
 

@@ -96,7 +96,7 @@ const UserPartnerPreferences = ({
   };
 
   return (
-    <section className="user-partner-preferences-wrap">
+    <section className="profile-wrap">
       <div className="update-button">
         <FaRegEdit className="icon" onClick={toggleModal} disabled={loading} />
       </div>

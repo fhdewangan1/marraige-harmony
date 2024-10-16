@@ -1,0 +1,116 @@
+.demo-card-details {
+  margin-top: 10vh;
+  padding: 0 50px;
+}
+
+.profile-wrap {
+  background-color: var(--background-color);
+  height: auto; /* Ensure the height is auto by default */
+  font-family: var(--font-family);
+  box-shadow: 0 8px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  padding: 20px;
+  min-height: 650px;
+  transition: transform 0.3s ease;
+}
+
+.update-button {
+  display: flex;
+  justify-content: flex-end; /* Changed from end to flex-end for clarity */
+  align-items: center;
+  margin-bottom: 20px;
+  cursor: pointer;
+  color: var(--text-color);
+  font-size: 18px;
+}
+
+.first-row-wrap {
+  display: flex;
+  align-items: flex-start;
+}
+
+.first-row-wrap img {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+
+.first-row-wrap span {
+  color: var(--text-color);
+  font-size: 50px;
+}
+
+.other-information-wrap {
+  display: flex; /* Use flexbox for layout */
+  flex-wrap: wrap; /* Allow items to wrap into multiple rows */
+  margin-top: 20px; /* Space above the information section */
+}
+
+.other-information {
+  flex: 1; /* Make this a flex item */
+  display: grid; /* Use CSS Grid for the two-column layout */
+  grid-template-columns: repeat(2, 1fr); /* Create two equal columns */
+  gap: 20px; /* Space between grid items */
+}
+
+.info-item {
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.1
+  ); /* Slightly tinted background for contrast */
+  padding: 10px; /* Padding for better touch target */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+}
+
+.label {
+  font-weight: bold; /* Bold labels */
+  color: var(--text-color); /* Text color from your CSS variables */
+}
+
+.value {
+  margin-left: 5px; /* Space between label and value */
+  color: var(--text-color); /* Text color from your CSS variables */
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  .demo-card-details {
+    padding: 0 20px; /* Reduce padding on smaller screens */
+    margin-top: 80px;
+  }
+
+  .profile-wrap {
+    width: 100%; /* Full width on small screens */
+    padding: 10px; /* Adjust padding for smaller screens */
+    min-height: auto; /* Set min-height to auto for mobile view */
+  }
+
+  .first-row-wrap {
+    flex-direction: column; /* Stack the image and text */
+    align-items: center; /* Center align items */
+  }
+
+  .first-row-wrap img {
+    width: 150px; /* Smaller image size */
+    height: 150px; /* Smaller image size */
+    margin: 0 0 20px 0; /* Remove margin on the right */
+  }
+
+  .first-row-wrap span {
+    font-size: 30px; /* Smaller font size */
+  }
+
+  .other-information {
+    grid-template-columns: 1fr; /* One column layout for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .update-button {
+    font-size: 16px; /* Smaller font size for buttons on very small screens */
+  }
+}

@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { Modal } from "react-bootstrap";
 import { FaRegEdit } from "react-icons/fa";
-import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import { RingLoader } from "react-spinners";
 
@@ -45,7 +44,6 @@ const UserFamilyDetails = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(response || {});
   const [loading, setLoading] = useState(false);
-  const session = AuthHook();
   const { mobileNumber } = useParams();
 
   useEffect(() => {
@@ -109,7 +107,7 @@ const UserFamilyDetails = ({
   };
 
   return (
-    <section className="user-family-details-wrap">
+    <section className="profile-wrap">
       <div className="update-button">
         <FaRegEdit className="icon" onClick={toggleModal} disabled={loading} />
       </div>

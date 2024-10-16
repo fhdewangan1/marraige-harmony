@@ -114,7 +114,7 @@ const PrimaryUserDetails = ({ status, setStatus, response, imageUrl }) => {
   };
 
   return (
-    <section className="primary-user-details-wrap">
+    <section className="profile-wrap">
       <div className="update-button">
         <FaRegEdit className="icon" onClick={toggleModal} disabled={loading} />
       </div>
@@ -142,7 +142,9 @@ const PrimaryUserDetails = ({ status, setStatus, response, imageUrl }) => {
 
       {isModalOpen && !loading && (
         <Modal show={isModalOpen} onHide={toggleModal} centered>
-          <Modal.Header closeButton>Update Profile</Modal.Header>
+          <Modal.Header closeButton>
+            <Modal.Title>Update Profile</Modal.Title>
+          </Modal.Header>
           <Modal.Body>
             <form
               onSubmit={(e) => {

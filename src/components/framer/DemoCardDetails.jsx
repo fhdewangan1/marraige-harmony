@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import "./DemoCardDetails.css";
 import SideBar from "./SideBar/SideBar";
 import PrimaryUserDetails from "../Profile/primary-user-details/PrimaryUserDetails";
 import UserFamilyDetails from "../Profile/user-family-details/UserFamilyDetails";
@@ -9,6 +8,7 @@ import UserLifeStyleAndEducation from "../Profile/user-life-style-and-education/
 import UserPartnerPreferences from "../Profile/user-partner-preferences/UserPartnerPreferences";
 import { getAllUserDetails } from "../../services/userAllDetailsService";
 import { getProfileImage } from "../../services/userAllDetailsService";
+import "./CommonStyles.css";
 
 const DemoCardDetails = () => {
   const { mobileNumber } = useParams();
@@ -51,6 +51,7 @@ const DemoCardDetails = () => {
     if (isMobile) {
       return (
         <>
+          <h1>Basic Information</h1>
           <PrimaryUserDetails
             status={status}
             setStatus={setStatus}
@@ -58,21 +59,26 @@ const DemoCardDetails = () => {
             mobileNumber={mobileNumber}
             imageUrl={profileImage}
           />
+          <h1>Family Details</h1>
           <UserFamilyDetails
             status={status}
             setStatus={setStatus}
             response={userDetails?.response?.userFamilyDetails}
           />
+          <h1>Personal Details</h1>
           <UserPersonalDetails
             status={status}
             setStatus={setStatus}
             response={userDetails?.response?.userPersonalDetails}
           />
+          <h1>Life Style and Education</h1>
           <UserLifeStyleAndEducation
             status={status}
             setStatus={setStatus}
             response={userDetails?.response?.userLifeStyleAndEducation}
           />
+
+          <h1>Partner Preferences</h1>
           <UserPartnerPreferences
             status={status}
             setStatus={setStatus}

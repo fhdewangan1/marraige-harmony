@@ -18,18 +18,6 @@ const DemoCardDetails = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [status, setStatus] = useState(false);
 
-  // Handle screen resize to adjust mobile view
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
   // Fetch user data
   const fetchUserData = async (mobileNumber) => {
     try {
@@ -45,7 +33,18 @@ const DemoCardDetails = () => {
   useEffect(() => {
     fetchUserData(mobileNumber);
   }, [mobileNumber, status]);
+  // Handle screen resize to adjust mobile view
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   // Function to render all sections at once or the active component
   const renderActiveSection = () => {
     if (isMobile) {

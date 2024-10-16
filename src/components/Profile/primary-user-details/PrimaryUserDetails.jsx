@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { Modal } from "react-bootstrap";
 import { FaRegEdit } from "react-icons/fa";
+import AuthHook from "../../../auth/AuthHook";
+import { useParams } from "react-router-dom";
 
 // Fields to show in the user information (top section)
 const showFields = [
@@ -28,6 +30,8 @@ const PrimaryUserDetails = ({ status, setStatus, response, imageUrl }) => {
   const [loading, setLoading] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [errors, setErrors] = useState({});
+  const session = AuthHook();
+  const { mobileNumber } = useParams();
 
   useEffect(() => {
     setUpdatedProfile(response || {});
@@ -115,9 +119,15 @@ const PrimaryUserDetails = ({ status, setStatus, response, imageUrl }) => {
 
   return (
     <section className="profile-wrap">
-      <div className="update-button">
-        <FaRegEdit className="icon" onClick={toggleModal} disabled={loading} />
-      </div>
+      {mobileNumber === session?.userName && (
+        <div className="update-button">
+          <FaRegEdit
+            className="icon"
+            onClick={toggleModal}
+            disabled={loading}
+          />
+        </div>
+      )}
       <div className="first-row-wrap">
         <div className="profile-image-wrap">
           <img src={imageUrl} alt="profile" className="profile-image" />

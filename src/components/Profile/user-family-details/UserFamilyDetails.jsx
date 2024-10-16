@@ -5,6 +5,7 @@ import { Modal } from "react-bootstrap";
 import { FaRegEdit } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { RingLoader } from "react-spinners";
+import AuthHook from "../../../auth/AuthHook";
 
 // Family fields to show
 const familyFields = [
@@ -45,6 +46,7 @@ const UserFamilyDetails = ({
   const [updatedProfile, setUpdatedProfile] = useState(response || {});
   const [loading, setLoading] = useState(false);
   const { mobileNumber } = useParams();
+  const session = AuthHook();
 
   useEffect(() => {
     setUpdatedProfile(response || {});
@@ -108,9 +110,15 @@ const UserFamilyDetails = ({
 
   return (
     <section className="profile-wrap">
-      <div className="update-button">
-        <FaRegEdit className="icon" onClick={toggleModal} disabled={loading} />
-      </div>
+      {mobileNumber === session?.userName && (
+        <div className="update-button">
+          <FaRegEdit
+            className="icon"
+            onClick={toggleModal}
+            disabled={loading}
+          />
+        </div>
+      )}
       <div className="family-information-wrap">
         <div className="other-information-wrap">
           <div className="other-information">

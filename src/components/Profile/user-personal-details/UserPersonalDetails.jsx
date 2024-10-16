@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { Modal } from "react-bootstrap";
 import { FaRegEdit } from "react-icons/fa";
+import AuthHook from "../../../auth/AuthHook";
+import { useParams } from "react-router-dom";
 
 // Fields to show in the user information
 const showFields = [
@@ -26,6 +28,9 @@ const UserPersonalDetails = ({ status, setStatus, response }) => {
   const [updatedProfile, setUpdatedProfile] = useState({});
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const { mobileNumber } = useParams();
+  const session = AuthHook();
 
   useEffect(() => {
     setUpdatedProfile(response || {});
@@ -95,9 +100,15 @@ const UserPersonalDetails = ({ status, setStatus, response }) => {
 
   return (
     <section className="profile-wrap">
-      <div className="update-button">
-        <FaRegEdit className="icon" onClick={toggleModal} disabled={loading} />
-      </div>
+      {mobileNumber === session?.userName && (
+        <div className="update-button">
+          <FaRegEdit
+            className="icon"
+            onClick={toggleModal}
+            disabled={loading}
+          />
+        </div>
+      )}
       <div className="other-information-wrap">
         <div className="other-information">
           {showFields.map(({ key, label }, index) => (

@@ -4,7 +4,7 @@ import { RingLoader } from "react-spinners";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import { FaRegEdit } from "react-icons/fa";
-import { Modal } from "react-bootstrap"; // Import Modal component
+import { Modal } from "react-bootstrap";
 
 const partnerPreferencesFields = [
   { key: "familyStatus", label: "Family Status" },
@@ -23,9 +23,8 @@ const UserPartnerPreferences = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(response || {});
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
   const session = AuthHook();
+
   const { mobileNumber } = useParams();
 
   useEffect(() => {
@@ -97,9 +96,15 @@ const UserPartnerPreferences = ({
 
   return (
     <section className="profile-wrap">
-      <div className="update-button">
-        <FaRegEdit className="icon" onClick={toggleModal} disabled={loading} />
-      </div>
+      {mobileNumber === session?.userName && (
+        <div className="update-button">
+          <FaRegEdit
+            className="icon"
+            onClick={toggleModal}
+            disabled={loading}
+          />
+        </div>
+      )}
       <div className="other-information-wrap">
         <div className="other-information">
           {partnerPreferencesFields.map(({ key, label }, index) => (

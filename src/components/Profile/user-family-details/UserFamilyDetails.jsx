@@ -1,27 +1,39 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import "./UserFamilyDetails.css";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { RingLoader } from "react-spinners";
+import { Modal } from "react-bootstrap";
+import { FaRegEdit } from "react-icons/fa";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./UserFamilyDetails.css";
+import { RingLoader } from "react-spinners";
 
-// Fields data
-export const familyFields = [
-  { key: "fatherName", value: "Father's Name: " },
-  { key: "fatherOccupation", value: "Father's Occupation: " },
-  { key: "motherName", value: "Mother's Name: " },
-  { key: "motherOccupation", value: "Mother's Occupation: " },
-  { key: "noOfBrothers", value: "Number of Brothers: " },
-  { key: "noOfBrothersMarried", value: "Number of Married Brothers: " },
-  { key: "noOfSisters", value: "Number of Sisters: " },
-  { key: "noOfSistersMarried", value: "Number of Married Sisters: " },
-  { key: "noOfFamilyMembers", value: "Total Number of Family Members: " },
-  { key: "familyValue", value: "Family Values: " },
-  { key: "familyDetails", value: "Family Details: " },
-  { key: "familyStatus", value: "Family Status: " },
-  { key: "maternalGotra", value: "Maternal Gotra: " },
+// Family fields to show
+const familyFields = [
+  { key: "fatherName", label: "Father's Name", type: "text" },
+  { key: "fatherOccupation", label: "Father's Occupation", type: "text" },
+  { key: "motherName", label: "Mother's Name", type: "text" },
+  { key: "motherOccupation", label: "Mother's Occupation", type: "text" },
+  { key: "noOfBrothers", label: "Number of Brothers", type: "number" },
+  {
+    key: "noOfBrothersMarried",
+    label: "Number of Married Brothers",
+    type: "number",
+  },
+  { key: "noOfSisters", label: "Number of Sisters", type: "number" },
+  {
+    key: "noOfSistersMarried",
+    label: "Number of Married Sisters",
+    type: "number",
+  },
+  {
+    key: "noOfFamilyMembers",
+    label: "Total Number of Family Members",
+    type: "number",
+  },
+  { key: "familyValue", label: "Family Values", type: "text" },
+  { key: "familyDetails", label: "Family Details", type: "text" },
+  { key: "familyStatus", label: "Family Status", type: "text" },
+  { key: "maternalGotra", label: "Maternal Gotra", type: "text" },
 ];
 
 const UserFamilyDetails = ({
@@ -40,18 +52,25 @@ const UserFamilyDetails = ({
     setUpdatedProfile(response || {});
   }, [response]);
 
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
+
   const handleFieldChange = (key, value) => {
-    setUpdatedProfile((prevProfile) => ({
-      ...prevProfile,
-      [key]: value,
-    }));
+    setUpdatedProfile((prevProfile) => ({ ...prevProfile, [key]: value }));
   };
 
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
+  const validateForm = () => {
+    for (const field of familyFields) {
+      if (!updatedProfile[field.key]) {
+        Swal.fire("Validation Error", `${field.label} is required!`, "error");
+        return false;
+      }
+    }
+    return true;
   };
 
   const handleSubmit = () => {
+    if (!validateForm()) return;
+
     setLoading(true);
     const apiUrl = response
       ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-family-details/${mobileNumber}`
@@ -59,9 +78,7 @@ const UserFamilyDetails = ({
 
     fetch(apiUrl, {
       method: response ? "PUT" : "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedProfile),
     })
       .then((res) => res.json())
@@ -75,10 +92,14 @@ const UserFamilyDetails = ({
             "User details updated successfully!",
             "success"
           ).then(() => {
-            toggleModal(); // Close modal after success
+            toggleModal();
           });
         } else {
-          Swal.fire("Error", "Failed to update user details", "error");
+          Swal.fire(
+            "Error",
+            data.message || "Failed to update user details",
+            "error"
+          );
         }
       })
       .catch(() => {
@@ -88,100 +109,65 @@ const UserFamilyDetails = ({
   };
 
   return (
-    <>
-      <motion.div
-        className="card shadow-sm mb-4 user-family-card"
-        initial={{ opacity: 0, x: -100 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        {mobileNumber === session?.userName && (
-          <div className="position-relative">
-            <button
-              className="btn btn-primary position-absolute top-0 end-0 m-3"
-              onClick={toggleModal}
-            >
-              {response ? "Update" : "Add"}
-            </button>
-          </div>
-        )}
-        <div className="card-body family-card-body">
-          <div className="row">
-            {familyFields.map((field, index) => (
-              <div className="col-md-4 mb-3" key={index}>
-                <strong className="label">{field.value}</strong>{" "}
-                <span className="value">
-                  {response && response[field.key]
-                    ? Array.isArray(response[field.key])
-                      ? response[field.key].join(", ")
-                      : response[field.key]
-                    : "N/A"}
-                </span>
+    <section className="user-family-details-wrap">
+      <div className="update-button">
+        <FaRegEdit className="icon" onClick={toggleModal} disabled={loading} />
+      </div>
+      <div className="family-information-wrap">
+        <div className="other-information-wrap">
+          <div className="other-information">
+            {familyFields.map(({ key, label }, index) => (
+              <div className="info-item" key={index}>
+                <span className="label">{label}:</span>
+                <span className="value">{response?.[key] || "N/A"}</span>
               </div>
             ))}
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {isModalOpen && (
-        <div className="modal show modal-background">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">
-                  {response ? "Update Family Details" : "Add Family Details"}
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={toggleModal}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="row">
-                  {familyFields.map((field, index) => (
-                    <div className="col-md-6 mb-3" key={index}>
-                      <label className="form-label">{field.value}</label>
-                      <input
-                        type={field.key.includes("noOf") ? "number" : "text"}
-                        className="form-control"
-                        value={updatedProfile[field.key] || ""}
-                        onChange={(e) =>
-                          handleFieldChange(field.key, e.target.value)
-                        }
-                        min={0}
-                      />
-                    </div>
-                  ))}
+        <Modal show={isModalOpen} onHide={toggleModal} centered>
+          <Modal.Header closeButton>Update Family Details</Modal.Header>
+          <Modal.Body>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }}
+            >
+              {familyFields.map(({ key, label, type }) => (
+                <div className="form-group" key={key}>
+                  <label htmlFor={key}>{label}</label>
+                  <input
+                    type={type}
+                    className="form-control"
+                    id={key}
+                    value={updatedProfile[key] || ""}
+                    onChange={(e) => handleFieldChange(key, e.target.value)}
+                  />
                 </div>
-
-                {loading ? (
-                  <div className="d-flex justify-content-center loader-container">
-                    <RingLoader color="#003566" size={60} />
-                  </div>
-                ) : (
-                  <button
-                    className="btn btn-primary"
-                    onClick={handleSubmit}
-                    disabled={loading}
-                    style={{ marginTop: "10px" }}
-                  >
-                    Save Changes
-                  </button>
-                )}
-                <button
-                  className="btn btn-secondary ms-2"
-                  onClick={toggleModal}
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+              ))}
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}
+              >
+                {loading ? <RingLoader size={20} /> : "Save Changes"}
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={toggleModal}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+            </form>
+          </Modal.Body>
+        </Modal>
       )}
-    </>
+    </section>
   );
 };
 

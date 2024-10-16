@@ -4,55 +4,83 @@ import Swal from "sweetalert2";
 import { Modal } from "react-bootstrap";
 import { FaRegEdit } from "react-icons/fa";
 
+// Fields to show in the user information (top section)
+const showFields = [
+  { key: "firstName", label: "First Name", type: "text", required: true },
+  { key: "lastName", label: "Last Name", type: "text", required: true },
+  { key: "age", label: "Age", type: "number", required: true },
+  { key: "gender", label: "Gender", type: "text", required: true },
+  { key: "languageKnown", label: "Language Known", type: "text" },
+  { key: "religion", label: "Religion", type: "text" },
+  { key: "community", label: "Community", type: "text" },
+  { key: "dob", label: "Date of Birth", type: "date", required: true },
+  { key: "residence", label: "Address", type: "text", required: true },
+  { key: "mobileNumber", label: "Mobile No", type: "text", required: true },
+  { key: "mailId", label: "Email", type: "email", required: true },
+];
+
+// Fields to hide from the top section
+const hideFields = ["profileImage", "firstName", "lastName"];
+
 const PrimaryUserDetails = ({ status, setStatus, response, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [updatedProfile, setUpdatedProfile] = useState({
-    firstName: "",
-    lastName: "",
-    age: "",
-    gender: "",
-    languageKnown: "",
-    religion: "",
-    community: "",
-    dob: "",
-    residence: "",
-    mobileNumber: "",
-    mailId: "",
-    profileImage: "",
-  });
-
+  const [updatedProfile, setUpdatedProfile] = useState({});
   const [loading, setLoading] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    setUpdatedProfile(response);
+    setUpdatedProfile(response || {});
   }, [response]);
 
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   const handleFieldChange = (key, value) => {
-    setUpdatedProfile((prevProfile) => ({
-      ...prevProfile,
-      [key]: value,
-    }));
+    setUpdatedProfile((prevProfile) => ({ ...prevProfile, [key]: value }));
   };
 
   const handleImageChange = (e) => {
     setProfileImage(e.target.files[0]);
   };
 
-  const handleSubmit = () => {
-    setLoading(true);
-
-    const formData = new FormData();
-    Object.keys(updatedProfile).forEach((key) => {
-      formData.append(key, updatedProfile[key]);
+  // Validation function
+  const validateForm = () => {
+    const newErrors = {};
+    showFields.forEach(({ key, required }) => {
+      if (required && !updatedProfile[key]) {
+        newErrors[key] = `${
+          key.charAt(0).toUpperCase() + key.slice(1)
+        } is required`;
+      }
     });
-    if (profileImage) {
-      formData.append("profileImage", profileImage);
+
+    // Additional validations
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (updatedProfile.mailId && !emailPattern.test(updatedProfile.mailId)) {
+      newErrors.mailId = "Invalid email format";
     }
+
+    const mobilePattern = /^\d{10}$/; // Assuming Indian mobile numbers
+    if (
+      updatedProfile.mobileNumber &&
+      !mobilePattern.test(updatedProfile.mobileNumber)
+    ) {
+      newErrors.mobileNumber = "Mobile number must be 10 digits";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Return true if no errors
+  };
+
+  const handleSubmit = () => {
+    if (!validateForm()) return; // Validate before submitting
+
+    setLoading(true);
+    const formData = new FormData();
+    showFields.forEach(({ key }) =>
+      formData.append(key, updatedProfile[key] || "")
+    );
+    if (profileImage) formData.append("profileImage", profileImage);
 
     fetch("https://shaadi-be.fino-web-app.agency/api/v1/auth/update-profile", {
       method: "PUT",
@@ -63,20 +91,12 @@ const PrimaryUserDetails = ({ status, setStatus, response, imageUrl }) => {
         setLoading(false);
         if (data.status === 200 || data.status === 201) {
           setStatus(!status);
-
-          if (data.profileImage) {
-            setUpdatedProfile((prevProfile) => ({
-              ...prevProfile,
-              profileImage: data.profileImage,
-            }));
-          }
-
           Swal.fire(
             "Success!",
             "Profile updated successfully!",
             "success"
           ).then(() => {
-            setIsModalOpen(false);
+            toggleModal();
             window.location.reload();
           });
         } else {
@@ -89,11 +109,7 @@ const PrimaryUserDetails = ({ status, setStatus, response, imageUrl }) => {
       })
       .catch(() => {
         setLoading(false);
-        Swal.fire(
-          "Error!",
-          "Failed to update profile. Please try again.",
-          "error"
-        );
+        Swal.fire("Error!", "An error occurred. Please try again.", "error");
       });
   };
 
@@ -104,40 +120,28 @@ const PrimaryUserDetails = ({ status, setStatus, response, imageUrl }) => {
       </div>
       <div className="first-row-wrap">
         <div className="profile-image-wrap">
-          <img src={imageUrl} alt="profile-image" className="profile-image" />
+          <img src={imageUrl} alt="profile" className="profile-image" />
+          {/* Displaying names separately */}
           <span>
-            {response?.firstName}
-            {response?.lastName}
+            {response?.firstName} {response?.lastName}
           </span>
         </div>
       </div>
       <div className="other-information-wrap">
         <div className="other-information">
-          {[
-            { label: "Age", value: response?.age },
-            { label: "Gender", value: response?.gender },
-            { label: "Language Known", value: response?.languageKnown },
-            { label: "Religion", value: response?.religion },
-            { label: "Community", value: response?.community },
-            { label: "Date of Birth", value: response?.dob },
-            { label: "Address", value: response?.residence },
-            { label: "Mobile No", value: response?.mobileNumber },
-            { label: "Email", value: response?.mailId },
-          ].map(({ label, value }, index) => (
-            <div className="info-item" key={index}>
-              <span className="label">{label}:</span>
-              <span className="value">{value || "N/A"}</span>
-            </div>
-          ))}
+          {showFields
+            .filter(({ key }) => !hideFields.includes(key)) // Filter out hidden fields
+            .map(({ key, label }, index) => (
+              <div className="info-item" key={index}>
+                <span className="label">{label}:</span>
+                <span className="value">{response?.[key] || "N/A"}</span>
+              </div>
+            ))}
         </div>
       </div>
 
-      {response && !loading && isModalOpen && (
-        <Modal
-          show={isModalOpen}
-          onHide={toggleModal}
-          className="modal-dialog modal-dialog-centered"
-        >
+      {isModalOpen && !loading && (
+        <Modal show={isModalOpen} onHide={toggleModal} centered>
           <Modal.Header closeButton>Update Profile</Modal.Header>
           <Modal.Body>
             <form
@@ -146,67 +150,25 @@ const PrimaryUserDetails = ({ status, setStatus, response, imageUrl }) => {
                 handleSubmit();
               }}
             >
-              <div className="form-group">
-                <label htmlFor="firstName">First Name</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="firstName"
-                  name="firstName"
-                  value={updatedProfile.firstName}
-                  onChange={(e) =>
-                    handleFieldChange("firstName", e.target.value)
-                  }
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="lastName">Last Name</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="lastName"
-                  name="lastName"
-                  value={updatedProfile.lastName}
-                  onChange={(e) =>
-                    handleFieldChange("lastName", e.target.value)
-                  }
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="profileImage">Profile Image</label>
-                <input
-                  type="file"
-                  className="form-control"
-                  id="profileImage"
-                  name="profileImage"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-              </div>
-              {/* Remove the duplicated profile image input */}
-              <div className="form-group">
-                <label htmlFor="age">Age</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  id="age"
-                  name="age"
-                  value={updatedProfile.age}
-                  onChange={(e) => handleFieldChange("age", e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="gender">Gender</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="gender"
-                  name="gender"
-                  value={updatedProfile.gender}
-                  onChange={(e) => handleFieldChange("gender", e.target.value)}
-                />
-              </div>
-              {/* Add remaining fields as necessary */}
+              {/* Show all fields in the modal */}
+              {showFields.map(({ key, label, type }) => (
+                <div className="form-group" key={key}>
+                  <label htmlFor={key}>{label}</label>
+                  <input
+                    type={type}
+                    className={`form-control ${
+                      errors[key] ? "is-invalid" : ""
+                    }`} // Add validation class
+                    id={key}
+                    name={key}
+                    value={updatedProfile[key] || ""}
+                    onChange={(e) => handleFieldChange(key, e.target.value)}
+                  />
+                  {errors[key] && (
+                    <div className="invalid-feedback">{errors[key]}</div>
+                  )}
+                </div>
+              ))}
               <button
                 type="submit"
                 className="btn btn-primary"

@@ -1,161 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { RingLoader } from "react-spinners";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
-import styled from "styled-components";
+import { FaRegEdit } from "react-icons/fa";
+import { Modal } from "react-bootstrap"; // Import Modal component
 
-const CardContainer = styled(motion.div)`
-  display: flex;
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 100%;
-  background-color: #fcd5ce;
-  max-height: 350px;
-  margin-bottom: 40px;
-  padding-bottom: 60px;
-`;
-
-const ContentWrapper = styled.div`
-  flex: 2;
-  padding: 30px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  max-height: 250px;
-  overflow-y: auto;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    max-height: 200px;
-    padding: 15px;
-  }
-`;
-
-const Field = styled.div`
-  padding: 10px;
-  border-radius: 4px;
-  color: #1f7a8c;
-  font-size: 20px;
-  word-wrap: break-word;
-
-  @media (max-width: 768px) {
-    font-size: 16px;
-  }
-`;
-
-const ButtonContainer = styled.div`
-  position: absolute;
-  top: 20px;
-  right: 20px;
-
-  @media (max-width: 768px) {
-    top: 10px; /* Adjust top position */
-    right: 10px; /* Adjust right position */
-  }
-`;
-
-
-const Button = styled.button`
-  background-color: #003566;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  font-size: 18px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #1f7a8c;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%; /* Responsive width */
-  max-width: 800px; /* Maximum width for larger screens */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
-  @media (max-width: 768px) {
-    padding: 15px; /* Adjust padding for mobile */
-  }
-`;
-
-const ModalHeader = styled.h2`
-  margin: 0;
-  margin-bottom: 20px;
-  font-size: 24px; /* Default font size */
-
-  @media (max-width: 768px) {
-    font-size: 20px; /* Smaller font size on mobile */
-  }
-`;
-
-const FormWrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr; /* Single column on mobile */
-  }
-`;
-
-const InputField = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Label = styled.label`
-  margin-bottom: 5px;
-  color: #333;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-
-  @media (max-width: 768px) {
-    font-size: 14px; /* Smaller font size on mobile */
-  }
-`;
-
-const Message = styled.div`
-  margin-top: 15px;
-  font-size: 16px;
-  color: ${({ success }) => (success ? "green" : "red")};
-`;
-
-// Fields data
-export const partnerPreferencesFields = [
-  { key: "familyStatus", value: "Family Status: " },
-  { key: "familyValue", value: "Family Values: " },
-  { key: "preferredLocation", value: "Preferred Locations: " },
-  { key: "desiredJobValue", value: "Desired Job: " },
-  { key: "anyOtherPreferences", value: "Other Preferences: " },
+const partnerPreferencesFields = [
+  { key: "familyStatus", label: "Family Status" },
+  { key: "familyValue", label: "Family Values" },
+  { key: "preferredLocation", label: "Preferred Locations" },
+  { key: "desiredJobValue", label: "Desired Job" },
+  { key: "anyOtherPreferences", label: "Other Preferences" },
 ];
 
 const UserPartnerPreferences = ({
@@ -209,14 +65,23 @@ const UserPartnerPreferences = ({
       if (data.status === 200 || data.status === 201) {
         setStatus(!status);
         refresAfterUpdate && refresAfterUpdate(!status);
-        Swal.fire("Success!", "User details updated successfully!", "success").then(() => {
+        Swal.fire(
+          "Success!",
+          "User details updated successfully!",
+          "success"
+        ).then(() => {
           toggleModal(); // Close modal after success
         });
       } else {
         setError(data.message || "Failed to update user details");
-        Swal.fire("Error", data.message || "Failed to update user details", "error");
+        Swal.fire(
+          "Error",
+          data.message || "Failed to update user details",
+          "error"
+        );
       }
     } catch (err) {
+      console.log("err :", err);
       setLoading(false);
       setError("An error occurred. Please try again.");
       Swal.fire("Error", "An error occurred. Please try again.", "error");
@@ -231,82 +96,62 @@ const UserPartnerPreferences = ({
   };
 
   return (
-    <>
-      <CardContainer
-        initial={{ opacity: 0, x: -100 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        {mobileNumber === session?.userName && (
-          <ButtonContainer>
-            <Button onClick={toggleModal}>{response ? "Update" : "Add"}</Button>
-          </ButtonContainer>
-        )}
-         <ContentWrapper style={{marginTop:'25px'}}>
-          {partnerPreferencesFields.map((field, index) => (
-            <Field key={index}>
-              {field.value}{" "}
-              <span style={{ color: "#003566" }}>
-                {response && response[field.key]
-                  ? limitWords(response[field.key], 17)
-                  : "N/A"}
-              </span>
-            </Field>
+    <section className="user-partner-preferences-wrap">
+      <div className="update-button">
+        <FaRegEdit className="icon" onClick={toggleModal} disabled={loading} />
+      </div>
+      <div className="other-information-wrap">
+        <div className="other-information">
+          {partnerPreferencesFields.map(({ key, label }, index) => (
+            <div className="info-item" key={index}>
+              <span className="label">{label}:</span>
+              <span className="value">{response?.[key] || "N/A"}</span>
+            </div>
           ))}
-        </ContentWrapper>
-      </CardContainer>
+        </div>
+      </div>
+
       {isModalOpen && (
-        <ModalOverlay>
-          <ModalContent>
-            <ModalHeader>Update PartnerPreferences</ModalHeader>
-            <FormWrapper>
-              {partnerPreferencesFields.map((field, index) => (
-                <InputField key={index}>
-                  <Label>{field.value}</Label>
-                  <Input
-                    type="text"
-                    value={updatedProfile[field.key] || ""}
-                    onChange={(e) =>
-                      handleFieldChange(field.key, e.target.value)
-                    }
-                  />
-                </InputField>
-              ))}
-            </FormWrapper>
-            {loading ? (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100px",
-                }}
-              >
-                <RingLoader color="#003566" size={60} />
+        <Modal show={isModalOpen} onHide={toggleModal} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Update Partner Preferences</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {partnerPreferencesFields.map(({ key, label }) => (
+              <div className="mb-3" key={key}>
+                <label htmlFor={key} className="form-label">
+                  {label}
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id={key}
+                  value={updatedProfile[key] || ""}
+                  onChange={(e) => handleFieldChange(key, e.target.value)}
+                />
               </div>
-            ) : (
-              <>
-                {success && (
-                  <Message success>Profile updated successfully!</Message>
-                )}
-                {error && <Message>{error}</Message>}
-              </>
-            )}
-            <br />
-            <Button onClick={handleSubmit} disabled={loading}>
-              Save Changes
-            </Button>
-            <Button
+            ))}
+          </Modal.Body>
+          <Modal.Footer>
+            <button
+              type="button"
+              className="btn btn-secondary"
               onClick={toggleModal}
-              style={{ marginLeft: "5px", marginTop:'10px' }}
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleSubmit}
               disabled={loading}
             >
-              Cancel
-            </Button>
-          </ModalContent>
-        </ModalOverlay>
+              {loading ? <RingLoader size={24} /> : "Save Changes"}
+            </button>
+          </Modal.Footer>
+        </Modal>
       )}
-    </>
+    </section>
   );
 };
 

@@ -1,24 +1,61 @@
 import React, { useState } from "react";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Container,
-  CircularProgress,
-} from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { AxiosConfig } from "../../config/AxiosConfig";
-import Swal from "sweetalert2"; // Import SweetAlert
+import Swal from "sweetalert2";
 
 function Login() {
-  const [formData, setFormData] = useState({
-    mobileNumber: "",
-    password: "",
-  });
-  const [loading, setLoading] = useState(false); // Loading state
+  const [formData, setFormData] = useState({ mobileNumber: "", password: "" });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Function to validate the form fields
+  const validate = (name, value) => {
+    const newErrors = {};
+
+    // Validate Mobile
+    if (name === "mobileNumber") {
+      if (!value) {
+        newErrors.mobileNumber = "Contact is required";
+      } else if (!/^\d{10}$/.test(value)) {
+        newErrors.mobileNumber = "Mobile must be of 10 digits";
+      } else {
+        delete newErrors.mobileNumber; // Remove the error if the field is valid
+      }
+    }
+
+    // Validate Password
+    if (name === "password") {
+      if (!value) {
+        newErrors.password = "Password is required";
+      } else {
+        delete newErrors.password; // Remove the error if the field is valid
+      }
+    }
+
+    setErrors(newErrors);
+
+    // Return true if there are no errors
+    // return Object.keys(newErrors).length === 0;
+  };
+
+  const validateall = () => {
+    const newErrors = {};
+
+    if (!formData.mobileNumber) {
+      newErrors.mobileNumber = "Contact is required";
+    } else if (!/^\d{10}$/.test(formData.mobileNumber)) {
+      newErrors.mobileNumber = "Mobile must be a 10-digit number";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,45 +63,56 @@ function Login() {
       ...formData,
       [name]: value,
     });
+
+    // Validate the specific field that changed
+    validate(name, value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading
-    try {
-      const response = await AxiosConfig.get("/auth/login-profile", {
-        params: formData,
-      });
-      if (response?.data?.statusCode === 200) {
-        localStorage.setItem("userInfo", JSON.stringify(response.data));
+    setLoading(true);
 
-        // Show SweetAlert success notification
-        Swal.fire({
-          title: "Login Successful",
-          text: "You have successfully logged in!",
-          icon: "success",
-          confirmButtonText: "OK",
-        }).then(() => {
-          setLoading(false); // Stop loading
-          navigate("/profiles"); // Navigate to profiles after successful login
+    if (validateall()) {
+      try {
+        const response = await AxiosConfig.get("/auth/login-profile", {
+          params: formData,
         });
-      } else {
+        if (response?.data?.statusCode === 200) {
+          localStorage.setItem("userInfo", JSON.stringify(response.data));
+
+          Swal.fire({
+            title: "Login Successful",
+            text: "You have successfully logged in!",
+            icon: "success",
+            confirmButtonText: "OK",
+          }).then(() => {
+            setLoading(false);
+            navigate("/profiles");
+          });
+        } else {
+          Swal.fire({
+            title: "Login failed",
+            text: response?.data?.statusMessage,
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Login failed", error);
+        setLoading(false);
+
         Swal.fire({
-          title: "Login failed",
-          text: response?.data?.statusMessage,
+          title: "Login Failed",
+          text: "Please check your credentials and try again.",
           icon: "error",
           confirmButtonText: "OK",
         });
-        setLoading(false);
       }
-    } catch (error) {
-      console.error("Login failed", error);
-      setLoading(false); // Stop loading in case of error
-
-      // Show SweetAlert error notification
+    } else {
       Swal.fire({
-        title: "Login Failed",
-        text: "Please check your credentials and try again.",
+        title: "Invalid Credentials",
+        text: "Please fill all credentials",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -72,183 +120,87 @@ function Login() {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        background:
-          "url('/path/to/your/background/image.jpg') no-repeat center center fixed",
-        backgroundSize: "cover",
-      }}
-    >
-      <Container
-        maxWidth="xs"
-        sx={{
-          backdropFilter: "blur(10px)",
-          backgroundColor: "rgba(255, 255, 255, 0.3)", // Semi-transparent background
-          padding: "2rem",
-          borderRadius: "12px",
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{ textAlign: "center", mb: 2, color: "#001d4a" }}
-        >
-          Welcome to Shubh Shaadi
-        </Typography>
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{ textAlign: "center", mb: 2, color: "#001d4a" }}
-        >
-          Login To Proceed
-        </Typography>
-
-        {/* Show loading spinner if loading is true */}
-        {loading ? (
-          <CircularProgress sx={{ margin: "2rem 0" }} />
-        ) : (
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              width: "100%",
-            }}
-          >
-            <TextField
-              variant="outlined"
-              label="Mobile Number"
-              name="mobileNumber"
-              value={formData.mobileNumber}
-              onChange={handleChange}
-              fullWidth
-              required
-              sx={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)", // Light background for input
-                borderRadius: "8px",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "rgba(0, 0, 0, 0.5)", // Border color
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#001d4a", // Border color on hover
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#001d4a", // Border color when focused
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "#001d4a", // Label color
-                  "&.Mui-focused": {
-                    color: "#001d4a", // Focused label color
-                  },
-                },
-              }}
+    <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center items-center">
+      <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1 py-16 px-6">
+        <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
+          <div>
+            <img
+              src="https://storage.googleapis.com/devitary-image-host.appspot.com/15846435184459982716-LogoMakr_7POjrN.png"
+              className="w-32 mx-auto"
+              alt="Logo"
             />
-            <TextField
-              variant="outlined"
-              label="Password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              fullWidth
-              required
-              sx={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)", // Light background for input
-                borderRadius: "8px",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "rgba(0, 0, 0, 0.5)", // Border color
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#001d4a", // Border color on hover
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#001d4a", // Border color when focused
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "#001d4a", // Label color
-                  "&.Mui-focused": {
-                    color: "#001d4a", // Focused label color
-                  },
-                },
-              }}
-            />
-            <Button
-              variant="contained"
-              type="submit"
-              fullWidth
-              sx={{ backgroundColor: "#001d4a", color: "#fff", mt: 2 }}
-            >
-              Login
-            </Button>
-          </Box>
-        )}
+          </div>
+          <div className="mt-12 flex flex-col items-center">
+            <div className="w-full flex-1">
+              <h1 className="text-2xl xl:text-3xl font-extrabold text-center">
+                Login
+              </h1>
 
-        <Typography
-          variant="body2"
-          sx={{
-            mt: 2,
-            textAlign: "center",
-            color: "white",
-            fontWeight: "bold", // Make the text bold
-            letterSpacing: "0.5px", // Add some letter spacing
+              <div className="mb-12 mt-6 border-b text-center">
+                <div className="leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2">
+                  Login with mobile and password
+                </div>
+              </div>
+
+              <div className="mx-auto max-w-xs">
+                <input
+                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                  type="Number"
+                  name="mobileNumber"
+                  onChange={handleChange}
+                  value={formData.mobileNumber}
+                  placeholder="Mobile"
+                />
+                {errors.mobileNumber && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.mobileNumber}
+                  </p>
+                )}
+                <input
+                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                  type="password"
+                  name="password"
+                  onChange={handleChange}
+                  value={formData.password}
+                  placeholder="Password"
+                />
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                )}
+                <button
+                  className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                  onClick={handleSubmit}
+                >
+                  <svg
+                    className="w-6 h-6 -ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="8.5" cy="7" r="4" />
+                    <path d="M20 8v6M23 11h-6" />
+                  </svg>
+                  <span className="ml-3">Login</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="flex-1 bg-indigo-100 text-center hidden lg:flex"
+          style={{
+            backgroundImage:
+              'url("https://storage.googleapis.com/devitary-image-host.appspot.com/15848031292911696601-undraw_designer_life_w96d.svg")',
+            backgroundSize: "contain",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
           }}
-        >
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            style={{
-              color: "blue", // A contrasting color for the link
-              textDecoration: "underline", // Underline the link
-              fontWeight: "bold", // Bold link
-              transition: "color 0.3s", // Smooth transition for hover effect
-            }}
-            // onMouseEnter={(e) => (e.target.style.color = "#ffd700")} // Change color on hover
-            // onMouseLeave={(e) => (e.target.style.color = "#ffcc00")} // Reset color on mouse leave
-          >
-            Register here
-          </Link>
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{
-            mt: 2,
-            textAlign: "center",
-            color: "white",
-            fontWeight: "bold", // Make the text bold
-            letterSpacing: "0.5px", // Add some letter spacing
-          }}
-        >
-          Forgot Password?{" "}
-          <Link
-            to="/forgot-password"
-            style={{
-              color: "blue", // A contrasting color for the link
-              textDecoration: "underline", // Underline the link
-              fontWeight: "bold", // Bold link
-              transition: "color 0.3s", // Smooth transition for hover effect
-            }}
-            // onMouseEnter={(e) => (e.target.style.color = "#ffd700")} // Change color on hover
-            // onMouseLeave={(e) => (e.target.style.color = "#ffcc00")} // Reset color on mouse leave
-          >
-            Click here
-          </Link>
-        </Typography>
-      </Container>
-    </Box>
+        />
+      </div>
+    </div>
   );
 }
 

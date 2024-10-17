@@ -1,51 +1,5 @@
 import React, { useEffect } from "react";
-import { motion } from "framer-motion";
-import styled from "styled-components";
-import {
-  Box,
-  Grid,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  Button,
-  CircularProgress,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
-
-const CardContainer = styled(motion.div)`
-  display: flex;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  max-width: 100%;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-`;
-
-const ContentWrapper = styled.div`
-  flex: 2;
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 15px;
-  align-items: center;
-
-  @media (max-width: 600px) {
-    flex-direction: column; /* Stack items on small screens */
-    align-items: stretch; /* Align items to stretch to full width */
-  }
-`;
-
-const FormFieldWrapper = styled.div`
-  flex: 1;
-  min-width: 150px;
-
-  @media (max-width: 600px) {
-    min-width: 100%; /* Full width on small screens */
-  }
-`;
+import { Link, useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
   const [gender, setGender] = React.useState(null);
@@ -77,190 +31,323 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        paddingTop: { xs: "100px", md: "400px" }, // Adjust padding for mobile
-        background: "url('/path/to/your/background/image.jpg') no-repeat center center fixed",
-        backgroundSize: "cover",
-      }}
-    >
-      <Box sx={{ width: { xs: "90%", sm: "80%", md: "80%" } }}>
-        <Grid container>
-          <Grid item xs={12}>
-            <Box sx={{ padding: 2, height: "100%" }}>
-              <CardContainer
-                initial={{ opacity: 0, x: -100 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
+    <>
+      <section
+        className="relative bg-cover bg-center bg-fixed h-screen md:h-4/5 lg:h-4/5 px-2 sm:px-4 md:px-6 lg:px-8"
+        style={{
+          backgroundImage:
+            "url('https://wallpaperaccess.com/full/2008544.jpg')",
+        }}
+      >
+        <div className="absolute inset-0 bg-black opacity-50"></div>{" "}
+      </section>
+
+      <div
+        className="flex justify-center w-full p-4 lg:p-8"
+        style={{ marginTop: "-15%", position: "relative" }}
+      >
+        <div className="w-full max-w-5xl p-6 bg-white rounded-lg shadow-lg">
+          <h2 className="text-lg font-semibold mb-4 text-center">
+            Find Your Match
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {/* Gender Select */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                I’m looking for a
+              </label>
+              <select
+                value={gender}
+                onChange={handleGenderChange}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
-                <ContentWrapper>
-                  <FormFieldWrapper>
-                    <FormControl fullWidth>
-                      <InputLabel id="gender-label">I'm looking for a</InputLabel>
-                      <Select
-                        labelId="gender-label"
-                        value={gender}
-                        onChange={handleGenderChange}
-                        label="I'm looking for a"
-                      >
-                        <MenuItem value="Female">Woman</MenuItem>
-                        <MenuItem value="Male">Man</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </FormFieldWrapper>
+                <option value="">Select</option>
+                <option value="Female">Bride</option>
+                <option value="Male">Groom</option>
+              </select>
+            </div>
 
-                  <FormFieldWrapper>
-                    <FormControl fullWidth>
-                      <InputLabel id="age-from-label">Age From</InputLabel>
-                      <Select
-                        labelId="age-from-label"
-                        value={ageFrom}
-                        onChange={handleAgeFromChange}
-                        label="Age From"
-                      >
-                        {[...Array(63)].map((_, i) => (
-                          <MenuItem key={i + 18} value={i + 18}>
-                            {i + 18}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </FormFieldWrapper>
+            {/* Age From Select */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Age From
+              </label>
+              <select
+                value={ageFrom}
+                onChange={handleAgeFromChange}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+              >
+                {[...Array(63)].map((_, i) => (
+                  <option key={i + 18} value={i + 18}>
+                    {i + 18}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                  <FormFieldWrapper>
-                    <FormControl fullWidth>
-                      <InputLabel id="age-to-label">Age To</InputLabel>
-                      <Select
-                        labelId="age-to-label"
-                        value={ageTo}
-                        onChange={handleAgeToChange}
-                        label="Age To"
-                      >
-                        {[...Array(63)].map((_, i) => (
-                          <MenuItem key={i + 18} value={i + 18}>
-                            {i + 18}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </FormFieldWrapper>
+            {/* Age To Select */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Age To
+              </label>
+              <select
+                value={ageTo}
+                onChange={handleAgeToChange}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+              >
+                {[...Array(63)].map((_, i) => (
+                  <option key={i + 18} value={i + 18}>
+                    {i + 18}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                  <FormFieldWrapper>
-                    <FormControl fullWidth>
-                      <InputLabel id="religion-label">Religion</InputLabel>
-                      <Select
-                        labelId="religion-label"
-                        value={religion}
-                        onChange={handleReligionChange}
-                        label="Religion"
-                      >
-                        <MenuItem value="Hindu">Hindu</MenuItem>
-                        <MenuItem value="Muslim">Muslim</MenuItem>
-                        <MenuItem value="Christian">Christian</MenuItem>
-                        <MenuItem value="Sikh">Sikh</MenuItem>
-                        <MenuItem value="Parsi">Parsi</MenuItem>
-                        <MenuItem value="Jain">Jain</MenuItem>
-                        <MenuItem value="Buddhist">Buddhist</MenuItem>
-                        <MenuItem value="Jewish">Jewish</MenuItem>
-                        <MenuItem value="No Religion">No Religion</MenuItem>
-                        <MenuItem value="Spiritual - not religious">
-                          Spiritual
-                        </MenuItem>
-                        <MenuItem value="Other">Other</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </FormFieldWrapper>
+            {/* Religion Select */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Religion
+              </label>
+              <select
+                value={religion}
+                onChange={handleReligionChange}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+              >
+                <option value="">Select</option>
+                <option value="Hindu">Hindu</option>
+                <option value="Muslim">Muslim</option>
+                <option value="Christian">Christian</option>
+                <option value="Sikh">Sikh</option>
+                <option value="Parsi">Parsi</option>
+                <option value="Jain">Jain</option>
+                <option value="Buddhist">Buddhist</option>
+                <option value="Jewish">Jewish</option>
+                <option value="No Religion">No Religion</option>
+                <option value="Spiritual - not religious">Spiritual</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
 
-                  <FormFieldWrapper>
-                    <FormControl fullWidth>
-                      <InputLabel id="mothertongue-label">Mother Tongue</InputLabel>
-                      <Select
-                        labelId="mothertongue-label"
-                        value={motherTongue}
-                        onChange={handleMotherTongueChange}
-                        label="Mother Tongue"
-                      >
-                        <MenuItem value="Bengali">Bengali</MenuItem>
-                        <MenuItem value="English">English</MenuItem>
-                        <MenuItem value="Gujarati">Gujarati</MenuItem>
-                        <MenuItem value="Hindi">Hindi</MenuItem>
-                        <MenuItem value="Kannada">Kannada</MenuItem>
-                        <MenuItem value="Marathi">Marathi</MenuItem>
-                        <MenuItem value="Marwari">Marwari</MenuItem>
-                        <MenuItem value="Odia">Odia</MenuItem>
-                        <MenuItem value="Punjabi">Punjabi</MenuItem>
-                        <MenuItem value="Tamil">Tamil</MenuItem>
-                        <MenuItem value="Telugu">Telugu</MenuItem>
-                        <MenuItem value="Urdu">Urdu</MenuItem>
-                        <MenuItem value="Aka">Aka</MenuItem>
-                        <MenuItem value="Arabic">Arabic</MenuItem>
-                        <MenuItem value="Arunachali">Arunachali</MenuItem>
-                        <MenuItem value="Assamese">Assamese</MenuItem>
-                        <MenuItem value="Awadhi">Awadhi</MenuItem>
-                        <MenuItem value="Baluchi">Baluchi</MenuItem>
-                        <MenuItem value="Bhojpuri">Bhojpuri</MenuItem>
-                        <MenuItem value="Bhutia">Bhutia</MenuItem>
-                        <MenuItem value="Brahui">Brahui</MenuItem>
-                        <MenuItem value="Brij">Brij</MenuItem>
-                        <MenuItem value="Burmese">Burmese</MenuItem>
-                        <MenuItem value="Chattisgarhi">Chattisgarhi</MenuItem>
-                        <MenuItem value="Chinese">Chinese</MenuItem>
-                        <MenuItem value="Coorgi">Coorgi</MenuItem>
-                        <MenuItem value="Dogri">Dogri</MenuItem>
-                        <MenuItem value="French">French</MenuItem>
-                        <MenuItem value="Garhwali">Garhwali</MenuItem>
-                        <MenuItem value="Garo">Garo</MenuItem>
-                        <MenuItem value="Haryanavi">Haryanavi</MenuItem>
-                        <MenuItem value="Himachali/Pahari">Himachali/Pahari</MenuItem>
-                        <MenuItem value="Hindko">Hindko</MenuItem>
-                        <MenuItem value="Kakbarak">Kakbarak</MenuItem>
-                        <MenuItem value="Kanauji">Kanauji</MenuItem>
-                        <MenuItem value="Kashmiri">Kashmiri</MenuItem>
-                        <MenuItem value="Khandesi">Khandesi</MenuItem>
-                        <MenuItem value="Khasi">Khasi</MenuItem>
-                        <MenuItem value="Konkani">Konkani</MenuItem>
-                        <MenuItem value="Koshali">Koshali</MenuItem>
-                        <MenuItem value="Maithili">Maithili</MenuItem>
-                        <MenuItem value="Mizo">Mizo</MenuItem>
-                        <MenuItem value="Nepali">Nepali</MenuItem>
-                        <MenuItem value="Pahari">Pahari</MenuItem>
-                        <MenuItem value="Rajasthani">Rajasthani</MenuItem>
-                        <MenuItem value="Sambalpuri">Sambalpuri</MenuItem>
-                        <MenuItem value="Santhali">Santhali</MenuItem>
-                        <MenuItem value="Sindhi">Sindhi</MenuItem>
-                        <MenuItem value="Tibetan">Tibetan</MenuItem>
-                        <MenuItem value="Urdu">Urdu</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </FormFieldWrapper>
+            {/* Mother Tongue Select */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Mother Tongue
+              </label>
+              <select
+                value={motherTongue}
+                onChange={handleMotherTongueChange}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+              >
+                <option value="">Select</option>
+                <option value="Bengali">Bengali</option>
+                <option value="English">English</option>
+                <option value="Gujarati">Gujarati</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Kannada">Kannada</option>
+                <option value="Marathi">Marathi</option>
+                <option value="Marwari">Marwari</option>
+                <option value="Odia">Odia</option>
+                <option value="Punjabi">Punjabi</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Telugu">Telugu</option>
+                <option value="Urdu">Urdu</option>
+                {/* Add more languages as needed */}
+              </select>
+            </div>
 
-                  <FormFieldWrapper>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleBeginClick}
-                      disabled={loading}
-                      size="large"
-                      fullWidth
-                    >
-                      {loading ? (
-                        <CircularProgress size={24} color="inherit" />
-                      ) : (
-                        "Let's Begin"
-                      )}
-                    </Button>
-                  </FormFieldWrapper>
-                </ContentWrapper>
-              </CardContainer>
-            </Box>
-          </Grid>
-        </Grid>
-      </Box>
-    </Box>
+            {/* Submit Button */}
+            <div className="mb-4 flex items-end">
+              <button
+                onClick={handleBeginClick}
+                disabled={loading}
+                className="w-full h-full bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:ring-2 focus:ring-pink-600 transition"
+              >
+                {loading ? (
+                  <span className="flex justify-center">Loading...</span>
+                ) : (
+                  "Let’s Begin"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section className="py-10 bg-white px-2">
+        <div className="container mx-auto">
+          <div className="relative flex justify-center mb-8">
+            {/* <!-- Animated Icons --> */}
+            <div className="absolute animate-pulse bg-blue-400 rounded-full h-6 w-6 opacity-75"></div>
+            <div className="absolute animate-bounce bg-gray-300 rounded-full h-4 w-4 top-0 left-0 opacity-75"></div>
+          </div>
+          <div className="flex flex-col lg:flex-row items-center justify-between">
+            {/* <!-- Content Column --> */}
+            <div className="w-full lg:w-1/2 mb-8 lg:mb-0 px-4">
+              <div>
+                <div className="mb-6">
+                  <span className="text-gray-500 uppercase font-semibold text-sm">
+                    ABOUT US
+                  </span>
+                  <h2 className="text-3xl font-bold text-gray-800 mb-4">
+                    Welcome to the Marriage Harmony
+                  </h2>
+                  <p className="text-gray-600 mb-4">
+                    Ready Matrimonial provides decent Matrimonial PHP Script in
+                    various design templates at a reasonable price. It is also
+                    available in Android &amp; iOS versions.
+                  </p>
+                </div>
+                <ul className="list-disc pl-5 mb-6 text-gray-600">
+                  <li className="mb-2">Profile with fully updated details</li>
+                  <li className="mb-2">Multiple &amp; easy ways to contact</li>
+                  <li className="mb-2">Automatic Matching System</li>
+                  <li>Easy &amp; flexible navigations</li>
+                </ul>
+                <div className="text-center py-5">
+                  <Link
+                    to="/register"
+                    className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded transition duration-300"
+                  >
+                    Register Now
+                  </Link>
+                </div>
+              </div>
+            </div>
+            {/* <!-- Image Column --> */}
+            <div className="w-full lg:w-1/2 px-4 hidden sm:block">
+              <div className="flex justify-center">
+                <img
+                  className="rounded-lg shadow-lg w-full"
+                  src="https://th.bing.com/th/id/R.a86ad74007ddc44621cbb1102f0f76f5?rik=13jiAs15l06lNA&riu=http%3a%2f%2fgetwallpapers.com%2fwallpaper%2ffull%2f2%2f3%2ff%2f1128636-amazing-hd-wedding-backgrounds-2160x1440.jpg&ehk=OgL359P%2b2f8ACcFd9KYLewOrwk%2fZijLEC%2bgN1SixLW4%3d&risl=&pid=ImgRaw&r=0"
+                  alt="About Us Image"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-10 bg-white px-3">
+        <div className="container mx-auto">
+          <div className="relative flex justify-center mb-8">
+            {/* <!-- Animated Icons --> */}
+            <div className="absolute animate-ping bg-blue-400 rounded-full h-6 w-6 opacity-75"></div>
+            <div className="absolute animate-bounce bg-gray-300 rounded-full h-4 w-4 top-0 left-4 opacity-75"></div>
+            <div className="absolute animate-spin bg-red-400 rounded-full h-5 w-5 top-0 right-4 opacity-75"></div>
+          </div>
+          <div className="flex flex-wrap -mx-4">
+            {/* <!-- Title Block --> */}
+            <div
+              className="w-full lg:w-1/3 px-4 mb-8"
+              style={{ alignContent: "center" }}
+            >
+              <span className="text-gray-500 uppercase font-semibold text-sm">
+                Features
+              </span>
+              <h2 className="text-5xl font-bold text-gray-800 mt-2">
+                Our Features
+              </h2>
+            </div>
+
+            <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
+              <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
+                <div className="text-green-500 mb-4">
+                  <i className="fas fa-user-friends text-4xl"></i>
+                </div>
+                <h4 className="text-xl font-semibold mb-2">
+                  <a
+                    href="login"
+                    className="text-gray-800 hover:text-green-500"
+                  >
+                    Personalized Matching
+                  </a>
+                </h4>
+                <p className="text-gray-600">
+                  We provide personalized matchmaking services to find the
+                  perfect partner for you.
+                </p>
+              </div>
+            </div>
+            {/* <!-- Feature Block --> */}
+            <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
+              <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
+                <div className="text-yellow-500 mb-4">
+                  <i className="fas fa-star text-4xl"></i>
+                </div>
+                <h4 className="text-xl font-semibold mb-2">
+                  <a
+                    href="login"
+                    className="text-gray-800 hover:text-yellow-500"
+                  >
+                    Verified Profiles
+                  </a>
+                </h4>
+                <p className="text-gray-600">
+                  All our profiles are verified to ensure a secure and genuine
+                  experience.
+                </p>
+              </div>
+            </div>
+            {/* <!-- Feature Block --> */}
+            <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
+              <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
+                <div className="text-red-500 mb-4">
+                  <i className="fas fa-bell text-4xl"></i>
+                </div>
+                <h4 className="text-xl font-semibold mb-2">
+                  <a href="login" className="text-gray-800 hover:text-red-500">
+                    Easily Update Profile
+                  </a>
+                </h4>
+                <p className="text-gray-600">
+                  The activities such as changing the display picture, birth
+                  details, and personal information.
+                </p>
+              </div>
+            </div>
+            {/* <!-- Feature Block --> */}
+            <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
+              <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
+                <div className="text-purple-500 mb-4">
+                  <i className="fas fa-shield-alt text-4xl"></i>
+                </div>
+                <h4 className="text-xl font-semibold mb-2">
+                  <a
+                    href="login"
+                    className="text-gray-800 hover:text-purple-500"
+                  >
+                    Restrictions Setting
+                  </a>
+                </h4>
+                <p className="text-gray-600">
+                  Restrictions enable copying photos &amp; video disable
+                  anti-spam systems provided.
+                </p>
+              </div>
+            </div>
+            {/* <!-- Feature Block --> */}
+            <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
+              <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
+                <div className="text-purple-500 mb-4">
+                  <i className="fas fa-headset text-4xl"></i>
+                </div>
+                <h4 className="text-xl font-semibold mb-2">
+                  <a
+                    href="login"
+                    className="text-gray-800 hover:text-purple-500"
+                  >
+                    Customer Support
+                  </a>
+                </h4>
+                <p className="text-gray-600">
+                  24/7 customer support to assist you throughout your journey.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 };
 

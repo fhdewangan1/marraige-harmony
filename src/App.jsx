@@ -13,81 +13,72 @@ import DemoCardDetails from "./components/framer/DemoCardDetails";
 import FramerCard from "./components/framer/FramerCard/FramerCard";
 import PrimaryUserDetails from "./components/Profile/primary-user-details/PrimaryUserDetails";
 import LandingPage from "./components/landing/LandingPage";
-import landingImage from "./images/bg-image-1.jpg";
-import { Box, Card } from "@mui/material";
 import ForgotPassword from "./components/forgot-password/ForgotPassword";
 import ChangePassword from "./components/chnage-password/ChangePassword";
+import "./App.css";
 
 const AppContent = () => {
   const location = useLocation();
-  const isLandingPage = location.pathname === "/";
-  const isRegisterPage = location.pathname === "/register";
-  const isLoginPage = location.pathname === "/login";
-  const isForgotPage = location.pathname === "/forgot-password";
-  const isChangePass = location.pathname === "/change-password";
-  console.log(location.pathname);
+  const landingPageRoutes = [
+    "/",
+    "/register",
+    "/login",
+    "/forgot-password",
+    "/change-password",
+  ];
+
+  const isLandingPage = landingPageRoutes.includes(location.pathname);
+
   return (
-    <Card>
-      <Box
-        style={{
-          height: "100vh", // Set to full viewport height
-          width: "100vw", // Set to full viewport width
-          overflow: "auto",
-          backgroundColor:
-            isLandingPage ||
-            isRegisterPage ||
-            isLoginPage ||
-            isForgotPage ||
-            isChangePass
-              ? "transparent"
-              : "var(--background-color)",
-          color: "var(--text-color)",
-          backgroundImage:
-            isLandingPage ||
-            isRegisterPage ||
-            isLoginPage ||
-            isForgotPage ||
-            isChangePass
-              ? `url(${landingImage})`
-              : "none",
-          backgroundSize: "cover",
-          backgroundPosition: "center -17%", // Adjusted to move the image down
-          backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed",
-          maxWidth: "100%",
-          maxHeight: "100vh",
-        }}
-      >
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/register" element={<Registration />} />
-          {/* <Route path="/register" element={<DemoRegister />} /> */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/card" element={<CardEx />} />
-          <Route path="/framer-data" element={<FramerCardData />} />
-          <Route path="/profiles" element={<FramerCard />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/change-password" element={<ChangePassword />} />
-          <Route
-            path="/all-details/:mobileNumber"
-            element={<DemoCardDetails />}
-          />
-          <Route path="/grid" element={<PrimaryUserDetails />} />
-        </Routes>
-      </Box>
-    </Card>
+    <div className={`app-content ${isLandingPage ? "landing-page" : ""}`}>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/register" element={<Registration />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/card" element={<CardEx />} />
+        <Route path="/framer-data" element={<FramerCardData />} />
+        <Route path="/profiles" element={<FramerCard />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/change-password" element={<ChangePassword />} />
+        <Route
+          path="/all-details/:mobileNumber"
+          element={<DemoCardDetails />}
+        />
+        <Route path="/grid" element={<PrimaryUserDetails />} />
+      </Routes>
+    </div>
   );
 };
 
 function App() {
   return (
-    <Card>
+    <div className="app">
       <Router>
-        <Navbar />
-        <AppContent />
+        <AppWrapper />
       </Router>
-    </Card>
+    </div>
   );
 }
+
+// This component wraps AppContent and handles Navbar visibility
+const AppWrapper = () => {
+  const location = useLocation(); // This now works inside Router
+
+  const hideNavbarRoutes = [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/change-password",
+  ];
+
+  const hideNavbar = hideNavbarRoutes.includes(location.pathname);
+
+  return (
+    <>
+      {!hideNavbar && <Navbar />}
+      <AppContent />
+    </>
+  );
+};
 
 export default App;

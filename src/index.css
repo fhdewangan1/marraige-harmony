@@ -1,22 +1,29 @@
 :root {
-  --primary: #780000; /* Original primary color */
-  --secondary: #c1121f; /* Original secondary color */
-  --third: #ffffff; /* Original third color */
-  --fourth: #003049; /* Original fourth color */
-  --fifth: #669bbc; /* Original fifth color */
+  --primary: #780000;
+  --secondary: #c1121f;
+  --third: #ffffff;
+  --fourth: #003049;
+  --fifth: #669bbc;
 
-  /* New vibrant colors */
-  --button-primary: #ff6b6b; /* Vibrant Red */
-  --button-secondary: #ff9f00; /* Bright Orange */
-  --button-success: #4caf50; /* Bright Green */
-  --button-info: #2196f3; /* Vibrant Blue */
-  --button-warning: #ff9800; /* Warm Orange */
-  --button-danger: #f44336; /* Strong Red */
-  --button-light: #ffffff; /* White for text on colored buttons */
+  --button-primary: #ff6b6b;
+  --button-secondary: #ff9f00;
+  --button-success: #4caf50;
+  --button-info: #2196f3;
+  --button-warning: #ff9800;
+  --button-danger: #f44336;
+  --button-light: #ffffff;
 
   --background-color: var(--third);
   --text-color: var(--fourth);
   --font-family: "Poppins", sans-serif;
+
+  /* Navbar */
+  --navbar-text-color: var(--third);
+  --navbar-hover-color: var(--secondary);
+  --navbar-shadow: rgba(0, 0, 0, 0.1);
+  --link-color: var(--third);
+  --link-hover-color: var(--navbar-hover-color);
+  --mobile-link-color: var(--fourth);
 }
 
 * {

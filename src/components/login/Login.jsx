@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AxiosConfig } from "../../config/AxiosConfig";
 import Swal from "sweetalert2";
 
@@ -122,14 +122,16 @@ function Login() {
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center items-center">
       <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1 py-16 px-6">
-        <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
-          <div>
-            <img
-              src="https://storage.googleapis.com/devitary-image-host.appspot.com/15846435184459982716-LogoMakr_7POjrN.png"
-              className="w-32 mx-auto"
-              alt="Logo"
-            />
+        <div className="lg:w-1/2 xl:w-5/12 p-4 sm:p-12">
+          <div className="py-3">
+            <Link to={"/register"} className="text-decoration-none">
+              <i className="fa-solid fa-arrow-left-long"></i>
+              <span className="ml-3 font-bold text-blue-500 hover:text-blue-700">
+                Signup Now
+              </span>
+            </Link>
           </div>
+
           <div className="mt-12 flex flex-col items-center">
             <div className="w-full flex-1">
               <h1 className="text-2xl xl:text-3xl font-extrabold text-center">
@@ -144,8 +146,8 @@ function Login() {
 
               <div className="mx-auto max-w-xs">
                 <input
-                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                  type="Number"
+                  className="w-full px-8 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                  type="tel"
                   name="mobileNumber"
                   onChange={handleChange}
                   value={formData.mobileNumber}
@@ -157,7 +159,7 @@ function Login() {
                   </p>
                 )}
                 <input
-                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                  className="w-full px-8 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-4"
                   type="password"
                   name="password"
                   onChange={handleChange}
@@ -168,7 +170,7 @@ function Login() {
                   <p className="text-red-500 text-sm mt-1">{errors.password}</p>
                 )}
                 <button
-                  className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                  className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-3 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                   onClick={handleSubmit}
                 >
                   <svg
@@ -185,6 +187,14 @@ function Login() {
                   </svg>
                   <span className="ml-3">Login</span>
                 </button>
+                <div className="text-center mt-4">
+                  <Link
+                    className="inline-block text-sm text-blue-500 dark:text-blue-500 align-baseline hover:text-blue-800"
+                    to={"/forgot-password"}
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

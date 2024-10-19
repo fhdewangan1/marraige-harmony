@@ -1,17 +1,16 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { RingLoader } from "react-spinners";
+import { Card, Button, Modal, Form, Spinner, Alert } from "react-bootstrap";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
-import { FaRegEdit } from "react-icons/fa";
-import { Modal } from "react-bootstrap";
 
-const partnerPreferencesFields = [
-  { key: "familyStatus", label: "Family Status" },
-  { key: "familyValue", label: "Family Values" },
-  { key: "preferredLocation", label: "Preferred Locations" },
-  { key: "desiredJobValue", label: "Desired Job" },
-  { key: "anyOtherPreferences", label: "Other Preferences" },
+// Fields data
+export const partnerPreferencesFields = [
+  { key: "familyStatus", value: "Family Status" },
+  { key: "familyValue", value: "Family Values" },
+  { key: "preferredLocation", value: "Preferred Locations" },
+  { key: "desiredJobValue", value: "Desired Job" },
+  { key: "anyOtherPreferences", value: "Other Preferences " },
 ];
 
 const UserPartnerPreferences = ({
@@ -23,8 +22,9 @@ const UserPartnerPreferences = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(response || {});
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
   const session = AuthHook();
-
   const { mobileNumber } = useParams();
 
   useEffect(() => {
@@ -80,7 +80,6 @@ const UserPartnerPreferences = ({
         );
       }
     } catch (err) {
-      console.log("err :", err);
       setLoading(false);
       setError("An error occurred. Please try again.");
       Swal.fire("Error", "An error occurred. Please try again.", "error");
@@ -95,68 +94,155 @@ const UserPartnerPreferences = ({
   };
 
   return (
-    <section className="profile-wrap">
-      {mobileNumber === session?.userName && (
-        <div className="update-button">
-          <FaRegEdit
-            className="icon"
-            onClick={toggleModal}
-            disabled={loading}
-          />
-        </div>
-      )}
-      <div className="other-information-wrap">
-        <div className="other-information">
-          {partnerPreferencesFields.map(({ key, label }, index) => (
-            <div className="info-item" key={index}>
-              <span className="label">{label}:</span>
-              <span className="value">{response?.[key] || "N/A"}</span>
+    <>
+      <Card
+        className="shadow-sm mb-4"
+        style={{
+          borderRadius: "10px",
+          border: "1px solid #e3e3e3",
+          padding: "20px",
+        }}
+      >
+        {mobileNumber === session?.userName && (
+          <div className="d-flex justify-content-end mb-2">
+            <Button
+              variant="primary"
+              onClick={toggleModal}
+              style={{
+                padding: "20px 20px",
+                borderRadius: "5px",
+                fontSize: "1rem",
+                fontFamily: "Verdana, sans-serif",
+                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#003566",
+                borderColor: "#003566",
+              }}
+            >
+              <i
+                className="fas fa-plus-circle me-2"
+                style={{ fontSize: "1.2rem" }}
+              ></i>
+              {response ? "Update" : "Add"}
+            </Button>
+          </div>
+        )}
+        <div className="mt-4 p-3 bg-light rounded shadow-sm">
+          {partnerPreferencesFields.map((field, index) => (
+            <div
+              key={index}
+              className="mb-3 p-2 d-flex justify-content-between align-items-center border-bottom"
+            >
+              <strong
+                className="text-primary"
+                style={{ fontSize: "1rem", fontFamily: "Arial, sans-serif" }}
+              >
+                {field.value}:
+              </strong>
+              <span
+                className="text-dark"
+                style={{
+                  fontSize: "0.9rem",
+                  fontFamily: "Verdana, sans-serif",
+                  paddingLeft: "10px",
+                }}
+              >
+                {response && response[field.key] ? response[field.key] : "N/A"}
+              </span>
             </div>
           ))}
         </div>
-      </div>
 
-      {isModalOpen && (
         <Modal show={isModalOpen} onHide={toggleModal} centered>
           <Modal.Header closeButton>
-            <Modal.Title>Update Partner Preferences</Modal.Title>
+            <Modal.Title>
+              <i className="fas fa-user-edit me-2"></i> Update Partner
+              Preferences
+            </Modal.Title>
           </Modal.Header>
-          <Modal.Body>
-            {partnerPreferencesFields.map(({ key, label }) => (
-              <div className="mb-3" key={key}>
-                <label htmlFor={key} className="form-label">
-                  {label}
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id={key}
-                  value={updatedProfile[key] || ""}
-                  onChange={(e) => handleFieldChange(key, e.target.value)}
-                />
+          <Modal.Body style={{ padding: "30px 50px" }}>
+            <Form>
+              {partnerPreferencesFields.map((field, index) => (
+                <Form.Group key={index} className="mb-4">
+                  <Form.Label className="font-weight-bold">
+                    {field.value}
+                  </Form.Label>
+                  <div className="input-group">
+                    <div
+                      className="input-group-prepend"
+                      style={{ alignContent: "center" }}
+                    >
+                      <span
+                        className="input-group-text border-0 h-full"
+                        style={{ backgroundColor: "rgb(219, 39, 119)" }}
+                      >
+                        <i className="fas fa-edit text-white"></i>
+                      </span>
+                    </div>
+                    <Form.Control
+                      type="text"
+                      value={updatedProfile[field.key] || ""}
+                      onChange={(e) =>
+                        handleFieldChange(field.key, e.target.value)
+                      }
+                      placeholder={`Enter ${field.value}`}
+                      className="border-0 rounded-end" // Style the control
+                      style={{
+                        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                        marginLeft: "5px",
+                      }} // Add a box shadow
+                    />
+                  </div>
+                </Form.Group>
+              ))}
+            </Form>
+            {loading ? (
+              <div className="d-flex justify-content-center my-3">
+                <Spinner animation="border" variant="primary" />
               </div>
-            ))}
+            ) : (
+              <>
+                {success && (
+                  <Alert
+                    variant="success"
+                    className="d-flex align-items-center"
+                  >
+                    <i className="fas fa-check-circle me-2"></i> Profile updated
+                    successfully!
+                  </Alert>
+                )}
+                {error && (
+                  <Alert variant="danger" className="d-flex align-items-center">
+                    <i className="fas fa-exclamation-circle me-2"></i> {error}
+                  </Alert>
+                )}
+              </>
+            )}
           </Modal.Body>
-          <Modal.Footer>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={toggleModal}
-            >
-              Close
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary"
+          <Modal.Footer style={{ justifyContent: "space-between" }}>
+            <Button
+              variant="success"
+              style={{
+                backgroundColor: "rgb(219, 39, 119)",
+                borderColor: "rgb(219, 39, 119)",
+              }}
               onClick={handleSubmit}
               disabled={loading}
             >
-              {loading ? <RingLoader size={24} /> : "Save Changes"}
-            </button>
+              <i className="fas fa-save me-2"></i> Save
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={toggleModal}
+              disabled={loading}
+            >
+              <i className="fas fa-times me-2"></i> Cancel
+            </Button>
           </Modal.Footer>
         </Modal>
-      )}
-    </section>
+      </Card>
+    </>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
@@ -8,6 +8,16 @@ const LandingPage = () => {
   const [religion, setReligion] = React.useState("");
   const [motherTongue, setMotherTongue] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false);
+
+  const handleCardClick = (e) => {
+    e.preventDefault(); // Prevent the default anchor behavior
+    if (showContactDetails === true) {
+      setShowContactDetails(false);
+    } else {
+      setShowContactDetails(true); // Toggle the contact details
+    }
+  };
 
   const navigate = useNavigate();
 
@@ -40,6 +50,21 @@ const LandingPage = () => {
         }}
       >
         <div className="absolute inset-0 bg-black opacity-50"></div>{" "}
+        {/* Black overlay */}
+        {/* <div className="flex flex-col items-center justify-end pb-16 text-center h-full mx-4 lg:px-0 relative z-10 lg:float-left md:float-left">
+          <h1 className="text-4xl text-red-400 hover:text-red-500 transition duration-300 transform hover:scale-105 font-extrabold md:text-5xl drop-shadow-lg">
+            Find Your Perfect Match
+          </h1>
+          <p className="text-lg text-white mt-4 max-w-xl leading-relaxed">
+            Connecting millions for marriages and happiness.
+          </p>
+          <Link
+            to="/login"
+            className="mt-8 bg-red-400 text-white py-3 px-8 rounded-md shadow-lg hover:bg-red-500 transition duration-300 transform hover:scale-105"
+          >
+            Get Started
+          </Link>
+        </div> */}
       </section>
 
       <div
@@ -59,11 +84,11 @@ const LandingPage = () => {
               <select
                 value={gender}
                 onChange={handleGenderChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+                className="py-2 px-3 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
                 <option value="">Select</option>
-                <option value="Female">Bride</option>
-                <option value="Male">Groom</option>
+                <option value="Female">Woman</option>
+                <option value="Male">Man</option>
               </select>
             </div>
 
@@ -75,7 +100,7 @@ const LandingPage = () => {
               <select
                 value={ageFrom}
                 onChange={handleAgeFromChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+                className="py-2 px-3 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
                 {[...Array(63)].map((_, i) => (
                   <option key={i + 18} value={i + 18}>
@@ -93,7 +118,7 @@ const LandingPage = () => {
               <select
                 value={ageTo}
                 onChange={handleAgeToChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+                className="py-2 px-3 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
                 {[...Array(63)].map((_, i) => (
                   <option key={i + 18} value={i + 18}>
@@ -111,7 +136,7 @@ const LandingPage = () => {
               <select
                 value={religion}
                 onChange={handleReligionChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+                className="py-2 px-3 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
                 <option value="">Select</option>
                 <option value="Hindu">Hindu</option>
@@ -136,7 +161,7 @@ const LandingPage = () => {
               <select
                 value={motherTongue}
                 onChange={handleMotherTongueChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+                className="py-2 px-3 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
                 <option value="">Select</option>
                 <option value="Bengali">Bengali</option>
@@ -156,11 +181,11 @@ const LandingPage = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="mb-4 flex items-end">
+            <div className="mb-4 flex items-end justify-center">
               <button
                 onClick={handleBeginClick}
                 disabled={loading}
-                className="w-full h-full bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:ring-2 focus:ring-pink-600 transition"
+                className="w-full h-full py-2  inline-block text-white bg-pink-600 hover:bg-pink-700 font-semibold rounded transition duration-300"
               >
                 {loading ? (
                   <span className="flex justify-center">Loading...</span>
@@ -206,7 +231,8 @@ const LandingPage = () => {
                 <div className="text-center py-5">
                   <Link
                     to="/register"
-                    className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded transition duration-300"
+                    className="inline-block text-white bg-pink-600 hover:bg-pink-700 font-semibold rounded transition duration-300"
+                    style={{ textDecoration: "none", padding: "12px 22px" }}
                   >
                     Register Now
                   </Link>
@@ -229,13 +255,16 @@ const LandingPage = () => {
 
       <section className="py-10 bg-white px-3">
         <div className="container mx-auto">
-          <div className="relative flex justify-center mb-8">
+          <div className="relative flex justify-center mb-12">
             {/* <!-- Animated Icons --> */}
-            <div className="absolute animate-ping bg-blue-400 rounded-full h-6 w-6 opacity-75"></div>
             <div className="absolute animate-bounce bg-gray-300 rounded-full h-4 w-4 top-0 left-4 opacity-75"></div>
             <div className="absolute animate-spin bg-red-400 rounded-full h-5 w-5 top-0 right-4 opacity-75"></div>
           </div>
-          <div className="flex flex-wrap -mx-4">
+
+          <div
+            className="flex flex-wrap -mx-4"
+            style={{ justifyContent: "space-around" }}
+          >
             {/* <!-- Title Block --> */}
             <div
               className="w-full lg:w-1/3 px-4 mb-8"
@@ -248,19 +277,20 @@ const LandingPage = () => {
                 Our Features
               </h2>
             </div>
-
+            {/* <!-- Feature Block --> */}
             <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
               <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
                 <div className="text-green-500 mb-4">
                   <i className="fas fa-user-friends text-4xl"></i>
                 </div>
                 <h4 className="text-xl font-semibold mb-2">
-                  <a
-                    href="login"
+                  <Link
+                    to="/login"
                     className="text-gray-800 hover:text-green-500"
+                    style={{ textDecoration: "none" }}
                   >
                     Personalized Matching
-                  </a>
+                  </Link>
                 </h4>
                 <p className="text-gray-600">
                   We provide personalized matchmaking services to find the
@@ -268,26 +298,16 @@ const LandingPage = () => {
                 </p>
               </div>
             </div>
-            {/* <!-- Feature Block --> */}
-            <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
-              <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
-                <div className="text-yellow-500 mb-4">
-                  <i className="fas fa-star text-4xl"></i>
-                </div>
-                <h4 className="text-xl font-semibold mb-2">
-                  <a
-                    href="login"
-                    className="text-gray-800 hover:text-yellow-500"
-                  >
-                    Verified Profiles
-                  </a>
-                </h4>
-                <p className="text-gray-600">
-                  All our profiles are verified to ensure a secure and genuine
-                  experience.
-                </p>
-              </div>
-            </div>
+          </div>
+
+          <div className="relative flex justify-center mb-12">
+            <div className="absolute animate-ping bg-blue-400 rounded-full h-6 w-6 opacity-75"></div>
+          </div>
+
+          <div
+            className="flex flex-wrap -mx-4 mt-3"
+            style={{ justifyContent: "space-around" }}
+          >
             {/* <!-- Feature Block --> */}
             <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
               <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
@@ -295,9 +315,13 @@ const LandingPage = () => {
                   <i className="fas fa-bell text-4xl"></i>
                 </div>
                 <h4 className="text-xl font-semibold mb-2">
-                  <a href="login" className="text-gray-800 hover:text-red-500">
+                  <Link
+                    to="/login"
+                    className="text-gray-800 hover:text-red-500"
+                    style={{ textDecoration: "none" }}
+                  >
                     Easily Update Profile
-                  </a>
+                  </Link>
                 </h4>
                 <p className="text-gray-600">
                   The activities such as changing the display picture, birth
@@ -309,39 +333,28 @@ const LandingPage = () => {
             <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
               <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
                 <div className="text-purple-500 mb-4">
-                  <i className="fas fa-shield-alt text-4xl"></i>
-                </div>
-                <h4 className="text-xl font-semibold mb-2">
-                  <a
-                    href="login"
-                    className="text-gray-800 hover:text-purple-500"
-                  >
-                    Restrictions Setting
-                  </a>
-                </h4>
-                <p className="text-gray-600">
-                  Restrictions enable copying photos &amp; video disable
-                  anti-spam systems provided.
-                </p>
-              </div>
-            </div>
-            {/* <!-- Feature Block --> */}
-            <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
-              <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
-                <div className="text-purple-500 mb-4">
                   <i className="fas fa-headset text-4xl"></i>
                 </div>
                 <h4 className="text-xl font-semibold mb-2">
-                  <a
-                    href="login"
+                  <Link
+                    to="/login"
                     className="text-gray-800 hover:text-purple-500"
+                    onClick={handleCardClick}
+                    style={{ textDecoration: "none" }}
                   >
                     Customer Support
-                  </a>
+                  </Link>
                 </h4>
                 <p className="text-gray-600">
                   24/7 customer support to assist you throughout your journey.
                 </p>
+                {showContactDetails && (
+                  <div className="mt-4 p-4 bg-purple-100 rounded">
+                    <h5 className="text-lg font-semibold">Contact Details:</h5>
+                    <p className="text-gray-700">Phone: +123 456 7890</p>
+                    <p className="text-gray-700">Email: support@example.com</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

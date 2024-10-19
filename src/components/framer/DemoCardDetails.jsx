@@ -45,6 +45,7 @@ const DemoCardDetails = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
   // Function to render all sections at once or the active component
   const renderActiveSection = () => {
     if (isMobile) {
@@ -141,19 +142,22 @@ const DemoCardDetails = () => {
     }
   };
 
+
   return (
+
     <section className="demo-card-details">
       <div className="row">
         {/* Sidebar with navigation, only visible on larger screens */}
         {!isMobile && (
-          <div className="col-3">
+          <div className="col-lg-3 col-md-4 col-sm-12">
             <SideBar setActiveSection={setActiveSection} />
           </div>
         )}
         {/* Display the active component or all sections in mobile view */}
-        <div className="col-9">{renderActiveSection()}</div>
+        <div className="col-lg-9 col-md-8 col-sm-12">{renderActiveSection()}</div>
       </div>
     </section>
+
   );
 };
 

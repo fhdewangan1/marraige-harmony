@@ -1,17 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  getAllProfiles,
-  getProfileImage,
-} from "../../../services/userAllDetailsService";
-import {
-  FaUserCircle,
-  FaUser,
-  FaPrayingHands,
-  FaMapMarkerAlt,
-} from "react-icons/fa";
-import AuthHook from "../../../auth/AuthHook";
-import "../Cards.css";
+import { getAllProfiles, getProfileImage } from "../../services/userAllDetailsService";
+import { FaUserCircle, FaUser, FaPrayingHands, FaMapMarkerAlt } from 'react-icons/fa';
+import AuthHook from "../../auth/AuthHook";
+import './Cards.css';
+
 
 export const fields = [
   { label: "First Name", key: "firstName" },
@@ -27,6 +20,7 @@ export const fields = [
 ];
 
 const FramerCard = () => {
+
   const [userDetails, setUserDetails] = useState([]);
   const [allUserDetails, setAllUserDetails] = useState([]);
   const [profileImages, setProfileImages] = useState({});
@@ -40,7 +34,7 @@ const FramerCard = () => {
 
   const session = AuthHook();
   const userGender = session.gender; // Get the logged-in user's gender
-  const oppositeGender = userGender === "male" ? "female" : "male"; // Determine the opposite gender
+  const oppositeGender = userGender === 'male' ? 'female' : 'male'; // Determine the opposite gender
 
   const handleMoreDetailsClick = (item) => {
     setLoading(true);
@@ -54,11 +48,7 @@ const FramerCard = () => {
     try {
       setLoading(true);
       // Pass the opposite gender to the API
-      const details = await getAllProfiles({
-        page,
-        size: pageSize,
-        gender: userGender,
-      });
+      const details = await getAllProfiles({ page, size: pageSize, gender: userGender });
       setUserDetails(details?.result || []);
       setAllUserDetails(details?.result || []);
       setTotalPages(details?.totalPages || 1);
@@ -106,15 +96,15 @@ const FramerCard = () => {
     setPage(0);
   };
 
+
   return (
+
     <section className="profile-carousel container mx-auto px-4 my-16">
       <div className="flex flex-wrap">
         <div className="row">
+
           {/* Search Section */}
-          <div
-            className="col-lg-3 col-md-6 col-sm-12"
-            style={{ padding: "20px 5px" }}
-          >
+          <div className="col-lg-3 col-md-6 col-sm-12" style={{ padding: "20px 5px" }}>
             <div className="filters-column">
               <div className="w-full">
                 <h5 className="text-xl font-semibold">Filters</h5>
@@ -166,31 +156,16 @@ const FramerCard = () => {
                         />
                       ) : (
                         <div className="d-flex justify-center items-center avatar-placeholder">
-                          <FaUserCircle style={{ fontSize: "100px" }} />
+                          <FaUserCircle style={{ fontSize: '100px' }} />
                         </div>
                       )}
                     </div>
 
                     <div className="col-lg-8 col-md-6 col-sm-12 p-4">
                       <h3 className="card-name">{profile.name}</h3>
-                      <p>
-                        <span>
-                          <FaUser />
-                        </span>
-                        Age: {profile.age}
-                      </p>
-                      <p>
-                        <span>
-                          <FaPrayingHands />
-                        </span>
-                        Religion: {profile.religion}
-                      </p>
-                      <p>
-                        <span>
-                          <FaMapMarkerAlt />
-                        </span>
-                        Community: {profile.community}
-                      </p>
+                      <p><span><FaUser /></span>Age: {profile.age}</p>
+                      <p><span><FaPrayingHands /></span>Religion: {profile.religion}</p>
+                      <p><span><FaMapMarkerAlt /></span>Community: {profile.community}</p>
                       <button
                         className="show-more-btn bg-blue-500 text-white px-4 py-2 rounded transition duration-200 ease-in-out transform hover:scale-105"
                         onClick={() => handleMoreDetailsClick(profile)}
@@ -208,10 +183,7 @@ const FramerCard = () => {
             <div>
               <ul className="pagination">
                 {Array.from({ length: totalPages }, (_, i) => (
-                  <li
-                    key={i}
-                    className={`page-item ${page === i ? "active" : ""}`}
-                  >
+                  <li key={i} className={`page-item ${page === i ? "active" : ""}`}>
                     <button className="page-link" onClick={() => setPage(i)}>
                       {i + 1}
                     </button>
@@ -220,10 +192,13 @@ const FramerCard = () => {
               </ul>
             </div>
           </div>
+
         </div>
       </div>
     </section>
+
   );
+
 };
 
 export default FramerCard;

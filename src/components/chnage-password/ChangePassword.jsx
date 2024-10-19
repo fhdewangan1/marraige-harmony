@@ -1,15 +1,7 @@
-import { useState } from "react";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Container,
-  CircularProgress,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { AxiosConfig } from "../../config/AxiosConfig";
-import Swal from "sweetalert2"; // Import SweetAlert
+import Swal from "sweetalert2";
 import AuthHook from "../../auth/AuthHook";
 
 function ChangePassword() {
@@ -18,13 +10,13 @@ function ChangePassword() {
     newPassword: "",
     confirmNewPassword: "",
   });
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Get the user session
   const session = AuthHook();
   const mobileNumber = session?.userName; // Use the userName from the session
-  //   const mobileNumber = 1234567890; // Use the userName from the session
+  // const mobileNumber = 1234567890; // Use the userName from the session
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,8 +33,8 @@ function ChangePassword() {
     if (formData.newPassword !== formData.confirmNewPassword) {
       setLoading(false);
       Swal.fire({
-        title: "Passwords do not match",
-        text: "Please make sure your new passwords match.",
+        title: "Passwords did not match",
+        text: "Please make sure your new password and confirm password match.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -59,7 +51,6 @@ function ChangePassword() {
       );
 
       if (response.status === 200) {
-        // Show SweetAlert success notification
         Swal.fire({
           title: "Password Changed Successfully",
           text: "Your password has been updated!",
@@ -82,7 +73,6 @@ function ChangePassword() {
       console.error("Change password failed", error);
       setLoading(false); // Stop loading in case of error
 
-      // Show SweetAlert error notification
       Swal.fire({
         title: "Change Password Failed",
         text: error.response?.data?.message || "Please try again later.",
@@ -93,157 +83,81 @@ function ChangePassword() {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        background:
-          "url('/path/to/your/background/image.jpg') no-repeat center center fixed",
-        backgroundSize: "cover",
-      }}
-    >
-      <Container
-        maxWidth="xs"
-        sx={{
-          backdropFilter: "blur(10px)",
-          backgroundColor: "rgba(255, 255, 255, 0.3)", // Semi-transparent background
-          padding: "2rem",
-          borderRadius: "12px",
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{ textAlign: "center", mb: 2, color: "#001d4a" }}
-        >
-          Change Your Password
-        </Typography>
+    <div className="py-20 hover:bg-gray-50 transition duration-100">
+      <div className="flex bg-white rounded-lg shadow-lg overflow-hidden mx-auto max-w-sm lg:max-w-4xl">
+        <div
+          className="hidden lg:block lg:w-1/2 bg-cover"
+          style={{
+            backgroundImage:
+              "url('https://media.istockphoto.com/id/1425457584/photo/security-shield-rotation-arrow-sign-on-dark-background-3d-render.webp?a=1&b=1&s=612x612&w=0&k=20&c=prcPmqnh5244S5XZJGr_6RiWBFspu7XGSIZ4eMrc4I0=')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        ></div>
 
-        {/* Show loading spinner if loading is true */}
-        {loading ? (
-          <CircularProgress sx={{ margin: "2rem 0" }} />
-        ) : (
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              width: "100%",
-            }}
-          >
-            <TextField
-              variant="outlined"
-              label="Old Password"
+        <form className="w-full p-8 lg:w-1/2" onSubmit={handleSubmit}>
+          <div className="py-3 text-end">
+            <Link to={"/profiles"} className="text-decoration-none">
+              <i class="fa-solid fa-arrow-left-long"></i>
+              <span className="ml-3 font-bold text-gray-700 hover:text-gray-600">
+                Dashboard
+              </span>
+            </Link>
+          </div>
+          <p className="text-xl text-gray-600 text-center py-2">
+            Change Your Password!
+          </p>
+          <hr className="w-full md:w-2/4 mx-auto" />
+          <div className="mt-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Old Password
+            </label>
+            <input
+              className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
               name="oldPassword"
               type="password"
               value={formData.oldPassword}
               onChange={handleChange}
-              fullWidth
-              required
-              sx={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                borderRadius: "8px",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "rgba(0, 0, 0, 0.5)",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#001d4a",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#001d4a",
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "#001d4a",
-                  "&.Mui-focused": {
-                    color: "#001d4a",
-                  },
-                },
-              }}
             />
-            <TextField
-              variant="outlined"
-              label="New Password"
+          </div>
+          <div className="mt-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              New Password
+            </label>
+            <input
+              className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
               name="newPassword"
               type="password"
               value={formData.newPassword}
               onChange={handleChange}
-              fullWidth
-              required
-              sx={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                borderRadius: "8px",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "rgba(0, 0, 0, 0.5)",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#001d4a",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#001d4a",
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "#001d4a",
-                  "&.Mui-focused": {
-                    color: "#001d4a",
-                  },
-                },
-              }}
             />
-            <TextField
-              variant="outlined"
-              label="Confirm New Password"
+          </div>
+          <div className="mt-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Confirm New Password
+            </label>
+            <input
+              className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
               name="confirmNewPassword"
               type="password"
               value={formData.confirmNewPassword}
               onChange={handleChange}
-              fullWidth
-              required
-              sx={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                borderRadius: "8px",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "rgba(0, 0, 0, 0.5)",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#001d4a",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#001d4a",
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "#001d4a",
-                  "&.Mui-focused": {
-                    color: "#001d4a",
-                  },
-                },
-              }}
             />
-            <Button
-              variant="contained"
+          </div>
+          <div className="mt-8">
+            <button
+              className="bg-gray-700 text-white font-bold py-2 px-4 w-full rounded hover:bg-gray-600"
               type="submit"
-              fullWidth
-              sx={{ backgroundColor: "#001d4a", color: "#fff", mt: 2 }}
             >
               Change Password
-            </Button>
-          </Box>
-        )}
-      </Container>
-    </Box>
+            </button>
+          </div>
+          <div className="mt-4 flex items-center justify-between">
+            <span className="border-b w-full md:w-full"></span>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
 

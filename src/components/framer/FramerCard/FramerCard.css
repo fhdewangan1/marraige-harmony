@@ -81,7 +81,9 @@ button {
 
 /* Pagination styles */
 .pagination {
-  margin: 0;
+  margin: 20px 0; /* Space above and below pagination */
+  display: flex; /* Center the pagination items */
+  justify-content: center; /* Center items horizontally */
 }
 
 .page-item {
@@ -111,7 +113,9 @@ button {
     flex-direction: column; /* Stack input and buttons on small screens */
   }
 
-  .search-button {
-    margin-top: 10px; /* Space between input and button */
+  .search-button,
+  .clear-button {
+    width: 100%; /* Full width on small screens */
+    margin-top: 10px; /* Space between buttons */
   }
 }

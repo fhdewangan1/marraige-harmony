@@ -168,7 +168,6 @@ const FramerCard = () => {
 
       {/* Pagination */}
       <div className="d-flex justify-content-center mt-2 mb-2">
-        <nav>
           <ul className="pagination">
             {Array.from({ length: totalPages }, (_, i) => (
               <li key={i} className={`page-item ${page === i ? "active" : ""}`}>
@@ -178,7 +177,6 @@ const FramerCard = () => {
               </li>
             ))}
           </ul>
-        </nav>
       </div>
     </div>
   );

@@ -1,3 +1,70 @@
+/* Navbar styles */
+.responsive-sidebar {
+  position: fixed; /* Position fixed to the viewport */
+  top: 0; /* Align to the top */
+  left: 0; /* Align to the left */
+  width: 100%; /* Sidebar width */
+  height: 100%; /* Full height */
+  background-color: white; /* Use your desired background color */
+  transform: translateX(-100%); /* Initially hide it off-screen */
+  transition: transform 0.3s ease; /* Smooth transition for sliding */
+  z-index: 60; /* Ensure it’s on top of other elements */
+  padding: 20px; /* Add padding for aesthetics */
+}
+
+.responsive-sidebar.open {
+  transform: translateX(0); /* Slide in */
+}
+
+.sidebar-header-wrap {
+  margin-bottom: 20px;
+}
+
+.navbar-brand {
+  font-family: cursive;
+  font-size: 200px;
+  color: var(--third) !important;
+}
+
+/* Optional: Style for the close button */
+.close-button {
+  position: absolute; /* Position the close button */
+  top: 0px; /* Align at the top */
+  right: 20px; /* Align to the right */
+  background: transparent; /* Transparent background */
+  border: none; /* No border */
+  cursor: pointer; /* Pointer cursor */
+  font-size: 34px; /* Adjust size */
+  color: black; /* Color from CSS variables */
+}
+
+/* Styles for mobile menu links */
+.mobile-menu {
+  list-style: none; /* Remove list styling */
+  padding: 0; /* Remove default padding */
+}
+
+.mobile-link {
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Center items vertically */
+  color: black; /* Color from CSS variables */
+  font-size: 1.5rem; /* Adjust font size */
+  padding: 15px; /* Add padding */
+  cursor: pointer; /* Pointer cursor */
+  transition: color 0.3s; /* Smooth color transition */
+}
+
+.mobile-link:hover {
+  color: var(--navbar-hover-color); /* Change color on hover */
+}
+
+.nav-icon,
+.mobile-icon {
+  margin-right: 8px; /* Add some space between icon and text */
+  vertical-align: middle; /* Align icons to the middle (not necessary with flexbox) */
+}
+
+/* Adjust your navbar styles if needed */
 .nav-bg-transparent {
   position: absolute;
   width: 100%;
@@ -7,6 +74,7 @@
   background-color: transparent;
   margin-bottom: -60px;
 }
+
 .nav-bg-white {
   width: 100%;
   z-index: 50;
@@ -17,98 +85,31 @@
 
 .navbar.bg-white {
   background-color: white !important;
-  /* White background on scroll */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  /* Add shadow on scroll */
+  transition: all 0.3s ease;
 }
 
-.navbar-brand {
+.nav-link {
   color: var(--third) !important;
-  font-family: cursive;
-  font-size: large;
+}
+
+.responsive-sidebar .nav-link.active,
+.responsive-sidebar .mobile-link.active {
   font-weight: bold;
-  cursor: default;
+  color: #007bff; /* This can also be adjusted if necessary */
 }
 
-.nav-item {
-  padding: 0 0.8rem;
+.navbar-toggler {
+  border: none;
+  outline: none;
 }
 
-.navbar-expand-lg .navbar-nav .nav-link {
-  position: relative;
-  color: var(--navbar-text-color);
-  font-size: 1.25rem;
-  text-decoration: none;
-  transition: color 0.3s, font-weight 0.3s;
-  padding: 0 1.2rem;
+.nav-bg-transparent .nav-link {
+  color: var(--third);
+  font-weight: 400;
 }
 
-.navbar-expand-lg .navbar-nav .nav-link::after {
-  background-color: var(--navbar-hover-color);
-  transition: transform 0.3s ease, left 0.3s ease;
-  transform: translateX(-50%);
-}
-
-.nav-bg-transparent .navbar-nav .nav-link:hover {
-  color: var(--navbar-hover-color);
-  opacity: 2;
-  font-weight: bold;
-}
-.nav-bg-white .navbar-nav .nav-link:hover {
-  color: var(--sixth);
-  opacity: 2;
-  font-weight: bold;
-}
-
-.navbar-expand-lg .navbar-nav .nav-link:hover::after {
-  max-width: 100%;
-  left: 50%;
-}
-
-/* Mobile Menu */
-.mobile-menu {
-  background: var(--navbar-bg-color);
-  position: absolute;
-  width: 100%;
-  top: 100%;
-  left: 0;
-  box-shadow: 0 2px 4px var(--navbar-shadow);
-}
-
-.mobile-menu .mobile-link {
-  display: block;
-  color: var(--mobile-link-color);
-  font-size: 1.25rem;
-  text-decoration: none;
-  padding: 1rem;
-  transition: color 0.3s;
-}
-
-.mobile-menu .mobile-link:hover {
-  color: var(--navbar-hover-color);
-}
-
-/* Media Queries for Mobile Menu Button */
-@media (max-width: 768px) {
-  /* .navbar-nav {
-        display: none;
-    } */
-
-  .mobile-menu-button {
-    display: block;
-    /* Show menu button on mobile */
-    font-size: 2rem;
-    color: var(--navbar-text-color);
-    cursor: pointer;
-  }
-
-  .mobile-menu {
-    display: none;
-    /* Hide mobile menu by default */
-  }
-
-  .mobile-menu.open {
-    display: block;
-    /* Show mobile menu when open */
-  }
+/* Ensure other links also adapt to navbar color */
+.nav-bg-transparent .nav-link:hover,
+.nav-bg-white .nav-link:hover {
+  color: var(--navbar-hover-color); /* Define hover color for links */
 }

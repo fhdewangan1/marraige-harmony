@@ -1,31 +1,23 @@
 :root {
   --primary: #780000;
   --secondary: #c1121f;
-  --third: #ffffff;
-  --fourth: #003049;
+  --third: rgba(255, 255, 255, 0.8);
+  --fourth: rgba(0, 48, 73, 0.9);
   --fifth: #669bbc;
   --sixth: #000000;
   --seventh: #e43641;
-
-  --button-primary: #ff6b6b;
-  --button-secondary: #ff9f00;
-  --button-success: #4caf50;
-  --button-info: #2196f3;
-  --button-warning: #ff9800;
-  --button-danger: #f44336;
-  --button-light: #ffffff;
 
   --background-color: var(--third);
   --text-color: var(--fourth);
   --font-family: "Poppins", sans-serif;
 
   /* Navbar */
-  --navbar-text-color: var(--third);
+  --navbar-text-color: var(--seventh);
   --navbar-hover-color: var(--secondary);
   --navbar-shadow: rgba(0, 0, 0, 0.1);
   --link-color: var(--third);
   --link-hover-color: var(--navbar-hover-color);
-  --mobile-link-color: var(--fourth);
+  --mobile-link-color: var(--third);
 }
 
 * {

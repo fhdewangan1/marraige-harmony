@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "npm run dev",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
@@ -27,6 +28,7 @@
     "react-router-dom": "^6.26.1",
     "react-spinners": "^0.14.1",
     "styled-components": "^6.1.13",
+    "subhshaadi": "file:",
     "sweetalert2": "^11.14.0"
   },
   "devDependencies": {

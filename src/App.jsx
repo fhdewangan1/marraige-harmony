@@ -10,7 +10,7 @@ import Navbar from "./components/navbar/Navbar";
 import CardEx from "./components/test/CardEx";
 import FramerCardData from "./components/framer/FramerCardData";
 import DemoCardDetails from "./components/framer/DemoCardDetails";
-import FramerCard from "./components/framer/FramerCard/FramerCard";
+import FramerCard from "./components/framer/FramerCard";
 import PrimaryUserDetails from "./components/Profile/primary-user-details/PrimaryUserDetails";
 import LandingPage from "./components/landing/LandingPage";
 import ForgotPassword from "./components/forgot-password/ForgotPassword";

@@ -89,7 +89,7 @@ function ChangePassword() {
           className="hidden lg:block lg:w-1/2 bg-cover"
           style={{
             backgroundImage:
-              "url('https://media.istockphoto.com/id/1425457584/photo/security-shield-rotation-arrow-sign-on-dark-background-3d-render.webp?a=1&b=1&s=612x612&w=0&k=20&c=prcPmqnh5244S5XZJGr_6RiWBFspu7XGSIZ4eMrc4I0=')",
+              "url('https://img.freepik.com/free-vector/data-stealing-malware-abstract-concept-illustration_335657-2128.jpg?t=st=1729431260~exp=1729434860~hmac=86ff5a58fc82695dab840e0471702f12b29a7022c4f1bbe79ffa79e7509cc811&w=740",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -98,7 +98,7 @@ function ChangePassword() {
         <form className="w-full p-8 lg:w-1/2" onSubmit={handleSubmit}>
           <div className="py-3 text-end">
             <Link to={"/profiles"} className="text-decoration-none">
-              <i class="fa-solid fa-arrow-left-long"></i>
+              <i className="fa-solid fa-arrow-left-long"></i>
               <span className="ml-3 font-bold text-gray-700 hover:text-gray-600">
                 Dashboard
               </span>

@@ -234,10 +234,8 @@ function Login() {
           className="flex-1 bg-indigo-100 text-center hidden lg:flex rounded-r-lg"
           style={{
             backgroundImage:
-              'url("https://storage.googleapis.com/devitary-image-host.appspot.com/15848031292911696601-undraw_designer_life_w96d.svg")',
-            backgroundSize: "contain",
+              'url("https://img.freepik.com/free-vector/access-control-system-abstract-concept_335657-3180.jpg?t=st=1729430893~exp=1729434493~hmac=7fb4df841069099c5a8cff04edbf1afcf78e14a9598b7fdf6530e6a76174d40d&w=740")',
             backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
           }}
         />
       </div>

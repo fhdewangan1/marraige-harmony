@@ -46,7 +46,7 @@ const LandingPage = () => {
         className="relative bg-cover bg-center bg-fixed h-screen md:h-4/5 lg:h-4/5 px-2 sm:px-4 md:px-6 lg:px-8"
         style={{
           backgroundImage:
-            "url('https://wallpaperaccess.com/full/2008544.jpg')",
+            "url('https://images.pexels.com/photos/5759223/pexels-photo-5759223.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')",
         }}
       >
         <div className="absolute inset-0 bg-black opacity-50"></div>{" "}
@@ -244,7 +244,7 @@ const LandingPage = () => {
               <div className="flex justify-center">
                 <img
                   className="rounded-lg shadow-lg w-full"
-                  src="https://th.bing.com/th/id/R.a86ad74007ddc44621cbb1102f0f76f5?rik=13jiAs15l06lNA&riu=http%3a%2f%2fgetwallpapers.com%2fwallpaper%2ffull%2f2%2f3%2ff%2f1128636-amazing-hd-wedding-backgrounds-2160x1440.jpg&ehk=OgL359P%2b2f8ACcFd9KYLewOrwk%2fZijLEC%2bgN1SixLW4%3d&risl=&pid=ImgRaw&r=0"
+                  src="https://images.pexels.com/photos/11652315/pexels-photo-11652315.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
                   alt="About Us Image"
                 />
               </div>

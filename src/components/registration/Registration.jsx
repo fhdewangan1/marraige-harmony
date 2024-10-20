@@ -240,7 +240,7 @@ function Registration() {
               className="w-full dark:bg-gray-800 hidden lg:block lg:w-5/12 bg-cover rounded-l-lg"
               style={{
                 backgroundImage:
-                  "url('https://www.affck.com/uploads/article/23666/DDEDOSjFLhb447ri.png')",
+                  "url('https://img.freepik.com/free-vector/man-using-face-mask-smartphone-illustration-designs_24877-63608.jpg?t=st=1729431096~exp=1729434696~hmac=2a804dbe0999555ea8a102307b1240a844cc3b5c26ef9f43eb8eb560918fcebe&w=740')",
                 backgroundSize: "contain",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",

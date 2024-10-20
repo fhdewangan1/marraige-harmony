@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { ClipLoader } from "react-spinners";
 import Swal from "sweetalert2";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
@@ -205,6 +204,7 @@ function Registration() {
           navigate("/login");
         });
       } catch (error) {
+        console.log("error :", error);
         setLoading(false);
         Swal.fire({
           title: "Error!",
@@ -370,6 +370,8 @@ function Registration() {
                     <input
                       className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="age"
+                      min="0"
+                      max="100"
                       type="number"
                       placeholder="Age"
                       name="age"
@@ -383,14 +385,20 @@ function Registration() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
                   <div>
-                    <input
+                    <select
                       className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="gender"
-                      type="text"
-                      placeholder="Gender"
                       name="gender"
                       onChange={handleChange}
-                    />
+                      defaultValue="" // To show a placeholder
+                    >
+                      <option value="" disabled>
+                        Select Gender
+                      </option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
                     {errors.gender && (
                       <p className="text-xs text-red-500">{errors.gender}</p>
                     )}
@@ -445,7 +453,7 @@ function Registration() {
                     className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     id="residence"
                     type="text"
-                    placeholder="Residence"
+                    placeholder="Address"
                     name="residence"
                     onChange={handleChange}
                   />
@@ -508,10 +516,19 @@ function Registration() {
 
                 <div className="flex items-center justify-between mt-4">
                   <button
-                    className="w-full px-4 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    type="submit"
+                    className={`mt-4 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-3 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none ${
+                      loading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    onClick={handleSubmit}
+                    disabled={loading} // Disable button while loading
                   >
-                    Register
+                    {loading ? (
+                      <div className="loader">Loading...!</div>
+                    ) : (
+                      <>
+                        <span className="ml-3">Register</span>
+                      </>
+                    )}
                   </button>
                 </div>
 

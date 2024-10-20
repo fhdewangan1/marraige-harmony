@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import Swal from "sweetalert2";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 function Registration() {
   const [formData, setFormData] = useState({
@@ -27,6 +28,8 @@ function Registration() {
   // const [passwordError, setPasswordError] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -123,37 +126,30 @@ function Registration() {
     const mobileNumberPattern = /^[0-9]{10}$/;
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const {
-      mobileNumber,
-      firstName,
-      lastName,
-      age,
-      gender,
-      password,
-      confirmPassword,
-      religion,
-      community,
-      dob,
-      residence,
-      email,
-      profileImage,
-    } = formData;
+    const requiredFields = [
+      { key: "mobileNumber", message: "Mobile number is required" },
+      { key: "firstName", message: "First name is required" },
+      { key: "lastName", message: "Last name is required" },
+      { key: "age", message: "Age is required" },
+      { key: "gender", message: "Gender is required" },
+      { key: "password", message: "Password is required" },
+      { key: "confirmPassword", message: "Please confirm your password" },
+      { key: "religion", message: "Religion is required" },
+      { key: "community", message: "Community is required" },
+      { key: "dob", message: "Date of birth is required" },
+      { key: "residence", message: "Residence is required" },
+      { key: "email", message: "Email is required" },
+      { key: "profileImage", message: "Profile image is required" },
+    ];
 
-    // Check for missing fields
-    if (!mobileNumber) newErrors.mobileNumber = "Mobile number is required";
-    if (!firstName) newErrors.firstName = "First name is required";
-    if (!lastName) newErrors.lastName = "Last name is required";
-    if (!age) newErrors.age = "Age is required";
-    if (!gender) newErrors.gender = "Gender is required";
-    if (!password) newErrors.password = "Password is required";
-    if (!confirmPassword)
-      newErrors.confirmPassword = "Please confirm your password";
-    if (!religion) newErrors.religion = "Religion is required";
-    if (!community) newErrors.community = "Community is required";
-    if (!dob) newErrors.dob = "Date of birth is required";
-    if (!residence) newErrors.residence = "Residence is required";
-    if (!email) newErrors.email = "Email is required";
-    if (!profileImage) newErrors.profileImage = "Profile image is required";
+    const { mobileNumber, email, password, confirmPassword } = formData;
+
+    // Check for missing required fields
+    requiredFields.forEach((field) => {
+      if (!formData[field.key]) {
+        newErrors[field.key] = field.message;
+      }
+    });
 
     // Validate mobile number pattern
     if (mobileNumber && !mobileNumberPattern.test(mobileNumber)) {
@@ -228,7 +224,15 @@ function Registration() {
   };
 
   return (
-    <div className="h-auto hover:bg-gray-50 transition duration-100">
+    <div className="">
+      <div className="py-3 text-end mr-5">
+        <Link to={"/"} className="text-decoration-none">
+          <i className="fa-solid fa-arrow-left-long"></i>
+          <span className="ml-3 font-bold text-blue-500 hover:text-blue-700">
+            Visit Home
+          </span>
+        </Link>
+      </div>
       <div className="mx-auto my-2">
         <div className="flex justify-center">
           <div className="w-full xl:w-4/5 lg:w-11/12 flex">
@@ -244,14 +248,6 @@ function Registration() {
             ></div>
 
             <div className="w-full lg:w-7/12 bg-white dark:bg-gray-700 px-12 py-4 rounded-lg lg:rounded-l-none">
-              <div className="py-3 text-end">
-                <Link to={"/"} className="text-decoration-none">
-                  <i className="fa-solid fa-arrow-left-long"></i>
-                  <span className="ml-3 font-bold text-blue-500 hover:text-blue-700">
-                    Visit Home
-                  </span>
-                </Link>
-              </div>
               <div
                 className="flex items-center justify-center"
                 style={{ justifyContent: "space-around" }}
@@ -306,19 +302,13 @@ function Registration() {
               </div>
               <hr />
               <form
-                className="bg-white dark:bg-gray-800 rounded"
+                className="bg-white dark:bg-gray-800 rounded-lg  p-4"
                 onSubmit={handleSubmit}
               >
-                <div className="mb-2 md:flex md:justify-between">
-                  <div className="mb-4 md:mr-2 md:mb-0">
-                    <label
-                      className="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
-                      htmlFor="firstName"
-                    >
-                      First Name
-                    </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+                  <div>
                     <input
-                      className="w-full px-3 py-2 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="firstName"
                       type="text"
                       placeholder="First Name"
@@ -326,20 +316,13 @@ function Registration() {
                       onChange={handleChange}
                     />
                     {errors.firstName && (
-                      <p className="text-xs italic text-red-500">
-                        {errors.firstName}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.firstName}</p>
                     )}
                   </div>
-                  <div className="md:ml-2">
-                    <label
-                      className="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
-                      htmlFor="lastName"
-                    >
-                      Last Name
-                    </label>
+
+                  <div>
                     <input
-                      className="w-full px-3 py-2 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="lastName"
                       type="text"
                       placeholder="Last Name"
@@ -347,20 +330,29 @@ function Registration() {
                       onChange={handleChange}
                     />
                     {errors.lastName && (
-                      <p className="text-xs italic text-red-500">
-                        {errors.lastName}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.lastName}</p>
                     )}
                   </div>
-                  <div className="md:ml-2">
-                    <label
-                      className="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
-                      htmlFor="lastName"
-                    >
-                      Mobile
-                    </label>
+                </div>
+
+                <div className="mb-4">
+                  <input
+                    className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    id="email"
+                    type="email"
+                    placeholder="Email"
+                    name="email"
+                    onChange={handleChange}
+                  />
+                  {errors.email && (
+                    <p className="text-xs text-red-500">{errors.email}</p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+                  <div>
                     <input
-                      className="w-full px-3 py-2 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="mobileNumber"
                       type="text"
                       placeholder="Mobile"
@@ -368,65 +360,31 @@ function Registration() {
                       onChange={handleChange}
                     />
                     {errors.mobileNumber && (
-                      <p className="text-xs italic text-red-500">
+                      <p className="text-xs text-red-500">
                         {errors.mobileNumber}
                       </p>
                     )}
                   </div>
-                </div>
 
-                <div className="mb-2 md:flex md:justify-between">
-                  <div className="mb-4 md:mr-2 md:mb-0">
-                    <label
-                      className="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
-                      htmlFor="email"
-                    >
-                      Email
-                    </label>
+                  <div>
                     <input
-                      className="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                      id="email"
-                      type="email"
-                      placeholder="Email"
-                      name="email"
-                      onChange={handleChange}
-                    />
-                    {errors.email && (
-                      <p className="text-xs italic text-red-500">
-                        {errors.email}
-                      </p>
-                    )}
-                  </div>
-                  <div className="md:ml-2">
-                    <label
-                      className="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
-                      htmlFor="email"
-                    >
-                      Age
-                    </label>
-                    <input
-                      className="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="age"
-                      type="Number"
+                      type="number"
                       placeholder="Age"
                       name="age"
                       onChange={handleChange}
                     />
                     {errors.age && (
-                      <p className="text-xs italic text-red-500">
-                        {errors.age}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.age}</p>
                     )}
                   </div>
-                  <div className="md:ml-2">
-                    <label
-                      className="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
-                      htmlFor="lastName"
-                    >
-                      Gender
-                    </label>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+                  <div>
                     <input
-                      className="w-full px-3 py-2 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="gender"
                       type="text"
                       placeholder="Gender"
@@ -434,44 +392,28 @@ function Registration() {
                       onChange={handleChange}
                     />
                     {errors.gender && (
-                      <p className="text-xs italic text-red-500">
-                        {errors.gender}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.gender}</p>
                     )}
                   </div>
-                </div>
 
-                <div className="mb-2 md:flex md:justify-between">
-                  <div className="mb-4 md:mr-2 md:mb-0">
-                    <label
-                      className="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
-                      htmlFor="email"
-                    >
-                      Date of Birth
-                    </label>
+                  <div>
                     <input
-                      className="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="dob"
-                      type="Date"
-                      placeholder="Date of Birth"
+                      type="date"
                       name="dob"
                       onChange={handleChange}
                     />
                     {errors.dob && (
-                      <p className="text-xs italic text-red-500">
-                        {errors.dob}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.dob}</p>
                     )}
                   </div>
-                  <div className="md:ml-2">
-                    <label
-                      className="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
-                      htmlFor="lastName"
-                    >
-                      Religion
-                    </label>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+                  <div>
                     <input
-                      className="w-full px-3 py-2 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="religion"
                       type="text"
                       placeholder="Religion"
@@ -479,20 +421,13 @@ function Registration() {
                       onChange={handleChange}
                     />
                     {errors.religion && (
-                      <p className="text-xs italic text-red-500">
-                        {errors.religion}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.religion}</p>
                     )}
                   </div>
-                  <div className="md:ml-2">
-                    <label
-                      className="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
-                      htmlFor="email"
-                    >
-                      Community
-                    </label>
+
+                  <div>
                     <input
-                      className="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="community"
                       type="text"
                       placeholder="Community"
@@ -500,101 +435,95 @@ function Registration() {
                       onChange={handleChange}
                     />
                     {errors.community && (
-                      <p className="text-xs italic text-red-500">
-                        {errors.community}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.community}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="mb-2 md:flex">
-                  <div className="w-full">
-                    <label
-                      className="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
-                      htmlFor="lastName"
-                    >
-                      Residence
-                    </label>
-                    <input
-                      className="w-full px-3 py-2 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                      id="residence"
-                      type="text"
-                      placeholder="Residence"
-                      name="residence"
-                      onChange={handleChange}
-                    />
-                    {errors.residence && (
-                      <p className="text-xs italic text-red-500">
-                        {errors.residence}
-                      </p>
-                    )}
-                  </div>
+                <div className="mb-4">
+                  <input
+                    className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    id="residence"
+                    type="text"
+                    placeholder="Residence"
+                    name="residence"
+                    onChange={handleChange}
+                  />
+                  {errors.residence && (
+                    <p className="text-xs text-red-500">{errors.residence}</p>
+                  )}
                 </div>
 
-                <div className="mb-2 md:flex md:justify-between">
-                  <div className="mb-4 md:mr-2 md:mb-0">
-                    <label
-                      className="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
-                      htmlFor="password"
-                    >
-                      Password
-                    </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+                  <div className="relative">
                     <input
-                      className="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 dark:text-white border border-red-500 rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="password"
-                      type="password"
-                      placeholder="******************"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Password"
                       name="password"
                       onChange={handleChange}
                     />
-                    {errors.password && (
-                      <p className="text-xs italic text-red-500">
-                        {errors.password}
-                      </p>
-                    )}
-                    {/* <p className="text-xs italic text-red-500">Please choose a password.</p> */}
-                  </div>
-                  <div className="md:ml-2">
-                    <label
-                      className="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
-                      htmlFor="c_password"
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3"
                     >
-                      Confirm Password
-                    </label>
+                      {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
+                    </button>
+                    {errors.password && (
+                      <p className="text-xs text-red-500">{errors.password}</p>
+                    )}
+                  </div>
+
+                  <div className="relative">
                     <input
-                      className="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="c_password"
-                      type="password"
-                      placeholder="******************"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm Password"
                       name="confirmPassword"
                       onChange={handleChange}
                     />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute right-3 top-3"
+                    >
+                      {showConfirmPassword ? (
+                        <AiFillEyeInvisible />
+                      ) : (
+                        <AiFillEye />
+                      )}
+                    </button>
                     {errors.confirmPassword && (
-                      <p className="text-xs italic text-red-500">
+                      <p className="text-xs text-red-500">
                         {errors.confirmPassword}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="mb-6 text-center">
+                <div className="flex items-center justify-between mt-4">
                   <button
-                    className="w-full px-4 py-3 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 dark:bg-blue-700 dark:text-white dark:hover:bg-blue-900 focus:outline-none focus:shadow-outline"
+                    className="w-full px-4 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     type="submit"
                   >
-                    Register Account
+                    Register
                   </button>
                 </div>
 
-                <hr className="mb-6 border-t" />
-                <div className="text-center">
+                <p className="mt-4 text-center text-gray-600">
+                  Already have an account?{" "}
                   <Link
-                    className="inline-block text-sm text-blue-500 dark:text-blue-500 align-baseline hover:text-blue-800"
-                    to={"/login"}
+                    to="/login"
+                    className="text-blue-500 hover:text-blue-700"
                   >
-                    Already have an account? Login!
+                    Log in
                   </Link>
-                </div>
+                </p>
               </form>
             </div>
           </div>

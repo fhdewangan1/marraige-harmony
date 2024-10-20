@@ -224,16 +224,16 @@ function Registration() {
   };
 
   return (
-    <div className="">
-      <div className="py-3 text-end mr-5">
-        <Link to={"/"} className="text-decoration-none">
-          <i className="fa-solid fa-arrow-left-long"></i>
-          <span className="ml-3 font-bold text-blue-500 hover:text-blue-700">
-            Visit Home
-          </span>
-        </Link>
-      </div>
-      <div className="mx-auto my-2">
+    <div style={{ maxHeight: "90vh" }}>
+      <div className="mx-auto">
+        <div className="py-2 text-end mr-12">
+          <Link to={"/"} className="text-decoration-none">
+            <i className="fa-solid fa-arrow-left-long"></i>
+            <span className="ml-3 font-bold text-blue-500 hover:text-blue-700">
+              Visit Home
+            </span>
+          </Link>
+        </div>
         <div className="flex justify-center">
           <div className="w-full xl:w-4/5 lg:w-11/12 flex">
             <div
@@ -247,7 +247,7 @@ function Registration() {
               }}
             ></div>
 
-            <div className="w-full lg:w-7/12 bg-white dark:bg-gray-700 px-12 py-4 rounded-lg lg:rounded-l-none">
+            <div className="w-full lg:w-7/12 bg-white dark:bg-gray-700 px-12 rounded-lg lg:rounded-l-none">
               <div
                 className="flex items-center justify-center"
                 style={{ justifyContent: "space-around" }}
@@ -302,7 +302,7 @@ function Registration() {
               </div>
               <hr />
               <form
-                className="bg-white dark:bg-gray-800 rounded-lg  p-4"
+                className="bg-white dark:bg-gray-800 rounded-lg"
                 onSubmit={handleSubmit}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">

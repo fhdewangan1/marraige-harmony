@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { Modal, Button, Form, Spinner, Alert } from "react-bootstrap";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Modal, Button, Form, Spinner } from "react-bootstrap";
 
 // Styled components
 const CardContainer = styled.div`
@@ -24,12 +22,6 @@ const CardContainer = styled.div`
 const ContentWrapper = styled.div`
   flex: 2;
   padding: 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto 1fr;
-  gap: -5px;
-  max-height: 320px; /* Adjust this height based on your design */
-  overflow-y: auto; /* Make the content scrollable */
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(
@@ -151,10 +143,10 @@ const Input = styled.input`
   font-size: 16px;
 `;
 
-const StyledSelect = styled(Select)`
-  height: 41px;
-  padding: 0 14px;
-`;
+// const StyledSelect = styled(Select)`
+//   height: 41px;
+//   padding: 0 14px;
+// `;
 
 const FileInput = styled.input`
   margin-top: 5px;
@@ -218,7 +210,8 @@ const PrimaryUserDetails = ({
     setProfileImage(e.target.files[0]);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     setLoading(true);
 
     const formData = new FormData();
@@ -253,8 +246,6 @@ const PrimaryUserDetails = ({
             "success"
           ).then(() => {
             setIsModalOpen(false);
-            // Reload the page after closing the modal
-            window.location.reload();
           });
         } else {
           Swal.fire(
@@ -276,7 +267,6 @@ const PrimaryUserDetails = ({
 
   return (
     <>
-
       <CardContainer
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
@@ -299,18 +289,30 @@ const PrimaryUserDetails = ({
                 borderColor: "#003566",
               }}
             >
-              <i className="fas fa-pencil-alt me-2" style={{ fontSize: "1.2rem" }}></i>
+              <i
+                className="fas fa-pencil-alt me-2"
+                style={{ fontSize: "1.2rem" }}
+              ></i>
               {response ? "Update" : "Add"}
             </Button>
           )}
         </div>
-        <ContentWrapper style={{ padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+        <ContentWrapper
+          style={{
+            padding: "15px",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "8px",
+          }}
+        >
           {fields.map((field, index) => (
             <div
               key={index}
               className="mb-3 p-2 d-flex justify-content-between align-items-center border-bottom"
             >
-              <strong className="text-primary" style={{ fontSize: "1rem", fontFamily: "Arial, sans-serif" }}>
+              <strong
+                className="text-primary"
+                style={{ fontSize: "1rem", fontFamily: "Arial, sans-serif" }}
+              >
                 {field.label}:
               </strong>
               <span
@@ -332,7 +334,6 @@ const PrimaryUserDetails = ({
         </ContentWrapper>
       </CardContainer>
 
-
       {isModalOpen && (
         <Modal show={isModalOpen} onHide={toggleModal} centered>
           <Modal.Header closeButton>
@@ -341,22 +342,27 @@ const PrimaryUserDetails = ({
               {response ? "Update Profile" : "Add Profile"}
             </Modal.Title>
           </Modal.Header>
-          <Modal.Body style={{ padding: "30px 50px", maxHeight: "60vh", overflowY: "auto" }}>
+          <Modal.Body
+            style={{
+              padding: "30px 50px",
+              maxHeight: "60vh",
+              overflowY: "auto",
+            }}
+          >
             <Form>
               {fields.map((field, index) => (
                 <Form.Group key={index} className="mb-4">
-                  <Form.Label className="font-weight-bold">{field.label}</Form.Label>
+                  <Form.Label className="font-weight-bold">
+                    {field.label}
+                  </Form.Label>
                   <div className="input-group">
-                    <div className="input-group-prepend px-2">
-                      <span className="input-group-text text-white border-0 h-full" style={{ backgroundColor: "rgb(219, 39, 119)" }}>
-                        <i className="fas fa-edit text-white"></i>
-                      </span>
-                    </div>
                     {field.key === "religion" || field.key === "community" ? (
                       <Form.Control
                         as="select"
                         value={updatedProfile[field.key] || ""}
-                        onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange(field.key, e.target.value)
+                        }
                         className="border-0 rounded-end"
                         style={{ boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)" }}
                       >
@@ -388,7 +394,9 @@ const PrimaryUserDetails = ({
                       <Form.Control
                         type={field.key === "mobileNumber" ? "text" : "text"}
                         value={updatedProfile[field.key] || ""}
-                        onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange(field.key, e.target.value)
+                        }
                         disabled={field.isDisabled}
                         placeholder={`Enter ${field.label}`}
                         className="border-0 rounded-end"
@@ -416,22 +424,21 @@ const PrimaryUserDetails = ({
               </div>
             )}
           </Modal.Body>
-          <Modal.Footer style={{ justifyContent: "space-between" }}>
+          <Modal.Footer>
             <Button
               variant="success"
-              style={{ backgroundColor: "rgb(219, 39, 119)", borderColor: "#ec4899" }}
+              style={{
+                backgroundColor: "rgb(219, 39, 119)",
+                borderColor: "#ec4899",
+              }}
               onClick={handleSubmit}
               disabled={loading}
             >
               <i className="fas fa-save me-2"></i> Save Changes
             </Button>
-            <Button variant="secondary" onClick={toggleModal} disabled={loading}>
-              <i className="fas fa-times me-2"></i> Cancel
-            </Button>
           </Modal.Footer>
         </Modal>
       )}
-
     </>
   );
 };

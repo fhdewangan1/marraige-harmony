@@ -3,14 +3,28 @@ import Swal from "sweetalert2";
 import { Card, Button, Modal, Form, Spinner, Alert } from "react-bootstrap";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
+import styled from "styled-components";
+
+const CardContainer = styled.div`
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 50px;
+  transition: transform 0.3s;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+`;
 
 // Fields data
 export const partnerPreferencesFields = [
-  { key: "familyStatus", value: "Family Status" },
-  { key: "familyValue", value: "Family Values" },
-  { key: "preferredLocation", value: "Preferred Locations" },
-  { key: "desiredJobValue", value: "Desired Job" },
-  { key: "anyOtherPreferences", value: "Other Preferences " },
+  { key: "familyStatus", value: "Family Status: " },
+  { key: "familyValue", value: "Family Values: " },
+  { key: "preferredLocation", value: "Preferred Locations: " },
+  { key: "desiredJobValue", value: "Desired Job: " },
+  { key: "anyOtherPreferences", value: "Other Preferences: " },
 ];
 
 const UserPartnerPreferences = ({
@@ -95,7 +109,7 @@ const UserPartnerPreferences = ({
 
   return (
     <>
-      <Card
+      <CardContainer
         className="shadow-sm mb-4"
         style={{
           borderRadius: "10px",
@@ -169,17 +183,6 @@ const UserPartnerPreferences = ({
                     {field.value}
                   </Form.Label>
                   <div className="input-group">
-                    <div
-                      className="input-group-prepend"
-                      style={{ alignContent: "center" }}
-                    >
-                      <span
-                        className="input-group-text border-0 h-full"
-                        style={{ backgroundColor: "rgb(219, 39, 119)" }}
-                      >
-                        <i className="fas fa-edit text-white"></i>
-                      </span>
-                    </div>
                     <Form.Control
                       type="text"
                       value={updatedProfile[field.key] || ""}
@@ -220,7 +223,7 @@ const UserPartnerPreferences = ({
               </>
             )}
           </Modal.Body>
-          <Modal.Footer style={{ justifyContent: "space-between" }}>
+          <Modal.Footer>
             <Button
               variant="success"
               style={{
@@ -232,16 +235,16 @@ const UserPartnerPreferences = ({
             >
               <i className="fas fa-save me-2"></i> Save
             </Button>
-            <Button
+            {/* <Button
               variant="secondary"
               onClick={toggleModal}
               disabled={loading}
             >
               <i className="fas fa-times me-2"></i> Cancel
-            </Button>
+            </Button> */}
           </Modal.Footer>
         </Modal>
-      </Card>
+      </CardContainer>
     </>
   );
 };

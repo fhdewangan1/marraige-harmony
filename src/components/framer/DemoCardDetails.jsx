@@ -9,6 +9,7 @@ import UserPartnerPreferences from "../Profile/user-partner-preferences/UserPart
 import { getAllUserDetails } from "../../services/userAllDetailsService";
 import { getProfileImage } from "../../services/userAllDetailsService";
 import "./CommonStyles.css";
+import ImageCard from "../Profile/primary-user-details/ImageCard";
 
 const DemoCardDetails = () => {
   const { mobileNumber } = useParams();
@@ -51,7 +52,8 @@ const DemoCardDetails = () => {
     if (isMobile) {
       return (
         <>
-          <h1>Basic Information</h1>
+          <ImageCard mobileNumber={mobileNumber} />
+          <h1 className="text-center">Primary Details</h1>
           <PrimaryUserDetails
             status={status}
             setStatus={setStatus}
@@ -59,26 +61,25 @@ const DemoCardDetails = () => {
             mobileNumber={mobileNumber}
             imageUrl={profileImage}
           />
-          <h1>Family Details</h1>
+          <h1 className="text-center">Family Details</h1>
           <UserFamilyDetails
             status={status}
             setStatus={setStatus}
             response={userDetails?.response?.userFamilyDetails}
           />
-          <h1>Personal Details</h1>
+          <h1 className="text-center">Personal Details</h1>
           <UserPersonalDetails
             status={status}
             setStatus={setStatus}
             response={userDetails?.response?.userPersonalDetails}
           />
-          <h1>Life Style and Education</h1>
+          <h1 className="text-center">Lifestyle and Education</h1>
           <UserLifeStyleAndEducation
             status={status}
             setStatus={setStatus}
             response={userDetails?.response?.userLifeStyleAndEducation}
           />
-
-          <h1>Partner Preferences</h1>
+          <h1 className="text-center">Partner Preferences</h1>
           <UserPartnerPreferences
             status={status}
             setStatus={setStatus}
@@ -142,22 +143,24 @@ const DemoCardDetails = () => {
     }
   };
 
-
   return (
-
-    <section className="demo-card-details">
-      <div className="row">
+    <section className="demo-card-details" style={{ height: "100vh" }}>
+      <div className="row h-full">
         {/* Sidebar with navigation, only visible on larger screens */}
         {!isMobile && (
-          <div className="col-lg-3 col-md-4 col-sm-12">
+          <div
+            className="col-lg-3 col-md-4 col-sm-12"
+            style={{ marginBottom: "80px" }}
+          >
             <SideBar setActiveSection={setActiveSection} />
           </div>
         )}
         {/* Display the active component or all sections in mobile view */}
-        <div className="col-lg-9 col-md-8 col-sm-12">{renderActiveSection()}</div>
+        <div className="col-lg-9 col-md-8 col-sm-12">
+          {renderActiveSection()}
+        </div>
       </div>
     </section>
-
   );
 };
 

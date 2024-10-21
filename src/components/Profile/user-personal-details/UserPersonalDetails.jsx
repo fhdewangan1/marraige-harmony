@@ -29,14 +29,11 @@ const Header = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Three columns for desktop */
-  gap: 10px;
-  max-height: 320px;
-  overflow-y: auto;
-
   @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Responsive for mobile */
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(120px, 1fr)
+    ); /* Responsive for mobile */
   }
 `;
 
@@ -136,24 +133,28 @@ const ButtonContainer = styled.div`
 
 // Personal Fields
 export const personalFields = [
-  { key: "userHeight", value: "Height: " },
-  { key: "userWeight", value: "Weight: " },
-  { key: "gotra", value: "Gotra: " },
-  { key: "manglik", value: "Manglik: " },
-  { key: "maritalStatus", value: "Marital Status: " },
-  { key: "isPersonDisabled", value: "Is Disabled: " },
+  { key: "userHeight", value: "Height " },
+  { key: "userWeight", value: "Weight " },
+  { key: "gotra", value: "Gotra " },
+  { key: "manglik", value: "Manglik " },
+  { key: "maritalStatus", value: "Marital Status " },
+  { key: "isPersonDisabled", value: "Is Disabled " },
   { key: "userIncome", value: "Monthly Income" },
-  { key: "isUserStayingAlone", value: "Is Staying Alone: " },
-  { key: "hobbies", value: "Hobbies: " },
-  { key: "birthPlace", value: "Birth Place: " },
-  { key: "complexion", value: "Complexion: " },
-  { key: "rashi", value: "Rashi: " },
-  { key: "bloodGroup", value: "Blood Group: " },
-  { key: "bodyType", value: "Body Type: " },
+  { key: "isUserStayingAlone", value: "Is Staying Alone " },
+  { key: "hobbies", value: "Hobbies " },
+  { key: "birthPlace", value: "Birth Place " },
+  { key: "complexion", value: "Complexion " },
+  { key: "rashi", value: "Rashi " },
+  { key: "bloodGroup", value: "Blood Group " },
+  { key: "bodyType", value: "Body Type " },
 ];
 
-const UserPersonalDetails = ({ response, refresAfterUpdate, setStatus, status }) => {
-
+const UserPersonalDetails = ({
+  response,
+  refresAfterUpdate,
+  setStatus,
+  status,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(response || {});
   const [loading, setLoading] = useState(false);
@@ -195,11 +196,19 @@ const UserPersonalDetails = ({ response, refresAfterUpdate, setStatus, status })
       if (data.status === 200 || data.status === 201) {
         setStatus(!status);
         refresAfterUpdate && refresAfterUpdate(!status);
-        Swal.fire("Success!", "User details updated successfully!", "success").then(() => {
+        Swal.fire(
+          "Success!",
+          "User details updated successfully!",
+          "success"
+        ).then(() => {
           toggleModal(); // Close modal after success
         });
       } else {
-        Swal.fire("Error", data.message || "Failed to update user details", "error");
+        Swal.fire(
+          "Error",
+          data.message || "Failed to update user details",
+          "error"
+        );
       }
     } catch (err) {
       setLoading(false);
@@ -209,7 +218,6 @@ const UserPersonalDetails = ({ response, refresAfterUpdate, setStatus, status })
 
   return (
     <>
-
       <CardContainer
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
@@ -232,18 +240,30 @@ const UserPersonalDetails = ({ response, refresAfterUpdate, setStatus, status })
                 borderColor: "#003566",
               }}
             >
-              <i className="fas fa-pencil-alt me-2" style={{ fontSize: "1.2rem" }}></i>
+              <i
+                className="fas fa-pencil-alt me-2"
+                style={{ fontSize: "1.2rem" }}
+              ></i>
               {response ? "Update" : "Add"}
             </Button>
           )}
         </div>
-        <ContentWrapper style={{ padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+        <ContentWrapper
+          style={{
+            padding: "15px",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "8px",
+          }}
+        >
           {personalFields.map((field, index) => (
             <div
               key={index}
               className="mb-3 p-2 d-flex justify-content-between align-items-center border-bottom"
             >
-              <strong className="text-primary" style={{ fontSize: "1rem", fontFamily: "Arial, sans-serif" }}>
+              <strong
+                className="text-primary"
+                style={{ fontSize: "1rem", fontFamily: "Arial, sans-serif" }}
+              >
                 {field.value}:
               </strong>
               <span
@@ -254,13 +274,14 @@ const UserPersonalDetails = ({ response, refresAfterUpdate, setStatus, status })
                   paddingLeft: "10px",
                 }}
               >
-                {response && response[field.key] ? response[field.key].toString() : "N/A"}
+                {response && response[field.key]
+                  ? response[field.key].toString()
+                  : "N/A"}
               </span>
             </div>
           ))}
         </ContentWrapper>
       </CardContainer>
-
 
       {isModalOpen && (
         <Modal show={isModalOpen} onHide={toggleModal} centered>
@@ -270,24 +291,32 @@ const UserPersonalDetails = ({ response, refresAfterUpdate, setStatus, status })
               {response ? "Update Personal Details" : "Add Personal Details"}
             </Modal.Title>
           </Modal.Header>
-          <Modal.Body style={{ padding: "30px 50px", maxHeight: "60vh", overflowY: "auto" }}>
+          <Modal.Body
+            style={{
+              padding: "30px 50px",
+              maxHeight: "60vh",
+              overflowY: "auto",
+            }}
+          >
             <Form>
               {personalFields.map((field, index) => (
                 <Form.Group key={index} className="mb-4">
-                  <Form.Label className="font-weight-bold">{field.value}</Form.Label>
+                  <Form.Label className="font-weight-bold">
+                    {field.value}
+                  </Form.Label>
                   <div className="input-group">
-                    <div className="input-group-prepend">
-                      <span className="input-group-text text-white border-0 h-full" style={{ backgroundColor: "rgb(219, 39, 119)" }}>
-                        <i className="fas fa-edit text-white"></i>
-                      </span>
-                    </div>
                     <Form.Control
                       type="text"
                       value={updatedProfile[field.key] || ""}
-                      onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                      onChange={(e) =>
+                        handleFieldChange(field.key, e.target.value)
+                      }
                       placeholder={`Enter ${field.value}`}
                       className="border-0 rounded-end"
-                      style={{ boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)", marginLeft: '5px', }}
+                      style={{
+                        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                        marginLeft: "5px",
+                      }}
                     />
                   </div>
                 </Form.Group>
@@ -299,22 +328,24 @@ const UserPersonalDetails = ({ response, refresAfterUpdate, setStatus, status })
               </div>
             )}
           </Modal.Body>
-          <Modal.Footer style={{ justifyContent: "space-between" }}>
+          <Modal.Footer>
             <Button
               variant="success"
-              style={{ backgroundColor: "rgb(219, 39, 119)", borderColor: "#ec4899" }}
+              style={{
+                backgroundColor: "rgb(219, 39, 119)",
+                borderColor: "#ec4899",
+              }}
               onClick={handleSubmit}
               disabled={loading}
             >
               <i className="fas fa-save me-2"></i> Save Changes
             </Button>
-            <Button variant="secondary" onClick={toggleModal} disabled={loading}>
+            {/* <Button variant="secondary" onClick={toggleModal} disabled={loading}>
               <i className="fas fa-times me-2"></i> Cancel
-            </Button>
+            </Button> */}
           </Modal.Footer>
         </Modal>
       )}
-
     </>
   );
 };

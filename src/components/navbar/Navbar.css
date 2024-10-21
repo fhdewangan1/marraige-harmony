@@ -99,8 +99,12 @@
 }
 
 .navbar-toggler {
-  border: none;
-  outline: none;
+  border: none !important;
+  outline: none !important;
+}
+
+.navbar-toggler-icon {
+  color: var(--third) !important;
 }
 
 .nav-bg-transparent .nav-link {

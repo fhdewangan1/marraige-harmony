@@ -14,6 +14,7 @@ import {
   FaSignInAlt,
   FaUserPlus,
 } from "react-icons/fa"; // Import icons
+import { GiHamburgerMenu } from "react-icons/gi";
 
 const Loader = styled(motion.div)`
   position: fixed;
@@ -117,7 +118,7 @@ function Navbar() {
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            <span className="navbar-toggler-icon"></span>
+            <GiHamburgerMenu className="navbar-toggler-icon" />
           </button>
           <div className={`collapse navbar-collapse ${menuOpen ? "show" : ""}`}>
             <ul className="navbar-nav ms-auto">

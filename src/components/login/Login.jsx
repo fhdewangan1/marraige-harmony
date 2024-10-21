@@ -36,6 +36,7 @@ function Login() {
     }
 
     setErrors(newErrors);
+    setLoading(false);
   };
 
   const validateAll = () => {
@@ -52,6 +53,7 @@ function Login() {
     }
 
     setErrors(newErrors);
+    setLoading(false);
 
     return Object.keys(newErrors).length === 0;
   };
@@ -115,6 +117,7 @@ function Login() {
         icon: "error",
         confirmButtonText: "OK",
       });
+      setLoading(false);
     }
   };
 

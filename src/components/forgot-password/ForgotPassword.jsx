@@ -14,7 +14,6 @@ import { AxiosConfig } from "../../config/AxiosConfig"; // Adjust the path as ne
 import Swal from "sweetalert2"; // Import SweetAlert
 
 const ForgotPassword = () => {
-
   const [formData, setFormData] = useState({
     mobileNumber: "",
     dateOfBirth: "",
@@ -51,7 +50,7 @@ const ForgotPassword = () => {
         qs.stringify(formattedData), // Stringify the data
         {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       );
@@ -88,14 +87,15 @@ const ForgotPassword = () => {
   };
 
   return (
-
     <div
       className="flex justify-center items-center min-h-screen bg-fixed bg-cover"
       style={{ backgroundImage: "url('/path/to/your/background/image.jpg')" }}
     >
       <div className="w-11/12 md:w-1/2 lg:w-1/3 py-8">
         <div className="container bg-white bg-opacity-80 p-6 rounded-lg shadow-md ">
-          <h3 className="text-center mb-4 text-blue-800 font-semibold">Forgot Password</h3>
+          <h3 className="text-center mb-4 text-blue-800 font-semibold">
+            Forgot Password
+          </h3>
 
           {loading && (
             <div className="text-center mb-4">
@@ -155,19 +155,19 @@ const ForgotPassword = () => {
               Send Reset Email
             </button>
           </form>
-
-          <p className="mt-3 text-center text-black font-semibold">
+          <p className="mt-4 text-center text-gray-600">
             Remembered your password?{" "}
-            <a href="/login" className="text-blue-800 underline hover:text-blue-700 transition duration-300">
+            <Link
+              to="/login"
+              className="text-blue-500 hover:text-blue-700 text-decoration-none"
+            >
               Login here
-            </a>
+            </Link>
           </p>
         </div>
       </div>
     </div>
-
   );
-
 };
 
 export default ForgotPassword;

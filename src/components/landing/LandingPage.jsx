@@ -84,7 +84,7 @@ const LandingPage = () => {
               <select
                 value={gender}
                 onChange={handleGenderChange}
-                className="py-2 px-3 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+                className="mt-1 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
                 <option value="">Select</option>
                 <option value="Female">Woman</option>
@@ -100,7 +100,7 @@ const LandingPage = () => {
               <select
                 value={ageFrom}
                 onChange={handleAgeFromChange}
-                className="py-2 px-3 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+                className="mt-1 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
                 {[...Array(63)].map((_, i) => (
                   <option key={i + 18} value={i + 18}>
@@ -118,7 +118,7 @@ const LandingPage = () => {
               <select
                 value={ageTo}
                 onChange={handleAgeToChange}
-                className="py-2 px-3 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+                className="mt-1 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
                 {[...Array(63)].map((_, i) => (
                   <option key={i + 18} value={i + 18}>
@@ -136,7 +136,7 @@ const LandingPage = () => {
               <select
                 value={religion}
                 onChange={handleReligionChange}
-                className="py-2 px-3 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+                className="mt-1 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
                 <option value="">Select</option>
                 <option value="Hindu">Hindu</option>
@@ -161,7 +161,7 @@ const LandingPage = () => {
               <select
                 value={motherTongue}
                 onChange={handleMotherTongueChange}
-                className="py-2 px-3 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+                className="mt-1 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
                 <option value="">Select</option>
                 <option value="Bengali">Bengali</option>
@@ -181,11 +181,11 @@ const LandingPage = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="mb-4 flex items-end justify-center">
+            <div className="mb-4 flex items-end">
               <button
                 onClick={handleBeginClick}
                 disabled={loading}
-                className="w-full h-full py-2  inline-block text-white bg-pink-600 hover:bg-pink-700 font-semibold rounded transition duration-300"
+                className="w-full h-full py-2 lg:h-3/4 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:ring-2 focus:ring-pink-600 transition"
               >
                 {loading ? (
                   <span className="flex justify-center">Loading...</span>
@@ -285,7 +285,7 @@ const LandingPage = () => {
                 </div>
                 <h4 className="text-xl font-semibold mb-2">
                   <Link
-                    to="/login"
+                    to={"/login"}
                     className="text-gray-800 hover:text-green-500"
                     style={{ textDecoration: "none" }}
                   >
@@ -316,7 +316,7 @@ const LandingPage = () => {
                 </div>
                 <h4 className="text-xl font-semibold mb-2">
                   <Link
-                    to="/login"
+                    to={"/login"}
                     className="text-gray-800 hover:text-red-500"
                     style={{ textDecoration: "none" }}
                   >
@@ -336,14 +336,13 @@ const LandingPage = () => {
                   <i className="fas fa-headset text-4xl"></i>
                 </div>
                 <h4 className="text-xl font-semibold mb-2">
-                  <Link
-                    to="/login"
+                  <button
                     className="text-gray-800 hover:text-purple-500"
                     onClick={handleCardClick}
-                    style={{ textDecoration: "none" }}
+                    style={{ textDecoration: "none", fontWeight: "500" }}
                   >
                     Customer Support
-                  </Link>
+                  </button>
                 </h4>
                 <p className="text-gray-600">
                   24/7 customer support to assist you throughout your journey.

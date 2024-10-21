@@ -182,7 +182,7 @@ function Login() {
                 )}
                 <div className="text-end mt-2">
                   <Link
-                    className="inline-block text-sm text-blue-500 align-baseline hover:text-blue-800 transition duration-200"
+                    className="inline-block text-sm text-blue-500 align-baseline hover:text-blue-800 transition duration-200 text-decoration-none"
                     to={"/forgot-password"}
                   >
                     Forgot Password?
@@ -216,15 +216,15 @@ function Login() {
                   )}
                 </button>
                 <div className="py-3">
-                  <Link
-                    to={"/register"}
-                    className="text-decoration-none flex justify-center"
-                  >
-                    <span className="text-sm">Don't have an account?</span>
-                    <span className="ml-3 font-bold text-blue-500 hover:text-blue-700 transition duration-200">
+                  <p className="mt-4 text-center text-gray-600">
+                    Don't have an account?{" "}
+                    <Link
+                      to="/register"
+                      className="text-blue-500 hover:text-blue-700 text-decoration-none"
+                    >
                       Signup Now
-                    </span>
-                  </Link>
+                    </Link>
+                  </p>
                 </div>
               </div>
             </div>

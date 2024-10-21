@@ -536,7 +536,7 @@ function Registration() {
                   Already have an account?{" "}
                   <Link
                     to="/login"
-                    className="text-blue-500 hover:text-blue-700"
+                    className="text-blue-500 hover:text-blue-700 text-decoration-none"
                   >
                     Log in
                   </Link>

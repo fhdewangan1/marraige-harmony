@@ -11,6 +11,7 @@
 
 @media (min-width: 1025px) {
   .main-background-image {
+    height: 80vh;
     min-height: 80vh; /* Increase height for larger screens */
   }
 }

@@ -18,8 +18,6 @@ import ForgotPassword from "./components/forgot-password/ForgotPassword";
 import ChangePassword from "./components/change-password/ChangePassword";
 
 const AppContent = () => {
-  const location = useLocation();
-  console.log(location.pathname);
   return (
     <Card>
       <Box

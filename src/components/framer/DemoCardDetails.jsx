@@ -152,6 +152,8 @@ const DemoCardDetails = () => {
             className="col-lg-3 col-md-4 col-sm-12"
             style={{ marginBottom: "80px" }}
           >
+            <ImageCard mobileNumber={mobileNumber} />
+
             <SideBar setActiveSection={setActiveSection} />
           </div>
         )}

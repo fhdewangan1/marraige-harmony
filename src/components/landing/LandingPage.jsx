@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "./LandingPage.css";
 
 const LandingPage = () => {
   const [gender, setGender] = React.useState(null);
@@ -42,29 +43,8 @@ const LandingPage = () => {
 
   return (
     <>
-      <section
-        className="relative bg-cover bg-center bg-fixed h-screen md:h-4/5 lg:h-4/5 px-2 sm:px-4 md:px-6 lg:px-8"
-        style={{
-          backgroundImage:
-            "url('https://images.pexels.com/photos/5759223/pexels-photo-5759223.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')",
-        }}
-      >
-        <div className="absolute inset-0 bg-black opacity-50"></div>{" "}
-        {/* Black overlay */}
-        {/* <div className="flex flex-col items-center justify-end pb-16 text-center h-full mx-4 lg:px-0 relative z-10 lg:float-left md:float-left">
-          <h1 className="text-4xl text-red-400 hover:text-red-500 transition duration-300 transform hover:scale-105 font-extrabold md:text-5xl drop-shadow-lg">
-            Find Your Perfect Match
-          </h1>
-          <p className="text-lg text-white mt-4 max-w-xl leading-relaxed">
-            Connecting millions for marriages and happiness.
-          </p>
-          <Link
-            to="/login"
-            className="mt-8 bg-red-400 text-white py-3 px-8 rounded-md shadow-lg hover:bg-red-500 transition duration-300 transform hover:scale-105"
-          >
-            Get Started
-          </Link>
-        </div> */}
+      <section className="main-background-image">
+        <div className="overlay"></div>
       </section>
 
       <div

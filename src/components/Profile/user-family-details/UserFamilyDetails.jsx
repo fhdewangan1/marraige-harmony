@@ -30,9 +30,9 @@ const ContentWrapper = styled.div`
 `;
 
 const familyFields = [
-  { key: "fatherName", value: "Father's Name " },
+  { key: "fatherName", value: "Father " },
   { key: "fatherOccupation", value: "Father's Occupation " },
-  { key: "motherName", value: "Mother's Name " },
+  { key: "motherName", value: "Mother" },
   { key: "motherOccupation", value: "Mother's Occupation " },
   { key: "noOfBrothers", value: "Number of Brothers " },
   { key: "noOfBrothersMarried", value: "Number of Married Brothers " },

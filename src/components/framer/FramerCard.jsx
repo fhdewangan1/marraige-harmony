@@ -39,8 +39,7 @@ const FramerCard = () => {
   const pageSize = 10;
 
   const session = AuthHook();
-  const userGender = session.gender; // Get the logged-in user's gender
-  const oppositeGender = userGender === "male" ? "female" : "male"; // Determine the opposite gender
+  const userGender = session.gender;
 
   const handleMoreDetailsClick = (item) => {
     setLoading(true);
@@ -53,7 +52,6 @@ const FramerCard = () => {
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      // Pass the opposite gender to the API
       const details = await getAllProfiles({
         page,
         size: pageSize,
@@ -75,6 +73,7 @@ const FramerCard = () => {
 
       setProfileImages(images);
     } catch (err) {
+      console.log("err :", err);
       setError("Failed to load data");
     } finally {
       setLoading(false);
@@ -83,7 +82,7 @@ const FramerCard = () => {
 
   useEffect(() => {
     fetchUserData();
-  }, [page, userGender]); // Include userGender as a dependency if needed
+  }, [page, userGender]);
 
   if (error) return <div>{error}</div>;
 
@@ -109,15 +108,15 @@ const FramerCard = () => {
   return (
     <section className="profile-carousel container mx-auto">
       <div className="flex flex-wrap">
-        <div className="row">
+        <div className="row w-full">
           <div
-            className="col-lg-3 col-md-12 col-sm-12 "
-            style={{ padding: "20px 5px" }}
+            className="col-lg-3 col-md-12 col-sm-12"
+            style={{ padding: "20px 5px", minWidth: "300px" }}
           >
             <div className="filters-column">
               <div className="w-full">
                 <h5 className="text-xl font-semibold">Filters</h5>
-                <div className="mb-3">
+                <div className="filter-row mb-3">
                   <input
                     type="text"
                     placeholder="Search for profiles..."
@@ -125,21 +124,21 @@ const FramerCard = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="form-control search-input w-full p-2"
                   />
-                </div>
-                {searchTerm && (
+                  {searchTerm && (
+                    <button
+                      onClick={handleClearSearch}
+                      className="clear-button bg-red-500 text-white px-4 py-2 rounded-full mt-2 transition duration-200 ease-in-out transform hover:scale-105"
+                    >
+                      Clear
+                    </button>
+                  )}
                   <button
-                    onClick={handleClearSearch}
-                    className="clear-button bg-red-500 text-white px-4 py-2 rounded-full mt-2 transition duration-200 ease-in-out transform hover:scale-105"
+                    onClick={handleSearch}
+                    className="search-button bg-green-500 text-white px-4 py-2 rounded-full mt-2 transition duration-200 ease-in-out transform hover:scale-105"
                   >
-                    Clear
+                    Search
                   </button>
-                )}
-                <button
-                  onClick={handleSearch}
-                  className="search-button bg-green-500 text-white px-4 py-2 rounded-full mt-2 transition duration-200 ease-in-out transform hover:scale-105"
-                >
-                  Search
-                </button>
+                </div>
               </div>
             </div>
           </div>
@@ -147,6 +146,15 @@ const FramerCard = () => {
           <div className="col-lg-9 col-md-12 col-sm-12 vertical-scroll">
             {loading ? (
               <div className="text-center">Loading...</div>
+            ) : userDetails.length === 0 ? (
+              <div
+                className="d-flex justify-center items-center h-full bg-white w-full"
+                style={{ minHeight: "300px" }}
+              >
+                <div className="text-center fontFamily-extrabold">
+                  No profiles found matching your search criteria
+                </div>
+              </div>
             ) : (
               userDetails
                 .slice(page * pageSize, (page + 1) * pageSize)
@@ -159,7 +167,7 @@ const FramerCard = () => {
                       {profileImages[profile.mobileNumber] ? (
                         <img
                           src={profileImages[profile.mobileNumber]}
-                          alt={`${profile.name}`}
+                          alt={`${profile.firstName}`}
                           className="profile-image"
                         />
                       ) : (
@@ -168,7 +176,6 @@ const FramerCard = () => {
                         </div>
                       )}
                     </div>
-
                     <div className="col-lg-8 col-md-12 col-sm-12 p-4">
                       <h3 className="card-name mb-4">
                         {profile.firstName} {profile.lastName}
@@ -205,7 +212,7 @@ const FramerCard = () => {
                         <span className="mr-2">
                           <FaMapMarkerAlt />
                         </span>
-                        Language Known: {profile.langknown}
+                        Language Known: {profile.langKnown}
                       </p>
                       <button
                         className="show-more-btn bg-blue-500 text-white w-full lg:w-4/12 float-right px-4 py-2 rounded transition duration-200 ease-in-out transform hover:scale-105"

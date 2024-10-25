@@ -214,12 +214,7 @@ function Registration() {
         });
       }
     } else {
-      Swal.fire({
-        title: "Error!",
-        text: "Please fill in all fields and upload a profile image.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
+      console.log("Form validation failed");
     }
   };
 

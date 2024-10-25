@@ -111,12 +111,6 @@ function Login() {
         });
       }
     } else {
-      Swal.fire({
-        title: "Invalid Credentials",
-        text: "Please fill all credentials",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
       setLoading(false);
     }
   };

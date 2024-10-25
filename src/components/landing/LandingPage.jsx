@@ -1,41 +1,48 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./LandingPage.css";
 
 const LandingPage = () => {
-  const [gender, setGender] = React.useState(null);
-  const [ageFrom, setAgeFrom] = React.useState(null);
-  const [ageTo, setAgeTo] = React.useState(null);
-  const [religion, setReligion] = React.useState("");
-  const [motherTongue, setMotherTongue] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
+  const [gender, setGender] = useState("");
+  const [ageFrom, setAgeFrom] = useState("");
+  const [ageTo, setAgeTo] = useState("");
+  const [religion, setReligion] = useState("");
+  const [motherTongue, setMotherTongue] = useState("");
+  const [loading, setLoading] = useState(false);
   const [showContactDetails, setShowContactDetails] = useState(false);
-
-  const handleCardClick = (e) => {
-    e.preventDefault(); // Prevent the default anchor behavior
-    if (showContactDetails === true) {
-      setShowContactDetails(false);
-    } else {
-      setShowContactDetails(true); // Toggle the contact details
-    }
-  };
+  const [errors, setErrors] = useState({});
+  const ages = [...Array(63)].map((_, i) => i + 18);
 
   const navigate = useNavigate();
 
-  const handleGenderChange = (event) => setGender(event.target.value);
-  const handleAgeFromChange = (event) => setAgeFrom(event.target.value);
-  const handleAgeToChange = (event) => setAgeTo(event.target.value);
-  const handleReligionChange = (event) => setReligion(event.target.value);
-  const handleMotherTongueChange = (event) =>
-    setMotherTongue(event.target.value);
+  const handleCardClick = (e) => {
+    e.preventDefault();
+    setShowContactDetails((prev) => !prev); // Toggle the contact details
+  };
 
   const handleBeginClick = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    const newErrors = {};
+
+    if (!gender) newErrors.gender = "Please select a gender.";
+    if (!ageFrom) newErrors.ageFrom = "Please select an age from.";
+    if (!ageTo) newErrors.ageTo = "Please select an age to.";
+    if (parseInt(ageFrom) > parseInt(ageTo))
+      newErrors.ageTo = "Age To must be greater than or equal to Age From.";
+    if (!religion) newErrors.religion = "Please select a religion.";
+    if (!motherTongue)
+      newErrors.motherTongue = "Please select a mother tongue.";
+
+    setErrors(newErrors);
+
+    // If no errors, proceed with the action
+    if (Object.keys(newErrors).length === 0) {
+      setLoading(true);
       navigate("/login");
-    }, 1000);
+    }
   };
+  useEffect(() => {
+    setShowContactDetails(true);
+  }, [gender, ageFrom, ageTo, religion, motherTongue]);
 
   useEffect(() => {
     localStorage.removeItem("userInfo");
@@ -46,7 +53,6 @@ const LandingPage = () => {
       <section className="main-background-image">
         <div className="overlay"></div>
       </section>
-
       <div
         className="flex justify-center w-full p-4 lg:p-8"
         style={{ marginTop: "-15%", position: "relative" }}
@@ -63,13 +69,15 @@ const LandingPage = () => {
               </label>
               <select
                 value={gender}
-                onChange={handleGenderChange}
+                onChange={(e) => setGender(e.target.value)}
                 className="mt-1 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
+                required
               >
                 <option value="">Select</option>
-                <option value="Female">Woman</option>
-                <option value="Male">Man</option>
+                <option value="Female">Bride</option>
+                <option value="Male">Groom</option>
               </select>
+              {errors.gender && <p className="text-red-500">{errors.gender}</p>}
             </div>
 
             {/* Age From Select */}
@@ -79,15 +87,19 @@ const LandingPage = () => {
               </label>
               <select
                 value={ageFrom}
-                onChange={handleAgeFromChange}
+                onChange={(e) => setAgeFrom(e.target.value)}
                 className="mt-1 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
-                {[...Array(63)].map((_, i) => (
-                  <option key={i + 18} value={i + 18}>
-                    {i + 18}
+                <option value="">Select</option>
+                {ages.map((age) => (
+                  <option key={age} value={age}>
+                    {age}
                   </option>
                 ))}
               </select>
+              {errors.ageFrom && (
+                <p className="text-red-500">{errors.ageFrom}</p>
+              )}
             </div>
 
             {/* Age To Select */}
@@ -97,15 +109,17 @@ const LandingPage = () => {
               </label>
               <select
                 value={ageTo}
-                onChange={handleAgeToChange}
+                onChange={(e) => setAgeTo(e.target.value)}
                 className="mt-1 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
-                {[...Array(63)].map((_, i) => (
-                  <option key={i + 18} value={i + 18}>
-                    {i + 18}
+                <option value="">Select</option>
+                {ages.map((age) => (
+                  <option key={age} value={age}>
+                    {age}
                   </option>
                 ))}
               </select>
+              {errors.ageTo && <p className="text-red-500">{errors.ageTo}</p>}
             </div>
 
             {/* Religion Select */}
@@ -115,22 +129,31 @@ const LandingPage = () => {
               </label>
               <select
                 value={religion}
-                onChange={handleReligionChange}
+                onChange={(e) => setReligion(e.target.value)}
                 className="mt-1 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
                 <option value="">Select</option>
-                <option value="Hindu">Hindu</option>
-                <option value="Muslim">Muslim</option>
-                <option value="Christian">Christian</option>
-                <option value="Sikh">Sikh</option>
-                <option value="Parsi">Parsi</option>
-                <option value="Jain">Jain</option>
-                <option value="Buddhist">Buddhist</option>
-                <option value="Jewish">Jewish</option>
-                <option value="No Religion">No Religion</option>
-                <option value="Spiritual - not religious">Spiritual</option>
-                <option value="Other">Other</option>
+                {[
+                  "Hindu",
+                  "Muslim",
+                  "Christian",
+                  "Sikh",
+                  "Parsi",
+                  "Jain",
+                  "Buddhist",
+                  "Jewish",
+                  "No Religion",
+                  "Spiritual - not religious",
+                  "Other",
+                ].map((religion) => (
+                  <option key={religion} value={religion}>
+                    {religion}
+                  </option>
+                ))}
               </select>
+              {errors.religion && (
+                <p className="text-red-500">{errors.religion}</p>
+              )}
             </div>
 
             {/* Mother Tongue Select */}
@@ -140,24 +163,32 @@ const LandingPage = () => {
               </label>
               <select
                 value={motherTongue}
-                onChange={handleMotherTongueChange}
+                onChange={(e) => setMotherTongue(e.target.value)}
                 className="mt-1 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
                 <option value="">Select</option>
-                <option value="Bengali">Bengali</option>
-                <option value="English">English</option>
-                <option value="Gujarati">Gujarati</option>
-                <option value="Hindi">Hindi</option>
-                <option value="Kannada">Kannada</option>
-                <option value="Marathi">Marathi</option>
-                <option value="Marwari">Marwari</option>
-                <option value="Odia">Odia</option>
-                <option value="Punjabi">Punjabi</option>
-                <option value="Tamil">Tamil</option>
-                <option value="Telugu">Telugu</option>
-                <option value="Urdu">Urdu</option>
-                {/* Add more languages as needed */}
+                {[
+                  "Bengali",
+                  "English",
+                  "Gujarati",
+                  "Hindi",
+                  "Kannada",
+                  "Marathi",
+                  "Marwari",
+                  "Odia",
+                  "Punjabi",
+                  "Tamil",
+                  "Telugu",
+                  "Urdu",
+                ].map((language) => (
+                  <option key={language} value={language}>
+                    {language}
+                  </option>
+                ))}
               </select>
+              {errors.motherTongue && (
+                <p className="text-red-500">{errors.motherTongue}</p>
+              )}
             </div>
 
             {/* Submit Button */}
@@ -165,19 +196,15 @@ const LandingPage = () => {
               <button
                 onClick={handleBeginClick}
                 disabled={loading}
-                className="w-full h-full py-2 lg:h-3/4 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:ring-2 focus:ring-pink-600 transition"
+                type="button"
+                className="w-full max-w-xs max-h-12 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:ring-2 focus:ring-pink-600 transition"
               >
-                {loading ? (
-                  <span className="flex justify-center">Loading...</span>
-                ) : (
-                  "Let’s Begin"
-                )}
+                {loading ? "Loading..." : "Find Your Match"}
               </button>
             </div>
           </div>
         </div>
       </div>
-
       <section className="py-10 bg-white px-2">
         <div className="container mx-auto">
           <div className="relative flex justify-center mb-8">
@@ -330,8 +357,10 @@ const LandingPage = () => {
                 {showContactDetails && (
                   <div className="mt-4 p-4 bg-purple-100 rounded">
                     <h5 className="text-lg font-semibold">Contact Details:</h5>
-                    <p className="text-gray-700">Phone: +123 456 7890</p>
-                    <p className="text-gray-700">Email: support@example.com</p>
+                    <p className="text-gray-700">Phone: +91 7000186765</p>
+                    <p className="text-gray-700">
+                      Email: intallyshwisdom@gmail.com
+                    </p>
                   </div>
                 )}
               </div>

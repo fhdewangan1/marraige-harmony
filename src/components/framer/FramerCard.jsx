@@ -163,7 +163,7 @@ const FramerCard = () => {
                     className="row profile-card flex items-center w-full"
                     key={index}
                   >
-                    <div className="col-lg-4 col-md-6 col-sm-12 p-4 mx-auto">
+                    <div className="col-lg-4 col-md-6 col-sm-12">
                       {profileImages[profile.mobileNumber] ? (
                         <img
                           src={profileImages[profile.mobileNumber]}

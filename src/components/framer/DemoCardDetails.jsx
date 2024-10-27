@@ -17,7 +17,9 @@ const DemoCardDetails = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [activeSection, setActiveSection] = useState("PrimaryUserDetails");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [updateimage, setupdateimage] = useState();
   const [status, setStatus] = useState(false);
+  const [updatedProfile, setUpdatedProfile] = useState(null);
 
   // Fetch user data
   const fetchUserData = async (mobileNumber) => {
@@ -52,7 +54,7 @@ const DemoCardDetails = () => {
     if (isMobile) {
       return (
         <>
-          <ImageCard mobileNumber={mobileNumber} />
+          <ImageCard mobileNumber={mobileNumber} userDetails={userDetails} />
           <h1 className="text-center">Primary Details</h1>
           <PrimaryUserDetails
             status={status}
@@ -60,6 +62,7 @@ const DemoCardDetails = () => {
             response={userDetails?.response}
             mobileNumber={mobileNumber}
             imageUrl={profileImage}
+            updateimage={updateimage} // Ensure this is included
           />
           <h1 className="text-center">Family Details</h1>
           <UserFamilyDetails
@@ -98,6 +101,7 @@ const DemoCardDetails = () => {
             response={userDetails?.response}
             mobileNumber={mobileNumber}
             imageUrl={profileImage}
+            handleModalUpdate={handleModalUpdate}
           />
         );
       case "UserFamilyDetails":
@@ -143,6 +147,10 @@ const DemoCardDetails = () => {
     }
   };
 
+  const handleModalUpdate = (data) => {
+    setUpdatedProfile(data);
+  };
+
   return (
     <section className="demo-card-details" style={{ height: "100vh" }}>
       <div className="row h-full">
@@ -152,12 +160,15 @@ const DemoCardDetails = () => {
             className="col-lg-3 col-md-4 col-sm-12"
             style={{ marginBottom: "80px" }}
           >
-            <ImageCard mobileNumber={mobileNumber} />
+            <ImageCard mobileNumber={mobileNumber} userDetails={userDetails} />
 
-            <SideBar setActiveSection={setActiveSection} />
+            <SideBar
+              setActiveSection={setActiveSection}
+              setStatus={setStatus}
+            />
           </div>
         )}
-        {/* Display the active component or all sections in mobile view */}
+
         <div className="col-lg-9 col-md-8 col-sm-12">
           {renderActiveSection()}
         </div>

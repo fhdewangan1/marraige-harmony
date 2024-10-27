@@ -5,10 +5,12 @@ import {
   getProfileImage,
 } from "../../services/userAllDetailsService";
 import {
-  FaUserCircle,
   FaUser,
   FaPrayingHands,
-  FaMapMarkerAlt,
+  FaVenusMars,
+  FaLanguage,
+  FaUsers,
+  FaUserCircle,
 } from "react-icons/fa";
 import AuthHook from "../../auth/AuthHook";
 import "./Cards.css";
@@ -33,6 +35,12 @@ const FramerCard = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [minAge, setMinAge] = useState(""); // Initialize minAge
+  const [maxAge, setMaxAge] = useState(""); // Initialize maxAge
+  const [minHeight, setMinHeight] = useState(""); // Initialize minHeight
+  const [maxHeight, setMaxHeight] = useState(""); // Initialize maxHeight
+  const [location, setLocation] = useState(""); // Initialize location
+  const [religion, setReligion] = useState(""); // Initialize religion
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
@@ -86,12 +94,37 @@ const FramerCard = () => {
 
   if (error) return <div>{error}</div>;
 
-  const handleSearch = () => {
-    const filteredUsers = allUserDetails.filter((item) =>
-      `${item.firstName} ${item.lastName}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    );
+  const handleApplyFilters = () => {
+    let filteredUsers = allUserDetails;
+
+    // Apply each filter conditionally
+    if (searchTerm) {
+      filteredUsers = filteredUsers.filter((user) =>
+        `${user.firstName} ${user.lastName}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      );
+    }
+    if (minAge && maxAge) {
+      filteredUsers = filteredUsers.filter(
+        (user) => user.age >= minAge && user.age <= maxAge
+      );
+    }
+    if (minHeight && maxHeight) {
+      filteredUsers = filteredUsers.filter(
+        (user) => user.height >= minHeight && user.height <= maxHeight
+      );
+    }
+    if (location) {
+      filteredUsers = filteredUsers.filter((user) =>
+        user.location.toLowerCase().includes(location.toLowerCase())
+      );
+    }
+    if (religion) {
+      filteredUsers = filteredUsers.filter((user) =>
+        user.religion.toLowerCase().includes(religion.toLowerCase())
+      );
+    }
 
     setUserDetails(filteredUsers);
     setTotalPages(Math.ceil(filteredUsers.length / pageSize));
@@ -100,6 +133,12 @@ const FramerCard = () => {
 
   const handleClearSearch = () => {
     setSearchTerm("");
+    setMinAge("");
+    setMaxAge("");
+    setMinHeight("");
+    setMaxHeight("");
+    setLocation("");
+    setReligion("");
     setUserDetails(allUserDetails);
     setTotalPages(Math.ceil(allUserDetails.length / pageSize));
     setPage(0);
@@ -111,34 +150,96 @@ const FramerCard = () => {
         <div className="row w-full">
           <div
             className="col-lg-3 col-md-12 col-sm-12"
-            style={{ padding: "20px 5px", minWidth: "300px" }}
+            style={{ padding: "20px 15px" }}
           >
             <div className="filters-column">
-              <div className="w-full">
+              <div className="flex items-center justify-between mb-4">
                 <h5 className="text-xl font-semibold">Filters</h5>
-                <div className="filter-row mb-3">
-                  <input
-                    type="text"
-                    placeholder="Search for profiles..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="form-control search-input w-full p-2"
-                  />
-                  {searchTerm && (
-                    <button
-                      onClick={handleClearSearch}
-                      className="clear-button bg-red-500 text-white px-4 py-2 rounded-full mt-2 transition duration-200 ease-in-out transform hover:scale-105"
-                    >
-                      Clear
-                    </button>
-                  )}
-                  <button
-                    onClick={handleSearch}
-                    className="search-button bg-green-500 text-white px-4 py-2 rounded-full mt-2 transition duration-200 ease-in-out transform hover:scale-105"
-                  >
-                    Search
-                  </button>
-                </div>
+                <button
+                  onClick={handleApplyFilters}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-full transition duration-200 ease-in-out transform hover:scale-105"
+                >
+                  Apply
+                </button>
+              </div>
+
+              {/* Name Filter */}
+              <div className="filter-row mb-3">
+                <input
+                  type="text"
+                  placeholder="Search for profiles..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="form-control search-input w-full p-2"
+                />
+              </div>
+
+              {/* Age Range Filter */}
+              <div className="flex mb-3">
+                <input
+                  type="number"
+                  placeholder="Min Age"
+                  value={minAge}
+                  onChange={(e) => setMinAge(e.target.value)}
+                  className="form-control mr-2 p-2"
+                />
+                <input
+                  type="number"
+                  placeholder="Max Age"
+                  value={maxAge}
+                  onChange={(e) => setMaxAge(e.target.value)}
+                  className="form-control p-2"
+                />
+              </div>
+
+              {/* Height Range Filter */}
+              <div className="flex mb-3">
+                <input
+                  type="number"
+                  placeholder="Min Height (cm)"
+                  value={minHeight}
+                  onChange={(e) => setMinHeight(e.target.value)}
+                  className="form-control mr-2 p-2"
+                />
+                <input
+                  type="number"
+                  placeholder="Max Height (cm)"
+                  value={maxHeight}
+                  onChange={(e) => setMaxHeight(e.target.value)}
+                  className="form-control p-2"
+                />
+              </div>
+
+              {/* Location Filter */}
+              <div className="mb-3">
+                <input
+                  type="text"
+                  placeholder="Location"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="form-control w-full p-2"
+                />
+              </div>
+
+              {/* Religion Filter */}
+              <div className="mb-3">
+                <input
+                  type="text"
+                  placeholder="Religion"
+                  value={religion}
+                  onChange={(e) => setReligion(e.target.value)}
+                  className="form-control w-full p-2"
+                />
+              </div>
+
+              {/* Clear Search Button */}
+              <div className="text-right">
+                <button
+                  onClick={handleClearSearch}
+                  className="clear-button bg-gray-500 text-white px-4 py-2 rounded-full mt-2"
+                >
+                  Clear Search
+                </button>
               </div>
             </div>
           </div>
@@ -163,19 +264,25 @@ const FramerCard = () => {
                     className="row profile-card flex items-center w-full"
                     key={index}
                   >
-                    <div className="col-lg-4 col-md-6 col-sm-12">
-                      {profileImages[profile.mobileNumber] ? (
-                        <img
-                          src={profileImages[profile.mobileNumber]}
-                          alt={`${profile.firstName}`}
-                          className="profile-image"
-                        />
-                      ) : (
-                        <div className="d-flex justify-center items-center avatar-placeholder">
-                          <FaUserCircle style={{ fontSize: "100px" }} />
-                        </div>
-                      )}
+                    <div
+                      className="col-lg-4 col-md-12 col-sm-12 mx-auto"
+                      style={{ padding: "20px 40px" }}
+                    >
+                      <div className="" style={{ height: "200px" }}>
+                        {profileImages[profile.mobileNumber] ? (
+                          <img
+                            src={profileImages[profile.mobileNumber]}
+                            alt={`${profile.firstName}`}
+                            className="profile-image"
+                          />
+                        ) : (
+                          <div className="d-flex justify-center items-center avatar-placeholder">
+                            <FaUserCircle style={{ fontSize: "100px" }} />
+                          </div>
+                        )}
+                      </div>
                     </div>
+
                     <div className="col-lg-8 col-md-12 col-sm-12 p-4">
                       <h3 className="card-name mb-4">
                         {profile.firstName} {profile.lastName}
@@ -197,20 +304,20 @@ const FramerCard = () => {
                       <div className="row">
                         <p className="col-lg-6 col-md-6 col-sm-12 d-flex">
                           <span className="mr-2">
-                            <FaMapMarkerAlt />
+                            <FaUsers /> {/* Community icon */}
                           </span>
                           Community: {profile.community}
                         </p>
                         <p className="col-lg-6 col-md-6 col-sm-12 d-flex">
                           <span className="mr-2">
-                            <FaMapMarkerAlt />
+                            <FaVenusMars /> {/* Alternative Gender icon */}
                           </span>
                           Gender: {profile.gender}
                         </p>
                       </div>
                       <p className="d-flex">
                         <span className="mr-2">
-                          <FaMapMarkerAlt />
+                          <FaLanguage /> {/* Language Known icon */}
                         </span>
                         Language Known: {profile.langKnown}
                       </p>

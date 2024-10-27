@@ -3,6 +3,34 @@ import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
+import styled from "styled-components";
+
+const CardContainer = styled.div`
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 50px;
+  transition: transform 0.3s;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+`;
+
+const InputField = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const Label = styled.label`
+  margin-bottom: 5px;
+  color: #333;
+`;
+
+const FileInput = styled.input`
+  margin-top: 5px;
+`;
 
 // Fields array
 const fields = [
@@ -25,6 +53,8 @@ const PrimaryUserDetails = ({
   refresAfterUpdate,
   setStatus,
   status,
+  updateimage,
+  handleModalUpdate,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(response || {});
@@ -36,6 +66,10 @@ const PrimaryUserDetails = ({
   useEffect(() => {
     setUpdatedProfile(response);
   }, [response]);
+
+  useEffect(() => {
+    console.log("image crop");
+  }, [updateimage]);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -60,6 +94,7 @@ const PrimaryUserDetails = ({
     Object.keys(updatedProfile).forEach((key) => {
       formData.append(key, updatedProfile[key]);
     });
+    handleModalUpdate(updatedProfile);
     if (profileImage) {
       formData.append("profileImage", profileImage);
     }
@@ -109,27 +144,54 @@ const PrimaryUserDetails = ({
 
   return (
     <>
-      <div className="bg-white shadow-lg rounded-lg p-6 mb-8 transition-transform hover:scale-105">
-        <div className="flex justify-end mb-4">
-          {mobileNumber === session?.userName && (
+      <CardContainer
+        initial={{ opacity: 0, x: -100 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        {/* <div className="flex justify-end mb-4"> */}
+        {mobileNumber === session?.userName && (
+          <div className="d-flex justify-content-end mb-4">
             <Button
               variant="primary"
               onClick={toggleModal}
-              className="px-4 py-2 rounded-lg text-base font-medium shadow-sm flex items-center bg-blue-600 text-white"
+              style={{
+                padding: "10px 20px",
+                borderRadius: "5px",
+                fontSize: "1rem",
+                fontFamily: "Verdana, sans-serif",
+                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#003566",
+                borderColor: "#003566",
+              }}
             >
-              <i className="fas fa-pencil-alt mr-2"></i>
-              {response ? "Update Profile" : "Add Profile"}
+              <i
+                className="fas fa-pencil-alt me-2"
+                style={{ fontSize: "1.2rem" }}
+              ></i>
+              {response ? "Update" : "Add"}
             </Button>
-          )}
-        </div>
-        <div className="grid grid-cols-1 gap-4">
+          </div>
+        )}
+        {/* </div> */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4">
           {fields.map((field, index) => (
             <div
               key={index}
-              className="flex justify-between items-center py-2 border-b"
+              className="mb-2 flex justify-between items-center py-2 border-b"
             >
-              <strong className="text-gray-700 text-sm">{field.label}:</strong>
-              <span className="text-gray-600 text-sm">
+              <strong
+                className="text-gray-700 text-sm text-primary"
+                style={{ fontSize: "medium", marginRight: "20px" }}
+              >
+                {field.label}:
+              </strong>
+              <span
+                className="text-gray-600 text-sm"
+                style={{ fontSize: "large" }}
+              >
                 {response && response[field.key] !== undefined
                   ? Array.isArray(response[field.key])
                     ? response[field.key].join(", ")
@@ -139,48 +201,94 @@ const PrimaryUserDetails = ({
             </div>
           ))}
         </div>
-      </div>
+      </CardContainer>
 
-      {/* Modal for editing profile */}
       {isModalOpen && (
         <Modal show={isModalOpen} onHide={toggleModal} centered>
           <Modal.Header closeButton>
-            <Modal.Title className="flex items-center">
-              <i className="fas fa-user-edit mr-2"></i>
+            <Modal.Title>
+              <i className="fas fa-users me-2"></i>
               {response ? "Update Profile" : "Add Profile"}
             </Modal.Title>
           </Modal.Header>
-          <Modal.Body>
+          <Modal.Body
+            style={{
+              padding: "30px 50px",
+              maxHeight: "60vh",
+              overflowY: "auto",
+            }}
+          >
             <Form>
               {fields.map((field, index) => (
                 <Form.Group key={index} className="mb-4">
-                  <Form.Label className="font-semibold">
+                  <Form.Label className="font-weight-bold">
                     {field.label}
                   </Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={updatedProfile[field.key] || ""}
-                    onChange={(e) =>
-                      handleFieldChange(field.key, e.target.value)
-                    }
-                    disabled={field.isDisabled}
-                    className="border rounded-md w-full px-3 py-2"
-                  />
+                  <div className="input-group">
+                    {field.key === "religion" || field.key === "community" ? (
+                      <Form.Control
+                        as="select"
+                        value={updatedProfile[field.key] || ""}
+                        onChange={(e) =>
+                          handleFieldChange(field.key, e.target.value)
+                        }
+                        className="border-0 rounded-end"
+                        style={{ boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)" }}
+                      >
+                        {/* Add your select options here based on the field.key */}
+                        {field.key === "religion" && (
+                          <>
+                            <option value="Hindu">Hindu</option>
+                            <option value="Muslim">Muslim</option>
+                            <option value="Christian">Christian</option>
+                            <option value="Sikh">Sikh</option>
+                            <option value="Parsi">Parsi</option>
+                            <option value="Jain">Jain</option>
+                            <option value="Buddhist">Buddhist</option>
+                            <option value="Jewish">Jewish</option>
+                            <option value="No Religion">No Religion</option>
+                          </>
+                        )}
+                        {field.key === "community" && (
+                          <>
+                            <option value="English">English</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Urdu">Urdu</option>
+                            <option value="Telugu">Telugu</option>
+                            <option value="Tamil">Tamil</option>
+                          </>
+                        )}
+                      </Form.Control>
+                    ) : (
+                      <Form.Control
+                        type={field.key === "mobileNumber" ? "text" : "text"}
+                        value={updatedProfile[field.key] || ""}
+                        onChange={(e) =>
+                          handleFieldChange(field.key, e.target.value)
+                        }
+                        disabled={field.isDisabled}
+                        placeholder={`Enter ${field.label}`}
+                        className="border-0 rounded-end"
+                        style={{ boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)" }}
+                      />
+                    )}
+                  </div>
                 </Form.Group>
               ))}
-              <Form.Group className="mb-4">
-                <Form.Label className="font-semibold">
-                  Profile Image:
-                </Form.Label>
-                <Form.Control
+
+              {/* Image Upload Input */}
+              <InputField>
+                <Label>Profile Image:</Label>
+                <FileInput
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
                 />
-              </Form.Group>
+              </InputField>
             </Form>
+
             {loading && (
-              <div className="flex justify-center mt-4">
+              <div className="d-flex justify-content-center my-3">
                 <Spinner animation="border" variant="primary" />
               </div>
             )}
@@ -188,13 +296,18 @@ const PrimaryUserDetails = ({
           <Modal.Footer>
             <Button
               variant="success"
+              style={{
+                backgroundColor: "rgb(219, 39, 119)",
+                borderColor: "#ec4899",
+              }}
               onClick={handleSubmit}
               disabled={loading}
-              className="bg-green-600 border-green-600 text-white px-4 py-2"
             >
-              <i className="fas fa-save mr-2"></i>
-              Save Changes
+              <i className="fas fa-save me-2"></i> Save Changes
             </Button>
+            {/* <Button variant="secondary" onClick={toggleModal} disabled={loading}>
+              <i className="fas fa-times me-2"></i> Cancel
+            </Button> */}
           </Modal.Footer>
         </Modal>
       )}

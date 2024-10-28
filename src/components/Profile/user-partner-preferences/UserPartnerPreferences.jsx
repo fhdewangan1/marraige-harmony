@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { Card, Button, Modal, Form, Spinner, Alert } from "react-bootstrap";
+import { Button, Modal, Form, Spinner, Alert } from "react-bootstrap";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
+import { AxiosConfig } from "../../../config/AxiosConfig";
 
 const CardContainer = styled.div`
   background: white;
@@ -19,7 +20,7 @@ const CardContainer = styled.div`
 `;
 
 // Fields data
-export const partnerPreferencesFields = [
+const partnerPreferencesFields = [
   { key: "familyStatus", value: "Family Status: " },
   { key: "familyValue", value: "Family Values: " },
   { key: "preferredLocation", value: "Preferred Locations: " },
@@ -61,21 +62,19 @@ const UserPartnerPreferences = ({
   const handleSubmit = async () => {
     setLoading(true);
     const apiUrl = response
-      ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-partner-preferences/${mobileNumber}`
-      : `https://shaadi-be.fino-web-app.agency/api/v1/save-user-partner-preferences?mobileNumber=${mobileNumber}`;
+      ? `update-user-partner-preferences/${mobileNumber}` // Use the endpoint relative to the base URL
+      : `save-user-partner-preferences?mobileNumber=${mobileNumber}`;
 
     try {
-      const res = await fetch(apiUrl, {
+      const res = await AxiosConfig({
         method: response ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedProfile),
+        url: apiUrl,
+        data: updatedProfile,
       });
-      const data = await res.json();
+
       setLoading(false);
 
-      if (data.status === 200 || data.status === 201) {
+      if (res.status === 200 || res.status === 201) {
         setStatus(!status);
         refresAfterUpdate && refresAfterUpdate(!status);
         Swal.fire(
@@ -86,27 +85,20 @@ const UserPartnerPreferences = ({
           toggleModal(); // Close modal after success
         });
       } else {
-        setError(data.message || "Failed to update user details");
+        setError(res.data.message || "Failed to update user details");
         Swal.fire(
           "Error",
-          data.message || "Failed to update user details",
+          res.data.message || "Failed to update user details",
           "error"
         );
       }
     } catch (err) {
+      console.log("err :", err);
       setLoading(false);
       setError("An error occurred. Please try again.");
       Swal.fire("Error", "An error occurred. Please try again.", "error");
     }
   };
-
-  const limitWords = (text, limit) => {
-    if (!text) return "N/A";
-    const words = text.split(" ");
-    if (words.length <= limit) return text;
-    return words.slice(0, limit).join(" ") + "..."; // Add ellipsis if truncated
-  };
-
   return (
     <>
       <CardContainer

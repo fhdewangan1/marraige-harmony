@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Card, Button, Modal, Form, Spinner, Alert } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Button, Modal, Form, Spinner, Alert } from "react-bootstrap";
 import Swal from "sweetalert2";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
+import { AxiosConfig } from "../../../config/AxiosConfig";
 
 const CardContainer = styled.div`
   background: white;
@@ -15,17 +16,6 @@ const CardContainer = styled.div`
 
   &:hover {
     transform: translateY(-5px);
-  }
-`;
-
-const ButtonContainer = styled.div`
-  position: absolute; /* Keep it absolute */
-  top: 20px;
-  right: 20px;
-
-  @media (max-width: 768px) {
-    top: 10px; /* Adjust top position for mobile */
-    right: 10px; /* Adjust right position for mobile */
   }
 `;
 
@@ -41,19 +31,8 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const Field = styled.div`
-  padding: 10px;
-  border-radius: 4px;
-  color: #1f7a8c;
-  font-size: 20px;
-
-  @media (max-width: 768px) {
-    font-size: 16px; /* Smaller font size on mobile */
-  }
-`;
-
 // Fields data
-export const lifeStyleAndEducationFields = [
+const lifeStyleAndEducationFields = [
   { key: "userOccupation", value: "Occupation " },
   { key: "userCurrentLoc", value: "Current Location " },
   { key: "drinking", value: "Drinking Habits " },
@@ -71,7 +50,6 @@ const UserLifeStyleAndEducation = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(response || {});
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const session = AuthHook();
   const { mobileNumber } = useParams();
@@ -89,7 +67,6 @@ const UserLifeStyleAndEducation = ({
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
-    setSuccess(false);
     setError("");
   };
 
@@ -104,21 +81,19 @@ const UserLifeStyleAndEducation = ({
 
     setLoading(true);
     const apiUrl = response
-      ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-life-style-details/${mobileNumber}`
-      : `https://shaadi-be.fino-web-app.agency/api/v1/save-user-life-style?mobileNumber=${mobileNumber}`;
+      ? `update-user-life-style-details/${mobileNumber}` // Use the endpoint relative to the base URL
+      : `save-user-life-style?mobileNumber=${mobileNumber}`;
 
     try {
-      const res = await fetch(apiUrl, {
+      const res = await AxiosConfig({
         method: response ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedProfile),
+        url: apiUrl,
+        data: updatedProfile,
       });
-      const data = await res.json();
+
       setLoading(false);
 
-      if (data.status === 200 || data.status === 201) {
+      if (res.status === 200 || res.status === 201) {
         setStatus(!status);
         refresAfterUpdate && refresAfterUpdate(!status);
         Swal.fire(
@@ -129,14 +104,15 @@ const UserLifeStyleAndEducation = ({
           toggleModal();
         });
       } else {
-        setError(data.message || "Failed to update user details");
+        setError(res.data.message || "Failed to update user details");
         Swal.fire(
           "Error",
-          data.message || "Failed to update user details",
+          res.data.message || "Failed to update user details",
           "error"
         );
       }
     } catch (err) {
+      console.log("err :", err);
       setLoading(false);
       setError("An error occurred. Please try again.");
       Swal.fire("Error", "An error occurred. Please try again.", "error");

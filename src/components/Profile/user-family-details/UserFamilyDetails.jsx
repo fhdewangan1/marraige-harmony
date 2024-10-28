@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
-// import { AxiosConfig } from "../../../config/AxiosConfig";
+import { AxiosConfig } from "../../../config/AxiosConfig";
 
 const CardContainer = styled.div`
   background: white;
@@ -73,40 +73,39 @@ const UserFamilyDetails = ({
     setIsModalOpen(!isModalOpen);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setLoading(true);
     const apiUrl = response
-      ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-family-details/${mobileNumber}`
-      : `https://shaadi-be.fino-web-app.agency/api/v1/save-user-family-details?mobileNumber=${mobileNumber}`;
+      ? `update-user-family-details/${mobileNumber}` // Use the endpoint relative to the base URL
+      : `save-user-family-details?mobileNumber=${mobileNumber}`;
 
-    fetch(apiUrl, {
-      method: response ? "PUT" : "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedProfile),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setLoading(false);
-        if (data.status === 200 || data.status === 201) {
-          setStatus(!status);
-          refresAfterUpdate && refresAfterUpdate(!status);
-          Swal.fire(
-            "Success!",
-            "User details updated successfully!",
-            "success"
-          ).then(() => {
-            toggleModal(); // Close modal after success
-          });
-        } else {
-          Swal.fire("Error", "Failed to update user details", "error");
-        }
-      })
-      .catch(() => {
-        setLoading(false);
-        Swal.fire("Error", "An error occurred. Please try again.", "error");
+    try {
+      const res = await AxiosConfig({
+        method: response ? "PUT" : "POST",
+        url: apiUrl,
+        data: updatedProfile, // Send updatedProfile directly as data
       });
+
+      setLoading(false);
+
+      if (res.status === 200 || res.status === 201) {
+        setStatus(!status);
+        refresAfterUpdate && refresAfterUpdate(!status);
+        Swal.fire(
+          "Success!",
+          "User details updated successfully!",
+          "success"
+        ).then(() => {
+          toggleModal(); // Close modal after success
+        });
+      } else {
+        Swal.fire("Error", "Failed to update user details", "error");
+      }
+    } catch (err) {
+      console.log("err :", err);
+      setLoading(false);
+      Swal.fire("Error", "An error occurred. Please try again.", "error");
+    }
   };
 
   return (

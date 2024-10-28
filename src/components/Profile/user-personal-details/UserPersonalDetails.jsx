@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { Modal, Button, Form, Spinner, Alert } from "react-bootstrap";
+import { Modal, Button, Form, Spinner } from "react-bootstrap";
+import { AxiosConfig } from "../../../config/AxiosConfig";
 
 // Styled components
 const CardContainer = styled.div`
@@ -20,14 +20,6 @@ const CardContainer = styled.div`
   }
 `;
 
-const Header = styled.div`
-  display: flex;
-  justify-content: flex-end; /* Aligns all items to the right */
-  align-items: center;
-  margin-bottom: 20px;
-  width: 100%; /* Ensure it takes full width */
-`;
-
 const ContentWrapper = styled.div`
   @media (max-width: 768px) {
     grid-template-columns: repeat(
@@ -37,102 +29,8 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const Field = styled.div`
-  padding: 10px;
-  border-radius: 4px;
-  color: #1f7a8c;
-  font-size: 20px;
-
-  @media (max-width: 768px) {
-    font-size: 16px;
-  }
-`;
-
-// const Button = styled.button`
-//   background-color: #003566;
-//   color: white;
-//   padding: 10px 20px;
-//   border: none;
-//   border-radius: 4px;
-//   font-size: 18px;
-//   cursor: pointer;
-
-//   &:hover {
-//     background-color: #1f7a8c;
-//   }
-
-//   @media (max-width: 768px) {
-//     font-size: 16px;
-//     padding: 8px 16px;
-//   }
-// `;
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000; /* Adjust as necessary */
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-`;
-
-const ModalHeader = styled.h2`
-  margin: 0 0 20px;
-`;
-
-const InputField = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Label = styled.label`
-  margin-bottom: 5px;
-  color: #333;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-
-  @media (max-width: 768px) {
-    font-size: 14px;
-  }
-`;
-
-const GridWrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-top: 20px;
-`;
-
-const FormWrapper = styled.div`
-  padding: 20px;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-`;
-
 // Personal Fields
-export const personalFields = [
+const personalFields = [
   { key: "userHeight", value: "Height " },
   { key: "userWeight", value: "Weight " },
   { key: "gotra", value: "Gotra " },
@@ -179,21 +77,19 @@ const UserPersonalDetails = ({
   const handleSubmit = async () => {
     setLoading(true);
     const apiUrl = response
-      ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-personal-details/${mobileNumber}`
-      : `https://shaadi-be.fino-web-app.agency/api/v1/save-user-personal-details?mobileNumber=${mobileNumber}`;
+      ? `update-user-personal-details/${mobileNumber}` // Use the endpoint relative to the base URL
+      : `save-user-personal-details?mobileNumber=${mobileNumber}`;
 
     try {
-      const res = await fetch(apiUrl, {
+      const res = await AxiosConfig({
         method: response ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedProfile),
+        url: apiUrl,
+        data: updatedProfile,
       });
-      const data = await res.json();
+
       setLoading(false);
 
-      if (data.status === 200 || data.status === 201) {
+      if (res.status === 200 || res.status === 201) {
         setStatus(!status);
         refresAfterUpdate && refresAfterUpdate(!status);
         Swal.fire(
@@ -206,11 +102,12 @@ const UserPersonalDetails = ({
       } else {
         Swal.fire(
           "Error",
-          data.message || "Failed to update user details",
+          res.data.message || "Failed to update user details",
           "error"
         );
       }
     } catch (err) {
+      console.log("err :", err);
       setLoading(false);
       Swal.fire("Error", "An error occurred. Please try again.", "error");
     }
@@ -340,9 +237,6 @@ const UserPersonalDetails = ({
             >
               <i className="fas fa-save me-2"></i> Save Changes
             </Button>
-            {/* <Button variant="secondary" onClick={toggleModal} disabled={loading}>
-              <i className="fas fa-times me-2"></i> Cancel
-            </Button> */}
           </Modal.Footer>
         </Modal>
       )}

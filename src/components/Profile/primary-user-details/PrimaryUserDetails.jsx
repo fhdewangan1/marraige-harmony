@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import styled from "styled-components";
+import { AxiosConfig } from "../../../config/AxiosConfig";
 
 const CardContainer = styled.div`
   background: white;
@@ -99,13 +100,10 @@ const PrimaryUserDetails = ({
       formData.append("profileImage", profileImage);
     }
 
-    fetch("https://shaadi-be.fino-web-app.agency/api/v1/auth/update-profile", {
-      method: "PUT",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
+    AxiosConfig.put("/api/v1/auth/update-profile", formData)
+      .then((response) => {
         setLoading(false);
+        const data = response.data;
         if (data.status === 200 || data.status === 201) {
           setStatus(!status);
           refresAfterUpdate && refresAfterUpdate(!status);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   TextField,
   Button,
@@ -11,10 +11,10 @@ import {
   Box,
   Avatar,
 } from "@mui/material";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import Swal from "sweetalert2"; // Import SweetAlert
+import Swal from "sweetalert2";
+import { AxiosConfig } from "../../config/AxiosConfig";
 
 function DemoRegister() {
   const [formData, setFormData] = useState({
@@ -60,19 +60,18 @@ function DemoRegister() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading
+    setLoading(true);
+
     const formDataToSend = new FormData();
     for (const key in formData) {
       formDataToSend.append(key, formData[key]);
     }
-    try {
-      await axios.post(
-        "https://shaadi-be.fino-web-app.agency/api/v1/auth/create-profile",
-        formDataToSend
-      );
-      setLoading(false); // Stop loading
 
-      // Display SweetAlert on success
+    try {
+      await AxiosConfig.post("auth/create-profile", formDataToSend);
+
+      setLoading(false);
+
       Swal.fire({
         title: "Success!",
         text: "Profile creation successful!",
@@ -82,6 +81,7 @@ function DemoRegister() {
         navigate("/profiles");
       });
     } catch (error) {
+      console.log("error :", error);
       setLoading(false);
       Swal.fire({
         title: "Error!",
@@ -292,4 +292,4 @@ function DemoRegister() {
   );
 }
 
-export default DemoRegister
+export default DemoRegister;

@@ -3,11 +3,11 @@ import { motion } from "framer-motion";
 import styled from "styled-components";
 import Cropper from "react-easy-crop";
 import { getProfileImage } from "../../../services/userAllDetailsService";
-import axios from "axios";
 import Swal from "sweetalert2";
 import AuthHook from "../../../auth/AuthHook";
 import { FaPencilAlt } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
+import { AxiosConfig } from "../../../config/AxiosConfig";
 
 const CardContainer = styled(motion.div)`
   display: flex;
@@ -213,8 +213,8 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
         formData.append(key, value);
       });
 
-      const res = await axios.put(
-        "https://shaadi-be.fino-web-app.agency/api/v1/auth/update-profile",
+      const res = await AxiosConfig.put(
+        "/api/v1/auth/update-profile",
         formData
       );
 

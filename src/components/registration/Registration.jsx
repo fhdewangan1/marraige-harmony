@@ -1,8 +1,8 @@
 import { useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { AxiosConfig } from "../../config/AxiosConfig";
 
 function Registration() {
   const [formData, setFormData] = useState({
@@ -177,7 +177,7 @@ function Registration() {
 
     if (validateAll()) {
       try {
-        setLoading(true); // Set loading before sending the request
+        setLoading(true);
 
         const formDataToSend = new FormData();
         for (const key in formData) {
@@ -187,11 +187,7 @@ function Registration() {
           );
         }
 
-        // Send form data
-        await axios.post(
-          "http://localhost:7878/api/v1/auth/create-profile",
-          formDataToSend
-        );
+        await AxiosConfig.post("auth/create-profile", formDataToSend);
 
         setLoading(false);
 

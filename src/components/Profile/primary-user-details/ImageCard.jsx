@@ -219,7 +219,11 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
       );
 
       if (res.status === 200 || res.status === 201) {
-        await Swal.fire("Success!", "Profile updated successfully!", "success");
+        await Swal.fire(
+          "Success!",
+          "Profile Image updated successfully!",
+          "success"
+        );
         fetchUserData();
         setFullScreen(false);
       } else {
@@ -229,7 +233,7 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
       console.log("error :", error);
       await Swal.fire(
         "Error!",
-        "There was an issue updating the profile.",
+        "There was an issue updating the profile Image.",
         "error"
       );
     }
@@ -258,18 +262,15 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
         </ImageWrapper>
       </CardContainer>
 
-      {/* Full-screen view modal */}
       {FullScreen && (
         <FullScreenModal
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={() => setFullScreen(false)} // Close on click outside
+          onClick={() => setFullScreen(false)}
         >
           <CropContainer onClick={(e) => e.stopPropagation()}>
-            {/* Close Icon */}
             <CloseIcon onClick={() => setFullScreen(false)} />
-            {/* Display the image without cropping */}
             <img
               src={profileImage || "defaultImageUrl.jpg"}
               alt="Full screen view"
@@ -279,13 +280,12 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
         </FullScreenModal>
       )}
 
-      {/* Crop modal */}
       {isFullScreen && (
         <FullScreenModal
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={() => setIsFullScreen(false)} // Close on click outside
+          onClick={() => setIsFullScreen(false)}
         >
           <CropContainer onClick={(e) => e.stopPropagation()}>
             {/* Close Icon */}
@@ -294,7 +294,7 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
               image={profileImage}
               crop={crop}
               zoom={zoom}
-              aspect={1} // Aspect ratio for square cropping
+              aspect={1}
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={onCropComplete}

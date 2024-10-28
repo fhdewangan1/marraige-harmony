@@ -189,7 +189,7 @@ function Registration() {
 
         // Send form data
         await axios.post(
-          "https://shaadi-be.fino-web-app.agency/api/v1/auth/create-profile",
+          "http://localhost:7878/api/v1/auth/create-profile",
           formDataToSend
         );
 

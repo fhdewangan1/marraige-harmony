@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import styled from "styled-components";
 import Cropper from "react-easy-crop";
@@ -6,6 +6,7 @@ import { getProfileImage } from "../../../services/userAllDetailsService";
 import axios from "axios";
 import Swal from "sweetalert2";
 import AuthHook from "../../../auth/AuthHook";
+import { FaPencilAlt } from "react-icons/fa";
 
 const CardContainer = styled(motion.div)`
   display: flex;
@@ -18,7 +19,7 @@ const CardContainer = styled(motion.div)`
   width: 100%;
   margin-bottom: 20px;
   align-self: flex-start;
-  cursor: pointer;
+  ${"" /* cursor: pointer; */}
 `;
 
 const ImageWrapper = styled.div`
@@ -28,6 +29,7 @@ const ImageWrapper = styled.div`
   background-position: center 20%;
   background-size: cover;
   height: 100%;
+  cursor: pointer;
 `;
 
 const FullScreenModal = styled(motion.div)`
@@ -46,9 +48,13 @@ const FullScreenModal = styled(motion.div)`
 
 const CropContainer = styled.div`
   position: relative;
-  width: 90vw;
+  width: 60vw;
   height: 90vh;
-  background-color: #333;
+  background-color: #a1a1a1;
+
+  @media (max-width: 768px) {
+    width: 90vw;
+  }
 `;
 
 const Button = styled.button`
@@ -60,20 +66,61 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
+const UpdateIconWrapper = styled.div`
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+`;
+
+const UpdateIcon = styled(FaPencilAlt)`
+  color: white;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 6px;
+  border-radius: 50%;
+  font-size: 2.1rem;
+  cursor: pointer;
+  &:hover + span {
+    opacity: 1;
+    visibility: visible;
+  }
+`;
+
+const Tooltip = styled.span`
+  position: absolute;
+  ${"" /* top: -30px; */}
+  right: 40px;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+`;
+
 const ImageCard = ({ mobileNumber, userDetails }) => {
   const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false); // Full screen state
+  const [FullScreen, setFullScreen] = useState(false); // Full screen state
 
+  // Crop-related states
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [croppedImageUrl, setCroppedImageUrl] = useState(null);
+  const [croppedImage, setCroppedImage] = useState(null); // To store the final cropped area
   const session = AuthHook();
 
   const fetchUserData = async () => {
     setLoading(true);
+    setError(null);
     try {
       const { imageUrl, status: responseStatus } = await getProfileImage(
         mobileNumber
@@ -82,12 +129,9 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
       if (responseStatus === 200) {
         setProfileImage(imageUrl);
       } else {
-        setError(
-          `Failed to load profile image. Status code: ${responseStatus}`
-        );
+        setError(`Failed to load profile image.Status code: ${responseStatus}`);
       }
     } catch (err) {
-      console.log("err :", err);
       setError("Failed to load profile image");
     } finally {
       setLoading(false);
@@ -132,8 +176,9 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
 
         canvas.toBlob((blob) => {
           const url = URL.createObjectURL(blob);
-          setCroppedImageUrl(url); // Store blob URL
+          setCroppedImage(url); // Store blob URL
           resolve(blob);
+          setIsFullScreen(false);
         }, "image/jpeg");
       };
     });
@@ -158,6 +203,8 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
 
       if (res.status === 200 || res.status === 201) {
         await Swal.fire("Success!", "Profile updated successfully!", "success");
+        fetchUserData();
+        setFullScreen(false);
       } else {
         throw new Error("Unexpected response status");
       }
@@ -182,24 +229,52 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
         transition={{ duration: 0.3 }}
       >
         <ImageWrapper
-          src={croppedImageUrl || profileImage || "defaultImageUrl.jpg"}
-          onClick={() => setIsFullScreen(mobileNumber === session?.userName)}
-        />
+          src={croppedImage || profileImage || "defaultImageUrl.jpg"}
+          onClick={() => setFullScreen(true)}
+        >
+          {mobileNumber === session?.userName && (
+            <UpdateIconWrapper>
+              <UpdateIcon onClick={() => setIsFullScreen(true)} />
+              <Tooltip>Edit Image</Tooltip>
+            </UpdateIconWrapper>
+          )}
+        </ImageWrapper>
+        {/* Fallback image */}
       </CardContainer>
 
+      {/* Full-screen modal for viewing only */}
+      {FullScreen && (
+        <FullScreenModal
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setFullScreen(false)} // Close on click outside
+        >
+          <CropContainer onClick={(e) => e.stopPropagation()}>
+            {/* Display the image without cropping */}
+            <img
+              src={profileImage || "defaultImageUrl.jpg"}
+              alt="Full screen view"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          </CropContainer>
+        </FullScreenModal>
+      )}
+
+      {/* Full-screen modal for crop */}
       {isFullScreen && (
         <FullScreenModal
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={() => setIsFullScreen(false)}
+          onClick={() => setIsFullScreen(false)} // Close on click outside
         >
           <CropContainer onClick={(e) => e.stopPropagation()}>
             <Cropper
               image={profileImage}
               crop={crop}
               zoom={zoom}
-              aspect={1}
+              aspect={1} // Aspect ratio for square cropping
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={onCropComplete}

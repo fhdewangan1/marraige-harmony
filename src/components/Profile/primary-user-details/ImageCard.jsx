@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import styled from "styled-components";
 import Cropper from "react-easy-crop";
@@ -7,6 +7,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import AuthHook from "../../../auth/AuthHook";
 import { FaPencilAlt } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
 
 const CardContainer = styled(motion.div)`
   display: flex;
@@ -103,6 +104,20 @@ const Tooltip = styled.span`
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
 `;
+const CloseIcon = styled(AiOutlineClose)`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
+  z-index: 10;
+  width: 30px;
+  height: 30px;
+`;
 
 const ImageCard = ({ mobileNumber, userDetails }) => {
   const [profileImage, setProfileImage] = useState(null);
@@ -132,6 +147,7 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
         setError(`Failed to load profile image.Status code: ${responseStatus}`);
       }
     } catch (err) {
+      console.log("err :", err);
       setError("Failed to load profile image");
     } finally {
       setLoading(false);
@@ -140,6 +156,7 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
 
   useEffect(() => {
     fetchUserData();
+    // eslint-disable-next-line
   }, [mobileNumber]);
 
   const onCropComplete = useCallback((_, croppedAreaPixels) => {
@@ -239,10 +256,9 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
             </UpdateIconWrapper>
           )}
         </ImageWrapper>
-        {/* Fallback image */}
       </CardContainer>
 
-      {/* Full-screen modal for viewing only */}
+      {/* Full-screen view modal */}
       {FullScreen && (
         <FullScreenModal
           initial={{ opacity: 0 }}
@@ -251,6 +267,8 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
           onClick={() => setFullScreen(false)} // Close on click outside
         >
           <CropContainer onClick={(e) => e.stopPropagation()}>
+            {/* Close Icon */}
+            <CloseIcon onClick={() => setFullScreen(false)} />
             {/* Display the image without cropping */}
             <img
               src={profileImage || "defaultImageUrl.jpg"}
@@ -261,7 +279,7 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
         </FullScreenModal>
       )}
 
-      {/* Full-screen modal for crop */}
+      {/* Crop modal */}
       {isFullScreen && (
         <FullScreenModal
           initial={{ opacity: 0 }}
@@ -270,6 +288,8 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
           onClick={() => setIsFullScreen(false)} // Close on click outside
         >
           <CropContainer onClick={(e) => e.stopPropagation()}>
+            {/* Close Icon */}
+            <CloseIcon onClick={() => setIsFullScreen(false)} />
             <Cropper
               image={profileImage}
               crop={crop}

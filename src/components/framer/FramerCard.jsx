@@ -325,7 +325,7 @@ const FramerCard = () => {
                         className="show-more-btn bg-blue-500 text-white w-full lg:w-4/12 float-right px-4 py-2 rounded transition duration-200 ease-in-out transform hover:scale-105"
                         onClick={() => handleMoreDetailsClick(profile)}
                       >
-                        Show More
+                        Show More Details
                       </button>
                     </div>
                   </div>
@@ -333,7 +333,7 @@ const FramerCard = () => {
             )}
 
             {/* Pagination */}
-            <div className="d-flex justify-center mt-2 w-full">
+            <div className="d-flex justify-center mt-2 w-full mb-4">
               <div>
                 <ul className="pagination">
                   {Array.from({ length: totalPages }, (_, i) => (

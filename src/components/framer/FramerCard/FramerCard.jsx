@@ -195,7 +195,7 @@ const FramerCard = () => {
                         className="show-more-btn bg-blue-500 text-white px-4 py-2 rounded transition duration-200 ease-in-out transform hover:scale-105"
                         onClick={() => handleMoreDetailsClick(profile)}
                       >
-                        Show More
+                        Show More Details
                       </button>
                     </div>
                   </div>

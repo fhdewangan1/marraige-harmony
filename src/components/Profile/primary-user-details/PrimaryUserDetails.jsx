@@ -190,6 +190,7 @@ const PrimaryUserDetails = ({
             "success"
           ).then(() => {
             setIsModalOpen(false);
+            window.location.reload(); //temp fix
           });
         } else {
           Swal.fire(

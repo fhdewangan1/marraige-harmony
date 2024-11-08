@@ -4,7 +4,6 @@ import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
-import { AxiosConfig } from "../../../config/AxiosConfig";
 
 // Styled components
 const CardContainer = styled.div`
@@ -20,31 +19,22 @@ const CardContainer = styled.div`
   }
 `;
 
-const ContentWrapper = styled.div`
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(
-      auto-fill,
-      minmax(120px, 1fr)
-    ); /* Responsive for mobile */
-  }
-`;
-
 // Personal Fields
 const personalFields = [
-  { key: "userHeight", value: "Height " },
-  { key: "userWeight", value: "Weight " },
-  { key: "gotra", value: "Gotra " },
-  { key: "manglik", value: "Manglik " },
-  { key: "maritalStatus", value: "Marital Status " },
-  { key: "isPersonDisabled", value: "Is Disabled " },
+  { key: "userHeight", value: "Height" },
+  { key: "userWeight", value: "Weight" },
+  { key: "gotra", value: "Gotra" },
+  { key: "manglik", value: "Manglik" },
+  { key: "maritalStatus", value: "Marital Status" },
+  { key: "isPersonDisabled", value: "Is Disabled" },
   { key: "userIncome", value: "Monthly Income" },
-  { key: "isUserStayingAlone", value: "Is Staying Alone " },
-  { key: "hobbies", value: "Hobbies " },
-  { key: "birthPlace", value: "Birth Place " },
-  { key: "complexion", value: "Complexion " },
-  { key: "rashi", value: "Rashi " },
-  { key: "bloodGroup", value: "Blood Group " },
-  { key: "bodyType", value: "Body Type " },
+  { key: "isUserStayingAlone", value: "Is Staying Alone" },
+  { key: "hobbies", value: "Hobbies" },
+  { key: "birthPlace", value: "Birth Place" },
+  { key: "complexion", value: "Complexion" },
+  { key: "rashi", value: "Rashi" },
+  { key: "bloodGroup", value: "Blood Group" },
+  { key: "bodyType", value: "Body Type" },
 ];
 
 const UserPersonalDetails = ({
@@ -58,12 +48,15 @@ const UserPersonalDetails = ({
   const [loading, setLoading] = useState(false);
   const session = AuthHook();
   const { mobileNumber } = useParams();
+  const [errors, setErrors] = useState({});
 
   const handleFieldChange = (key, value) => {
     setUpdatedProfile((prevProfile) => ({
       ...prevProfile,
       [key]: value,
     }));
+
+    validate(key, value);
   };
 
   useEffect(() => {
@@ -74,22 +67,76 @@ const UserPersonalDetails = ({
     setIsModalOpen(!isModalOpen);
   };
 
+  const validateFields = () => {
+    const { userHeight, userWeight, userIncome, ...otherFields } =
+      updatedProfile;
+    let errors = {};
+
+    if (!updatedProfile.userHeight) {
+      errors.userHeight = "value is required";
+    } else if (userHeight > 100) {
+      errors.userHeight = "Please enter a valid value of height in centimeter";
+    }
+
+    if (!updatedProfile.userWeight) {
+      errors.userWeight = "value is required.";
+    } else if (userWeight > 100) {
+      errors.userWeight = "Please enter a valid value of weight in kilograms";
+    }
+
+    if (!updatedProfile.userIncome) {
+      errors.userIncome = "value is required.";
+    } else if (userIncome > 100) {
+      errors.userIncome = "Please enter a valid value of income in rupees";
+    }
+
+    // Check if any other field is empty
+    for (const key in otherFields) {
+      if (!otherFields[key]) {
+        errors[key] = `The field ${key} cannot be empty.`;
+      }
+    }
+
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validate = (key, value) => {
+    let newErrors = { ...errors };
+
+    if (!value) {
+      newErrors[key] = `${key} is required`;
+    } else if (key === "userHeight" && value.length > 3) {
+      newErrors[key] = "please enter height in 3 digits in CM";
+    } else if (key === "userWeight" && value.length > 3) {
+      newErrors[key] = "please enter weight in 3 digits in KG";
+    } else {
+      delete newErrors[key];
+    }
+
+    setErrors(newErrors);
+  };
+
   const handleSubmit = async () => {
+    if (!validateFields()) return;
+
     setLoading(true);
     const apiUrl = response
-      ? `update-user-personal-details/${mobileNumber}` // Use the endpoint relative to the base URL
-      : `save-user-personal-details?mobileNumber=${mobileNumber}`;
+      ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-personal-details/${mobileNumber}`
+      : `https://shaadi-be.fino-web-app.agency/api/v1/save-user-personal-details?mobileNumber=${mobileNumber}`;
 
     try {
-      const res = await AxiosConfig({
+      const res = await fetch(apiUrl, {
         method: response ? "PUT" : "POST",
-        url: apiUrl,
-        data: updatedProfile,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedProfile),
       });
-
+      const data = await res.json();
       setLoading(false);
 
-      if (res.status === 200 || res.status === 201) {
+      if (data.status === 200 || data.status === 201) {
         setStatus(!status);
         refresAfterUpdate && refresAfterUpdate(!status);
         Swal.fire(
@@ -102,7 +149,7 @@ const UserPersonalDetails = ({
       } else {
         Swal.fire(
           "Error",
-          res.data.message || "Failed to update user details",
+          data.message || "Failed to update user details",
           "error"
         );
       }
@@ -145,17 +192,12 @@ const UserPersonalDetails = ({
             </Button>
           )}
         </div>
-        <ContentWrapper
-          style={{
-            padding: "15px",
-            backgroundColor: "#f8f9fa",
-            borderRadius: "8px",
-          }}
-        >
+        <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4">
           {personalFields.map((field, index) => (
             <div
               key={index}
-              className="mb-3 p-2 d-flex justify-content-between align-items-center border-bottom"
+              className="mb-2 p-2 d-flex justify-content-between align-items-center border-bottom"
+              style={{ flexWrap: "wrap" }}
             >
               <strong
                 className="text-primary"
@@ -177,7 +219,7 @@ const UserPersonalDetails = ({
               </span>
             </div>
           ))}
-        </ContentWrapper>
+        </div>
       </CardContainer>
 
       {isModalOpen && (
@@ -201,7 +243,10 @@ const UserPersonalDetails = ({
                   <Form.Label className="font-weight-bold">
                     {field.value}
                   </Form.Label>
-                  <div className="input-group">
+                  <div
+                    className="input-group"
+                    style={{ flexDirection: "column" }}
+                  >
                     <Form.Control
                       type="text"
                       value={updatedProfile[field.key] || ""}
@@ -213,8 +258,17 @@ const UserPersonalDetails = ({
                       style={{
                         boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
                         marginLeft: "5px",
+                        width: "100%",
                       }}
                     />
+                    {errors[field.key] && (
+                      <div
+                        className="text-danger mt-1"
+                        style={{ fontSize: "0.8rem" }}
+                      >
+                        {errors[field.key]}
+                      </div>
+                    )}
                   </div>
                 </Form.Group>
               ))}

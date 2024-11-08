@@ -4,7 +4,6 @@ import Swal from "sweetalert2";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { AxiosConfig } from "../../../config/AxiosConfig";
 
 const CardContainer = styled.div`
   background: white;
@@ -19,26 +18,14 @@ const CardContainer = styled.div`
   }
 `;
 
-const ContentWrapper = styled.div`
-  max-height: 100vh;
-  // top:30px
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(
-      auto-fill,
-      minmax(120px, 1fr)
-    ); /* Responsive for mobile */
-  }
-`;
-
 // Fields data
-const lifeStyleAndEducationFields = [
-  { key: "userOccupation", value: "Occupation " },
-  { key: "userCurrentLoc", value: "Current Location " },
-  { key: "drinking", value: "Drinking Habits " },
-  { key: "smoking", value: "Smoking Habits " },
-  { key: "diet", value: "Diet " },
-  { key: "qualification", value: "Qualification " },
+export const lifeStyleAndEducationFields = [
+  { key: "userOccupation", value: "Occupation" },
+  { key: "userCurrentLoc", value: "Current Location" },
+  { key: "drinking", value: "Drinking Habits" },
+  { key: "smoking", value: "Smoking Habits" },
+  { key: "diet", value: "Diet" },
+  { key: "qualification", value: "Qualification" },
 ];
 
 const UserLifeStyleAndEducation = ({
@@ -53,6 +40,7 @@ const UserLifeStyleAndEducation = ({
   const [error, setError] = useState("");
   const session = AuthHook();
   const { mobileNumber } = useParams();
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     setUpdatedProfile(response || {});
@@ -63,6 +51,8 @@ const UserLifeStyleAndEducation = ({
       ...prevProfile,
       [key]: value,
     }));
+
+    validate(key, value);
   };
 
   const toggleModal = () => {
@@ -70,30 +60,60 @@ const UserLifeStyleAndEducation = ({
     setError("");
   };
 
-  const handleSubmit = async () => {
-    // Basic validation
-    for (const field of lifeStyleAndEducationFields) {
-      if (!updatedProfile[field.key]) {
-        setError(`${field.value} is required.`);
-        return; // Stop if validation fails
+  const validateFields = () => {
+    let errors = {};
+
+    // Check if any other field is empty
+    for (const key in updatedProfile) {
+      if (!updatedProfile[key]) {
+        errors[key] = `The field ${key} cannot be empty.`;
       }
     }
 
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validate = (key, value) => {
+    let newErrors = { ...errors };
+
+    if (!value) {
+      newErrors[key] = `${key} is required`;
+    } else {
+      delete newErrors[key];
+    }
+
+    setErrors(newErrors);
+  };
+
+  const handleSubmit = async () => {
+    // Basic validation
+    // for (const field of lifeStyleAndEducationFields) {
+    //   if (!updatedProfile[field.key]) {
+    //     setError(`${field.value} is required.`);
+    //     return; // Stop if validation fails
+    //   }
+    // }
+
+    if (!validateFields()) return;
+
     setLoading(true);
     const apiUrl = response
-      ? `update-user-life-style-details/${mobileNumber}` // Use the endpoint relative to the base URL
-      : `save-user-life-style?mobileNumber=${mobileNumber}`;
+      ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-life-style-details/${mobileNumber}`
+      : `https://shaadi-be.fino-web-app.agency/api/v1/save-user-life-style?mobileNumber=${mobileNumber}`;
 
     try {
-      const res = await AxiosConfig({
+      const res = await fetch(apiUrl, {
         method: response ? "PUT" : "POST",
-        url: apiUrl,
-        data: updatedProfile,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedProfile),
       });
-
+      const data = await res.json();
       setLoading(false);
 
-      if (res.status === 200 || res.status === 201) {
+      if (data.status === 200 || data.status === 201) {
         setStatus(!status);
         refresAfterUpdate && refresAfterUpdate(!status);
         Swal.fire(
@@ -104,10 +124,10 @@ const UserLifeStyleAndEducation = ({
           toggleModal();
         });
       } else {
-        setError(res.data.message || "Failed to update user details");
+        setError(data.message || "Failed to update user details");
         Swal.fire(
           "Error",
-          res.data.message || "Failed to update user details",
+          data.message || "Failed to update user details",
           "error"
         );
       }
@@ -151,18 +171,12 @@ const UserLifeStyleAndEducation = ({
             </Button>
           </div>
         )}
-        <ContentWrapper
-          style={{
-            marginTop: "29px",
-            padding: "15px",
-            backgroundColor: "#f8f9fa",
-            borderRadius: "8px",
-          }}
-        >
+        <div className="grid grid-cols-1 gap-4">
           {lifeStyleAndEducationFields.map((field, index) => (
             <div
               key={index}
-              className="mb-3 p-2 d-flex justify-content-between align-items-center border-bottom"
+              className="mb-2 p-2 d-flex justify-content-between align-items-center border-bottom"
+              style={{ flexWrap: "wrap" }}
             >
               <strong
                 className="text-primary"
@@ -186,7 +200,7 @@ const UserLifeStyleAndEducation = ({
               </span>
             </div>
           ))}
-        </ContentWrapper>
+        </div>
       </CardContainer>
 
       {isModalOpen && (
@@ -199,14 +213,23 @@ const UserLifeStyleAndEducation = ({
                 : "Add Lifestyle and Education Details"}
             </Modal.Title>
           </Modal.Header>
-          <Modal.Body style={{ padding: "30px 50px" }}>
+          <Modal.Body
+            style={{
+              padding: "30px 50px",
+              maxHeight: "60vh",
+              overflowY: "auto",
+            }}
+          >
             <Form>
               {lifeStyleAndEducationFields.map((field, index) => (
                 <Form.Group key={index} className="mb-4">
                   <Form.Label className="font-weight-bold">
                     {field.value}
                   </Form.Label>
-                  <div className="input-group">
+                  <div
+                    className="input-group"
+                    style={{ flexDirection: "column" }}
+                  >
                     <Form.Control
                       type="text"
                       value={updatedProfile[field.key] || ""}
@@ -217,9 +240,18 @@ const UserLifeStyleAndEducation = ({
                       className="border-0 rounded-end"
                       style={{
                         boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                        width: "100%",
                         marginLeft: "5px", // Slight margin for spacing consistency
                       }}
                     />
+                    {errors[field.key] && (
+                      <div
+                        className="text-danger mt-1"
+                        style={{ fontSize: "0.8rem" }}
+                      >
+                        {errors[field.key]}
+                      </div>
+                    )}
                   </div>
                 </Form.Group>
               ))}

@@ -4,7 +4,6 @@ import Swal from "sweetalert2";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
-import { AxiosConfig } from "../../../config/AxiosConfig";
 
 const CardContainer = styled.div`
   background: white;
@@ -19,31 +18,20 @@ const CardContainer = styled.div`
   }
 `;
 
-const ContentWrapper = styled.div`
-  // top:30px
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(
-      auto-fill,
-      minmax(120px, 1fr)
-    ); /* Responsive for mobile */
-  }
-`;
-
 const familyFields = [
-  { key: "fatherName", value: "Father " },
-  { key: "fatherOccupation", value: "Father's Occupation " },
+  { key: "fatherName", value: "Father" },
+  { key: "fatherOccupation", value: "Father's Occupation" },
   { key: "motherName", value: "Mother" },
-  { key: "motherOccupation", value: "Mother's Occupation " },
-  { key: "noOfBrothers", value: "Number of Brothers " },
-  { key: "noOfBrothersMarried", value: "Number of Married Brothers " },
-  { key: "noOfSisters", value: "Number of Sisters " },
-  { key: "noOfSistersMarried", value: "Number of Married Sisters " },
-  { key: "noOfFamilyMembers", value: "Total Number of Family Members " },
-  { key: "familyValue", value: "Family Values " },
-  { key: "familyDetails", value: "Family Details " },
-  { key: "familyStatus", value: "Family Status " },
-  { key: "maternalGotra", value: "Maternal Gotra " },
+  { key: "motherOccupation", value: "Mother's Occupation" },
+  { key: "noOfBrothers", value: "Number of Brothers" },
+  { key: "noOfBrothersMarried", value: "Number of Married Brothers" },
+  { key: "noOfSisters", value: "Number of Sisters" },
+  { key: "noOfSistersMarried", value: "Number of Married Sisters" },
+  { key: "noOfFamilyMembers", value: "Total Number of Family Members" },
+  { key: "familyValue", value: "Family Values" },
+  { key: "familyDetails", value: "Family Details" },
+  { key: "familyStatus", value: "Family Status" },
+  { key: "maternalGotra", value: "Maternal Gotra" },
 ];
 
 const UserFamilyDetails = ({
@@ -57,6 +45,7 @@ const UserFamilyDetails = ({
   const [loading, setLoading] = useState(false);
   const session = AuthHook();
   const { mobileNumber } = useParams();
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     setUpdatedProfile(response || {});
@@ -67,45 +56,124 @@ const UserFamilyDetails = ({
       ...prevProfile,
       [key]: value,
     }));
+
+    validate(key, value);
+  };
+
+  const validateFields = () => {
+    const {
+      noOfBrothers,
+      noOfBrothersMarried,
+      noOfSisters,
+      noOfSistersMarried,
+      noOfFamilyMembers,
+      ...otherFields
+    } = updatedProfile;
+    let errors = {};
+
+    if (!updatedProfile.noOfBrothers) {
+      errors.noOfBrothers = "value is required";
+    } else if (noOfBrothers > 100) {
+      errors.noOfBrothers = "Please enter a valid value below 100";
+    }
+
+    if (!updatedProfile.noOfBrothersMarried) {
+      errors.noOfBrothersMarried = "value is required.";
+    } else if (noOfBrothersMarried > 100) {
+      errors.noOfBrothersMarried = "Please enter a valid value below 100";
+    }
+
+    if (!updatedProfile.noOfSisters) {
+      errors.noOfSisters = "value is required.";
+    } else if (noOfSisters > 100) {
+      errors.noOfSisters = "Please enter a valid value below 100";
+    }
+
+    if (!updatedProfile.noOfSistersMarried) {
+      errors.noOfSistersMarried = "value is required.";
+    } else if (noOfSistersMarried > 100) {
+      errors.noOfSistersMarried = "Please enter a valid value below 100";
+    }
+
+    if (!updatedProfile.noOfFamilyMembers) {
+      errors.noOfFamilyMembers = "value is required.";
+    } else if (noOfFamilyMembers > 100) {
+      errors.noOfFamilyMembers = "Please enter a valid value below 100";
+    }
+
+    // Check if any other field is empty
+    for (const key in otherFields) {
+      if (!otherFields[key]) {
+        errors[key] = `The field ${key} cannot be empty.`;
+      }
+    }
+
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validate = (key, value) => {
+    let newErrors = { ...errors };
+
+    if (!value) {
+      newErrors[key] = `${key} is required`;
+    } else if (key === "noOfFamilyMembers" && value > 100) {
+      newErrors[key] = "value should be less than 100";
+    } else if (key === "noOfBrothers" && value > 100) {
+      newErrors[key] = "value should be less than 100";
+    } else if (key === "noOfBrothersMarried" && value > 100) {
+      newErrors[key] = "value should be less than 100";
+    } else if (key === "noOfSisters" && value > 100) {
+      newErrors[key] = "value should be less than 100";
+    } else if (key === "noOfSistersMarried" && value > 100) {
+      newErrors[key] = "value should be less than 100";
+    } else {
+      delete newErrors[key];
+    }
+
+    setErrors(newErrors);
   };
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
+    if (!validateFields()) return;
+
     setLoading(true);
     const apiUrl = response
-      ? `update-user-family-details/${mobileNumber}` // Use the endpoint relative to the base URL
-      : `save-user-family-details?mobileNumber=${mobileNumber}`;
+      ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-family-details/${mobileNumber}`
+      : `https://shaadi-be.fino-web-app.agency/api/v1/save-user-family-details?mobileNumber=${mobileNumber}`;
 
-    try {
-      const res = await AxiosConfig({
-        method: response ? "PUT" : "POST",
-        url: apiUrl,
-        data: updatedProfile, // Send updatedProfile directly as data
+    fetch(apiUrl, {
+      method: response ? "PUT" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedProfile),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLoading(false);
+        if (data.status === 200 || data.status === 201) {
+          setStatus(!status);
+          refresAfterUpdate && refresAfterUpdate(!status);
+          Swal.fire(
+            "Success!",
+            "User details updated successfully!",
+            "success"
+          ).then(() => {
+            toggleModal(); // Close modal after success
+          });
+        } else {
+          Swal.fire("Error", "Failed to update user details", "error");
+        }
+      })
+      .catch(() => {
+        setLoading(false);
+        Swal.fire("Error", "An error occurred. Please try again.", "error");
       });
-
-      setLoading(false);
-
-      if (res.status === 200 || res.status === 201) {
-        setStatus(!status);
-        refresAfterUpdate && refresAfterUpdate(!status);
-        Swal.fire(
-          "Success!",
-          "User details updated successfully!",
-          "success"
-        ).then(() => {
-          toggleModal(); // Close modal after success
-        });
-      } else {
-        Swal.fire("Error", "Failed to update user details", "error");
-      }
-    } catch (err) {
-      console.log("err :", err);
-      setLoading(false);
-      Swal.fire("Error", "An error occurred. Please try again.", "error");
-    }
   };
 
   return (
@@ -140,17 +208,12 @@ const UserFamilyDetails = ({
             </Button>
           </div>
         )}
-        <ContentWrapper
-          style={{
-            padding: "15px",
-            backgroundColor: "#f8f9fa",
-            borderRadius: "8px",
-          }}
-        >
+        <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4">
           {familyFields.map((field, index) => (
             <div
               key={index}
-              className="mb-3 p-2 d-flex justify-content-between align-items-center border-bottom"
+              className="mb-2 p-2 d-flex justify-content-between align-items-center border-bottom"
+              style={{ flexWrap: "wrap" }}
             >
               <strong
                 className="text-primary"
@@ -174,7 +237,7 @@ const UserFamilyDetails = ({
               </span>
             </div>
           ))}
-        </ContentWrapper>
+        </div>
       </CardContainer>
 
       {isModalOpen && (
@@ -198,7 +261,10 @@ const UserFamilyDetails = ({
                   <Form.Label className="font-weight-bold">
                     {field.value}
                   </Form.Label>
-                  <div className="input-group">
+                  <div
+                    className="input-group"
+                    style={{ flexDirection: "column" }}
+                  >
                     <Form.Control
                       type={field.key.includes("noOf") ? "number" : "text"}
                       value={updatedProfile[field.key] || ""}
@@ -208,8 +274,19 @@ const UserFamilyDetails = ({
                       min={0}
                       placeholder={`Enter ${field.value}`}
                       className="border-0 rounded-end"
-                      style={{ boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)" }}
+                      style={{
+                        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                        width: "100%",
+                      }}
                     />
+                    {errors[field.key] && (
+                      <div
+                        className="text-danger mt-1"
+                        style={{ fontSize: "0.8rem" }}
+                      >
+                        {errors[field.key]}
+                      </div>
+                    )}
                   </div>
                 </Form.Group>
               ))}
@@ -228,14 +305,15 @@ const UserFamilyDetails = ({
                 backgroundColor: "rgb(219, 39, 119)",
                 borderColor: "#ec4899",
               }}
-              onClick={handleSubmit}
+              onClick={() => {
+                // if (validateForm()) {
+                handleSubmit();
+                // }
+              }}
               disabled={loading}
             >
               <i className="fas fa-save me-2"></i> Save Changes
             </Button>
-            {/* <Button variant="secondary" onClick={toggleModal} disabled={loading}>
-              <i className="fas fa-times me-2"></i> Cancel
-            </Button> */}
           </Modal.Footer>
         </Modal>
       )}

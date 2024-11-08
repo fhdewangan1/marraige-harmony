@@ -196,14 +196,14 @@ const FramerCard = () => {
               <div className="flex mb-3">
                 <input
                   type="number"
-                  placeholder="Min Height (cm)"
+                  placeholder="Min Height"
                   value={minHeight}
                   onChange={(e) => setMinHeight(e.target.value)}
                   className="form-control mr-2 p-2"
                 />
                 <input
                   type="number"
-                  placeholder="Max Height (cm)"
+                  placeholder="Max Height"
                   value={maxHeight}
                   onChange={(e) => setMaxHeight(e.target.value)}
                   className="form-control p-2"

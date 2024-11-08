@@ -17,9 +17,7 @@ const DemoCardDetails = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [activeSection, setActiveSection] = useState("PrimaryUserDetails");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [updateimage, setupdateimage] = useState();
   const [status, setStatus] = useState(false);
-  const [updatedProfile, setUpdatedProfile] = useState(null);
 
   // Fetch user data
   const fetchUserData = async (mobileNumber) => {
@@ -62,7 +60,6 @@ const DemoCardDetails = () => {
             response={userDetails?.response}
             mobileNumber={mobileNumber}
             imageUrl={profileImage}
-            updateimage={updateimage} // Ensure this is included
           />
           <h1 className="text-center">Family Details</h1>
           <UserFamilyDetails
@@ -101,7 +98,6 @@ const DemoCardDetails = () => {
             response={userDetails?.response}
             mobileNumber={mobileNumber}
             imageUrl={profileImage}
-            handleModalUpdate={handleModalUpdate}
           />
         );
       case "UserFamilyDetails":
@@ -145,10 +141,6 @@ const DemoCardDetails = () => {
           />
         );
     }
-  };
-
-  const handleModalUpdate = (data) => {
-    setUpdatedProfile(data);
   };
 
   return (

@@ -21,6 +21,7 @@ function Navbar() {
   const session = AuthHook();
   const navigate = useNavigate();
   const location = useLocation(); // Get the current location
+  const handleAccept = () => {};
   const [toggleNavbarColor, setToggleNavbarColor] = useState(
     !!session?.jwtToken
   );
@@ -97,7 +98,7 @@ function Navbar() {
             <ul className="navbar-nav ms-auto">
               {session?.jwtToken ? (
                 <>
-                  <li className="nav-item">
+                  {/* <li className="nav-item">
                     <button
                       className={`nav-link ${
                         activeLink === "profile" ? "active" : ""
@@ -107,7 +108,7 @@ function Navbar() {
                       <span className="nav-icon desktop-only"></span>
                       My Requests
                     </button>
-                  </li>
+                  </li> */}
                   <li className="nav-item">
                     <button
                       className={`nav-link ${
@@ -223,7 +224,7 @@ function Navbar() {
                 <FaTachometerAlt className="mobile-icon" />
                 Dashboard
               </li>
-              <li
+              {/* <li
                 className={`mobile-link ${
                   activeLink === "/profiles" ? "active" : ""
                 }`}
@@ -231,7 +232,7 @@ function Navbar() {
               >
                 <FaTachometerAlt className="mobile-icon" />
                 My Requests
-              </li>
+              </li> */}
               <li
                 className={`mobile-link ${
                   activeLink === "/change-password" ? "active" : ""

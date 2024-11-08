@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import styled from "styled-components";
-import { AxiosConfig } from "../../../config/AxiosConfig";
 
 const CardContainer = styled.div`
   background: white;
@@ -54,8 +53,6 @@ const PrimaryUserDetails = ({
   refresAfterUpdate,
   setStatus,
   status,
-  updateimage,
-  handleModalUpdate,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(response || {});
@@ -63,17 +60,90 @@ const PrimaryUserDetails = ({
   const [profileImage, setProfileImage] = useState(null);
   const session = AuthHook();
   const { mobileNumber } = useParams();
+  const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
     setUpdatedProfile(response);
   }, [response]);
 
-  useEffect(() => {
-    console.log("image crop");
-  }, [updateimage]);
-
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
+  };
+
+  const handleImageChange = (e) => {
+    setProfileImage(e.target.files[0]);
+  };
+
+  const validateFields = () => {
+    const { mailId, ...otherFields } = updatedProfile;
+    let errors = {};
+
+    if (!updatedProfile.mobileNumber) {
+      errors.mobileNumber = "Contact is required";
+    } else if (!/^\d{10}$/.test(updatedProfile.mobileNumber)) {
+      errors.mobileNumber = "Mobile must be a 10-digit number";
+    }
+
+    if (!updatedProfile.mailId) {
+      errors.mailId = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mailId)) {
+      errors.mailId = "Please enter a valid email address.";
+    }
+
+    // Check if any other field is empty
+    for (const key in otherFields) {
+      if (!otherFields[key]) {
+        errors[key] = `The field ${key} cannot be empty.`;
+      }
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validate = (name, value) => {
+    let newErrors = { ...formErrors };
+
+    switch (name) {
+      case "mobileNumber":
+        if (!value) {
+          newErrors.mobileNumber = "Contact is required";
+        } else if (!/^\d{10}$/.test(value)) {
+          newErrors.mobileNumber = "Mobile must be of 10 digits";
+        } else {
+          delete newErrors.mobileNumber;
+        }
+        break;
+
+      case "mailId":
+        if (!value) {
+          newErrors.email = "Email is required";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          newErrors.email = "Please enter a valid email address";
+        } else {
+          delete newErrors.email;
+        }
+        break;
+
+      case "age":
+        if (!value) {
+          newErrors.age = "Age is required";
+        } else if (value > 100) {
+          newErrors.age = "Please enter age below 100";
+        } else {
+          delete newErrors.age;
+        }
+        break;
+
+      default:
+        if (!value) {
+          newErrors[name] = `${name} is required`;
+        } else {
+          delete newErrors[name];
+        }
+    }
+
+    setFormErrors(newErrors);
   };
 
   const handleFieldChange = (key, value) => {
@@ -81,40 +151,39 @@ const PrimaryUserDetails = ({
       ...prevProfile,
       [key]: value,
     }));
-  };
 
-  const handleImageChange = (e) => {
-    setProfileImage(e.target.files[0]);
+    validate(key, value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateFields()) return;
     setLoading(true);
 
     const formData = new FormData();
     Object.keys(updatedProfile).forEach((key) => {
       formData.append(key, updatedProfile[key]);
     });
-    handleModalUpdate(updatedProfile);
     if (profileImage) {
       formData.append("profileImage", profileImage);
     }
 
-    AxiosConfig.put("/api/v1/auth/update-profile", formData)
-      .then((response) => {
+    fetch("https://shaadi-be.fino-web-app.agency/api/v1/auth/update-profile", {
+      method: "PUT",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
         setLoading(false);
-        const data = response.data;
         if (data.status === 200 || data.status === 201) {
           setStatus(!status);
           refresAfterUpdate && refresAfterUpdate(!status);
-
           if (data.profileImage) {
             setUpdatedProfile((prevProfile) => ({
               ...prevProfile,
               profileImage: data.profileImage,
             }));
           }
-
           Swal.fire(
             "Success!",
             "Profile updated successfully!",
@@ -179,6 +248,7 @@ const PrimaryUserDetails = ({
             <div
               key={index}
               className="mb-2 flex justify-between items-center py-2 border-b"
+              style={{ flexWrap: "wrap" }}
             >
               <strong
                 className="text-gray-700 text-sm text-primary"
@@ -190,6 +260,22 @@ const PrimaryUserDetails = ({
                 className="text-gray-600 text-sm"
                 style={{ fontSize: "large" }}
               >
+                {/* {field.key === "mobileNumber" ? (
+                  session && response?.mobileNumber === session.userName ? ( // Check if user is logged in and matches
+                    response.mobileNumber // Show mobile number
+                  ) : (
+                    <Button>Request</Button> // Show button if user is not logged in or not the same user
+                  )
+                ) : response && response[field.key] !== undefined ? (
+                  Array.isArray(response[field.key]) ? (
+                    response[field.key].join(", ")
+                  ) : (
+                    response[field.key]
+                  )
+                ) : (
+                  "N/A"
+                )} */}
+
                 {response && response[field.key] !== undefined
                   ? Array.isArray(response[field.key])
                     ? response[field.key].join(", ")
@@ -209,6 +295,7 @@ const PrimaryUserDetails = ({
               {response ? "Update Profile" : "Add Profile"}
             </Modal.Title>
           </Modal.Header>
+
           <Modal.Body
             style={{
               padding: "30px 50px",
@@ -230,7 +317,9 @@ const PrimaryUserDetails = ({
                         onChange={(e) =>
                           handleFieldChange(field.key, e.target.value)
                         }
-                        className="border-0 rounded-end"
+                        className={`border-0 rounded-end ${
+                          formErrors[field.key] ? "border-red-500" : ""
+                        }`}
                         style={{ boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)" }}
                       >
                         {/* Add your select options here based on the field.key */}
@@ -266,11 +355,20 @@ const PrimaryUserDetails = ({
                         }
                         disabled={field.isDisabled}
                         placeholder={`Enter ${field.label}`}
-                        className="border-0 rounded-end"
+                        className={`border-0 rounded-end ${
+                          formErrors[field.key] ? "border-red-500" : ""
+                        }`}
                         style={{ boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)" }}
                       />
                     )}
                   </div>
+
+                  {/* Display error message below the input */}
+                  {formErrors[field.key] && (
+                    <div className="text-red-500 text-sm mt-1">
+                      {formErrors[field.key]}
+                    </div>
+                  )}
                 </Form.Group>
               ))}
 
@@ -291,6 +389,7 @@ const PrimaryUserDetails = ({
               </div>
             )}
           </Modal.Body>
+
           <Modal.Footer>
             <Button
               variant="success"
@@ -303,9 +402,6 @@ const PrimaryUserDetails = ({
             >
               <i className="fas fa-save me-2"></i> Save Changes
             </Button>
-            {/* <Button variant="secondary" onClick={toggleModal} disabled={loading}>
-              <i className="fas fa-times me-2"></i> Cancel
-            </Button> */}
           </Modal.Footer>
         </Modal>
       )}

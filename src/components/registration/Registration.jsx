@@ -214,6 +214,20 @@ function Registration() {
     }
   };
 
+  function toPascalCase(text) {
+    return text
+      .toLowerCase()
+      .replace(/(?:^|\s|-|_)\w/g, (match) => match.toUpperCase())
+      .replace(/\s|-|_/g, "");
+  }
+  const handlePascalCaseChange = (e) => {
+    const { name, value } = e.target;
+    const pascalCaseValue = toPascalCase(value);
+
+    // Pass the PascalCase value to the parent handleChange function
+    handleChange({ target: { name, value: pascalCaseValue } });
+  };
+
   return (
     <div style={{ maxHeight: "90vh" }}>
       <div className="mx-auto">
@@ -304,7 +318,9 @@ function Registration() {
                       type="text"
                       placeholder="First Name"
                       name="firstName"
+                      onBlur={handlePascalCaseChange}
                       onChange={handleChange}
+                      value={formData.firstName}
                     />
                     {errors.firstName && (
                       <p className="text-xs text-red-500">{errors.firstName}</p>
@@ -318,6 +334,8 @@ function Registration() {
                       type="text"
                       placeholder="Last Name"
                       name="lastName"
+                      onBlur={handlePascalCaseChange}
+                      value={formData.lastName}
                       onChange={handleChange}
                     />
                     {errors.lastName && (
@@ -345,10 +363,12 @@ function Registration() {
                     <input
                       className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="mobileNumber"
-                      type="text"
+                      type="tel"
                       placeholder="Mobile"
                       name="mobileNumber"
                       onChange={handleChange}
+                      pattern="[\+0-9]{1}[0-9]{9,14}"
+                      required
                     />
                     {errors.mobileNumber && (
                       <p className="text-xs text-red-500">
@@ -358,16 +378,24 @@ function Registration() {
                   </div>
 
                   <div>
-                    <input
+                    <select
                       className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="age"
-                      min="0"
-                      max="100"
-                      type="number"
-                      placeholder="Age"
                       name="age"
                       onChange={handleChange}
-                    />
+                      defaultValue="" // Set an empty default to show placeholder
+                    >
+                      <option value="" disabled>
+                        Select Age
+                      </option>
+                      {Array.from({ length: 43 }, (_, i) => i + 18).map(
+                        (age) => (
+                          <option key={age} value={age}>
+                            {age}
+                          </option>
+                        )
+                      )}
+                    </select>
                     {errors.age && (
                       <p className="text-xs text-red-500">{errors.age}</p>
                     )}
@@ -410,29 +438,54 @@ function Registration() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+                  {/* Religion Dropdown */}
                   <div>
-                    <input
+                    <select
                       className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="religion"
-                      type="text"
-                      placeholder="Religion"
                       name="religion"
                       onChange={handleChange}
-                    />
+                      defaultValue=""
+                    >
+                      <option value="" disabled>
+                        Select Religion
+                      </option>
+                      <option value="Hindu">Hindu</option>
+                      <option value="Muslim">Muslim</option>
+                      <option value="Christian">Christian</option>
+                      <option value="Sikh">Sikh</option>
+                      <option value="Parsi">Parsi</option>
+                      <option value="Jain">Jain</option>
+                      <option value="Buddhist">Buddhist</option>
+                      <option value="Jewish">Jewish</option>
+                      <option value="No Religion">No Religion</option>
+                      <option value="Spiritual">Spiritual</option>
+                      <option value="Other">Other</option>
+                    </select>
                     {errors.religion && (
                       <p className="text-xs text-red-500">{errors.religion}</p>
                     )}
                   </div>
 
+                  {/* Community Dropdown */}
                   <div>
-                    <input
+                    <select
                       className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="community"
-                      type="text"
-                      placeholder="Community"
                       name="community"
                       onChange={handleChange}
-                    />
+                      defaultValue=""
+                    >
+                      <option value="" disabled>
+                        Select Community
+                      </option>
+                      <option value={"English"}>English</option>
+                      <option value={"Hindi"}>Hindi</option>
+                      <option value={"Marathi"}>Marathi</option>
+                      <option value={"Urdu"}>Urdu</option>
+                      <option value={"Telugu"}>Telugu</option>
+                      <option value={"Tamil"}>Tamil</option>
+                    </select>
                     {errors.community && (
                       <p className="text-xs text-red-500">{errors.community}</p>
                     )}

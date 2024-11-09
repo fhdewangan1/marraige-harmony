@@ -11,7 +11,7 @@ const LandingPage = () => {
   const [loading, setLoading] = useState(false);
   const [showContactDetails, setShowContactDetails] = useState(false);
   const [errors, setErrors] = useState({});
-  const ages = [...Array(63)].map((_, i) => i + 18);
+  const ages = [...Array(43)].map((_, i) => i + 18);
 
   const navigate = useNavigate();
 
@@ -40,6 +40,7 @@ const LandingPage = () => {
       navigate("/login");
     }
   };
+
   useEffect(() => {
     setShowContactDetails(true);
   }, [gender, ageFrom, ageTo, religion, motherTongue]);
@@ -53,6 +54,7 @@ const LandingPage = () => {
       <section className="main-background-image">
         <div className="overlay"></div>
       </section>
+
       <div
         className="flex justify-center w-full p-4 lg:p-8"
         style={{ marginTop: "-15%", position: "relative" }}
@@ -132,7 +134,6 @@ const LandingPage = () => {
                 onChange={(e) => setReligion(e.target.value)}
                 className="mt-1 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
-                <option value="">Select</option>
                 {[
                   "Hindu",
                   "Muslim",
@@ -143,7 +144,7 @@ const LandingPage = () => {
                   "Buddhist",
                   "Jewish",
                   "No Religion",
-                  "Spiritual - not religious",
+                  "Spiritual",
                   "Other",
                 ].map((religion) => (
                   <option key={religion} value={religion}>
@@ -205,6 +206,7 @@ const LandingPage = () => {
           </div>
         </div>
       </div>
+
       <section className="py-10 bg-white px-2">
         <div className="container mx-auto">
           <div className="relative flex justify-center mb-8">
@@ -280,25 +282,25 @@ const LandingPage = () => {
               <span className="text-gray-500 uppercase font-semibold text-sm">
                 Features
               </span>
-              <h2 className="text-5xl font-bold text-gray-800 mt-2">
+              <h4 className="text-4xl font-bold text-gray-800 mt-2">
                 Our Features
-              </h2>
+              </h4>
             </div>
             {/* <!-- Feature Block --> */}
             <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
               <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
-                <div className="text-green-500 mb-4">
+                <div className="text-green-500 mb-4 d-flex">
                   <i className="fas fa-user-friends text-4xl"></i>
+                  <h4 className="text-xl font-semibold ml-4 text-center">
+                    <Link
+                      to={"/login"}
+                      className="text-gray-800 hover:text-green-500"
+                      style={{ textDecoration: "none" }}
+                    >
+                      Personalized Matching
+                    </Link>
+                  </h4>
                 </div>
-                <h4 className="text-xl font-semibold mb-2">
-                  <Link
-                    to={"/login"}
-                    className="text-gray-800 hover:text-green-500"
-                    style={{ textDecoration: "none" }}
-                  >
-                    Personalized Matching
-                  </Link>
-                </h4>
                 <p className="text-gray-600">
                   We provide personalized matchmaking services to find the
                   perfect partner for you.
@@ -318,18 +320,18 @@ const LandingPage = () => {
             {/* <!-- Feature Block --> */}
             <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
               <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
-                <div className="text-red-500 mb-4">
+                <div className="text-red-500 mb-4 d-flex">
                   <i className="fas fa-bell text-4xl"></i>
+                  <h4 className="text-xl font-semibold mb-2 ml-4 text-center">
+                    <Link
+                      to={"/login"}
+                      className="text-gray-800 hover:text-red-500"
+                      style={{ textDecoration: "none" }}
+                    >
+                      Easily Update Profile
+                    </Link>
+                  </h4>
                 </div>
-                <h4 className="text-xl font-semibold mb-2">
-                  <Link
-                    to={"/login"}
-                    className="text-gray-800 hover:text-red-500"
-                    style={{ textDecoration: "none" }}
-                  >
-                    Easily Update Profile
-                  </Link>
-                </h4>
                 <p className="text-gray-600">
                   The activities such as changing the display picture, birth
                   details, and personal information.
@@ -339,27 +341,36 @@ const LandingPage = () => {
             {/* <!-- Feature Block --> */}
             <div className="w-full lg:w-1/3 md:w-1/2 px-4 mb-8">
               <div className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105">
-                <div className="text-purple-500 mb-4">
+                <div className="text-purple-500 mb-4 d-flex">
                   <i className="fas fa-headset text-4xl"></i>
+                  <h4 className="text-xl font-semibold mb-2 ml-4 text-center">
+                    <button
+                      className="text-gray-800 hover:text-purple-500"
+                      onClick={handleCardClick}
+                      style={{ textDecoration: "none", fontWeight: "500" }}
+                    >
+                      Customer Support
+                    </button>
+                  </h4>
                 </div>
-                <h4 className="text-xl font-semibold mb-2">
-                  <button
-                    className="text-gray-800 hover:text-purple-500"
-                    onClick={handleCardClick}
-                    style={{ textDecoration: "none", fontWeight: "500" }}
-                  >
-                    Customer Support
-                  </button>
-                </h4>
                 <p className="text-gray-600">
                   24/7 customer support to assist you throughout your journey.
                 </p>
                 {showContactDetails && (
-                  <div className="mt-4 p-4 bg-purple-100 rounded">
+                  <div className="mt-4 p-2 bg-purple-100 rounded">
                     <h5 className="text-lg font-semibold">Contact Details:</h5>
                     <p className="text-gray-700">Phone: +91 7000186765</p>
                     <p className="text-gray-700">
-                      Email: intallyshwisdom@gmail.com
+                      Email:
+                      <span
+                        className="text-gray-700 ml-1"
+                        style={{
+                          wordBreak: "break-word",
+                          overflowWrap: "break-word",
+                        }}
+                      >
+                        intallyshwisdom@gmail.com
+                      </span>
                     </p>
                   </div>
                 )}

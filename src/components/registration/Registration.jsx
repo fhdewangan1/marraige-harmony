@@ -34,6 +34,7 @@ function Registration() {
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
+    // Set formData
     setFormData({
       ...formData,
       [name]: type === "file" ? files[0] : value,
@@ -47,13 +48,28 @@ function Registration() {
         setImagePreview(null);
       }
     }
+
     if (name === "dob" && value) {
       const age = calculateAge(value);
-      setFormData((prevData) => ({
-        ...prevData,
-        dob: value,
-        age, // Automatically set age
-      }));
+
+      // Check for valid age (between 18 and 60)
+      if (age < 18 || age > 60) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          age: "Age must be between 18 and 60",
+        }));
+        setFormData((prevData) => ({
+          ...prevData,
+          dob: value,
+          age: "", // Clear age if invalid
+        }));
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          dob: value,
+          age, // Automatically set age if valid
+        }));
+      }
     } else {
       setFormData((prevData) => ({
         ...prevData,
@@ -61,8 +77,10 @@ function Registration() {
       }));
     }
 
-    validate(name, value);
+    validate(name, value); // Validate other fields
   };
+
+  // Calculate age based on dob
   const calculateAge = (dob) => {
     const birthDate = new Date(dob);
     const currentDate = new Date();
@@ -76,7 +94,6 @@ function Registration() {
     }
     return age;
   };
-
   const validate = (name, value) => {
     const newErrors = {};
 
@@ -149,7 +166,10 @@ function Registration() {
       { key: "mobileNumber", message: "Mobile number is required" },
       { key: "firstName", message: "First name is required" },
       { key: "lastName", message: "Last name is required" },
-      { key: "age", message: "Age is required" },
+      {
+        key: "age",
+        message: "Age is required and you can select it from the calender",
+      },
       { key: "gender", message: "Gender is required" },
       { key: "password", message: "Password is required" },
       { key: "confirmPassword", message: "Please confirm your password" },
@@ -333,6 +353,7 @@ function Registration() {
                 className="bg-white dark:bg-gray-800 rounded-lg"
                 onSubmit={handleSubmit}
               >
+                {/* First and last name */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
                   <div>
                     <input
@@ -367,6 +388,7 @@ function Registration() {
                   </div>
                 </div>
 
+                {/* Email and mobile number */}
                 <div className="mb-4">
                   <input
                     className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -380,7 +402,7 @@ function Registration() {
                     <p className="text-xs text-red-500">{errors.email}</p>
                   )}
                 </div>
-
+                {/* Mobile number and gender */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
                   <div>
                     <input
@@ -421,6 +443,7 @@ function Registration() {
                   </div>
                 </div>
 
+                {/* Date of birth and age */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
                   <div>
                     <input
@@ -440,9 +463,8 @@ function Registration() {
                       className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="age"
                       name="age"
-                      onChange={handleChange}
                       value={formData.age}
-                      disabled // Disable the age field as it's auto-calculated
+                      disabled // Age is auto-calculated, so it's disabled
                     >
                       <option value="" disabled>
                         Select Age
@@ -461,8 +483,8 @@ function Registration() {
                   </div>
                 </div>
 
+                {/* Religion and community */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
-                  {/* Religion Dropdown */}
                   <div>
                     <select
                       className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -516,6 +538,7 @@ function Registration() {
                   </div>
                 </div>
 
+                {/* Address and password */}
                 <div className="mb-4">
                   <input
                     className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -530,6 +553,7 @@ function Registration() {
                   )}
                 </div>
 
+                {/* Password and confirm password */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
                   <div className="relative">
                     <input
@@ -581,7 +605,7 @@ function Registration() {
                     )}
                   </div>
                 </div>
-
+                {/* Button for registration */}
                 <div className="flex items-center justify-between mt-4">
                   <button
                     className={`mt-4 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-3 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none ${

@@ -79,7 +79,12 @@ const UserPartnerPreferences = ({
     let newErrors = { ...errors };
 
     if (!value) {
-      newErrors[key] = `${key} is required`;
+      newErrors[key] = `Data is required`;
+    } else if (key === "desiredJobValue") {
+      // No additional validation, as both letters and numbers are allowed
+      delete newErrors[key];
+    } else if (typeof value !== "string" || /\d/.test(value)) {
+      newErrors[key] = `Input should contain only letters`;
     } else {
       delete newErrors[key];
     }

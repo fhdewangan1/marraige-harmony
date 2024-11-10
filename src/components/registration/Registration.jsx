@@ -47,74 +47,94 @@ function Registration() {
         setImagePreview(null);
       }
     }
+    if (name === "dob" && value) {
+      const age = calculateAge(value);
+      setFormData((prevData) => ({
+        ...prevData,
+        dob: value,
+        age, // Automatically set age
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
 
     validate(name, value);
+  };
+  const calculateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const currentDate = new Date();
+    let age = currentDate.getFullYear() - birthDate.getFullYear();
+    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age;
   };
 
   const validate = (name, value) => {
     const newErrors = {};
 
-    if (name === "firstName") {
-      if (!value) {
-        newErrors.firstName = "Firstname is required";
-      }
+    // image validation
+    if (name === "profileImage" && !value) {
+      newErrors.profileImage = "Profile image is required";
     }
-    if (name === "lastName") {
-      if (!value) {
-        newErrors.lastName = "Lastname is required";
-      }
+    // Check for required fields and other validations
+    if (name === "firstName" && !value) {
+      newErrors.firstName = "First name is required";
     }
+
+    if (name === "lastName" && !value) {
+      newErrors.lastName = "Last name is required";
+    }
+
     if (name === "mobileNumber") {
       if (!value) {
-        newErrors.lastName = "Lastname is required";
+        newErrors.mobileNumber = "Mobile number is required";
       } else if (!/^\d{10}$/.test(value)) {
         newErrors.mobileNumber = "Mobile must be of 10 digits";
       }
     }
-    if (name === "email") {
-      if (!value) {
-        newErrors.email = "Email is required";
-      }
+
+    if (name === "email" && !value) {
+      newErrors.email = "Email is required";
     }
-    if (name === "age") {
-      if (!value) {
-        newErrors.age = "Age is required";
-      }
+
+    if (name === "age" && !value) {
+      newErrors.age = "Age is required and you can select it from the calender";
     }
-    if (name === "gender") {
-      if (!value) {
-        newErrors.gender = "Gender is required";
-      }
+
+    if (name === "gender" && !value) {
+      newErrors.gender = "Gender is required";
     }
-    if (name === "dob") {
-      if (!value) {
-        newErrors.dob = "Birth date is required";
-      }
+
+    if (name === "dob" && !value) {
+      newErrors.dob = "Birth date is required";
     }
-    if (name === "religion") {
-      if (!value) {
-        newErrors.religion = "Religion is required";
-      }
+
+    if (name === "religion" && !value) {
+      newErrors.religion = "Religion is required"; // Validation for religion dropdown
     }
-    if (name === "community") {
-      if (!value) {
-        newErrors.community = "Community is required";
-      }
+
+    if (name === "community" && !value) {
+      newErrors.community = "Community is required"; // Validation for community dropdown
     }
-    if (name === "residence") {
-      if (!value) {
-        newErrors.residence = "Residence is required";
-      }
+
+    if (name === "residence" && !value) {
+      newErrors.residence = "Residence is required";
     }
-    if (name === "password") {
-      if (!value) {
-        newErrors.password = "Password is required";
-      }
+
+    if (name === "password" && !value) {
+      newErrors.password = "Password is required";
     }
-    if (name === "confirmPassword") {
-      if (!value) {
-        newErrors.confirmPassword = "Confirm Password is required";
-      }
+
+    if (name === "confirmPassword" && !value) {
+      newErrors.confirmPassword = "Confirm Password is required";
     }
 
     setErrors(newErrors);
@@ -300,6 +320,9 @@ function Registration() {
                     </div>
                   </label>
                 </div>
+                {errors.profileImage && (
+                  <p className="text-xs text-red-500">{errors.profileImage}</p>
+                )}
 
                 <h3 className="py-4 text-3xl text-center text-gray-800 dark:text-white ml-4">
                   Create Your Account!
@@ -380,10 +403,46 @@ function Registration() {
                   <div>
                     <select
                       className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      id="gender"
+                      name="gender"
+                      onChange={handleChange}
+                      defaultValue="" // To show a placeholder
+                    >
+                      <option value="" disabled>
+                        Select Gender
+                      </option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
+                    {errors.gender && (
+                      <p className="text-xs text-red-500">{errors.gender}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+                  <div>
+                    <input
+                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      id="dob"
+                      type="date"
+                      name="dob"
+                      onChange={handleChange}
+                      value={formData.dob}
+                    />
+                    {errors.dob && (
+                      <p className="text-xs text-red-500">{errors.dob}</p>
+                    )}
+                  </div>
+                  <div>
+                    <select
+                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="age"
                       name="age"
                       onChange={handleChange}
-                      defaultValue="" // Set an empty default to show placeholder
+                      value={formData.age}
+                      disabled // Disable the age field as it's auto-calculated
                     >
                       <option value="" disabled>
                         Select Age
@@ -403,41 +462,6 @@ function Registration() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
-                  <div>
-                    <select
-                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      id="gender"
-                      name="gender"
-                      onChange={handleChange}
-                      defaultValue="" // To show a placeholder
-                    >
-                      <option value="" disabled>
-                        Select Gender
-                      </option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </select>
-                    {errors.gender && (
-                      <p className="text-xs text-red-500">{errors.gender}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <input
-                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      id="dob"
-                      type="date"
-                      name="dob"
-                      onChange={handleChange}
-                    />
-                    {errors.dob && (
-                      <p className="text-xs text-red-500">{errors.dob}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
                   {/* Religion Dropdown */}
                   <div>
                     <select
@@ -445,22 +469,22 @@ function Registration() {
                       id="religion"
                       name="religion"
                       onChange={handleChange}
-                      defaultValue=""
+                      defaultValue={" "}
                     >
-                      <option value="" disabled>
-                        Select Religion
+                      <option value=" " disabled>
+                        Select
                       </option>
-                      <option value="Hindu">Hindu</option>
-                      <option value="Muslim">Muslim</option>
-                      <option value="Christian">Christian</option>
-                      <option value="Sikh">Sikh</option>
-                      <option value="Parsi">Parsi</option>
-                      <option value="Jain">Jain</option>
-                      <option value="Buddhist">Buddhist</option>
-                      <option value="Jewish">Jewish</option>
-                      <option value="No Religion">No Religion</option>
-                      <option value="Spiritual">Spiritual</option>
-                      <option value="Other">Other</option>
+                      <option value={"Hindu"}>Hindu</option>
+                      <option value={"Muslim"}>Muslim</option>
+                      <option value={"Christian"}>Christian</option>
+                      <option value={"Sikh"}>Sikh</option>
+                      <option value={"Parsi"}>Parsi</option>
+                      <option value={"Jain"}>Jain</option>
+                      <option value={"Buddhist"}>Buddhist</option>
+                      <option value={"Jewish"}>Jewish</option>
+                      <option value={"No Religion"}>No Religion</option>
+                      <option value={"Spiritual"}>Spiritual</option>
+                      <option value={"Other"}>Other</option>
                     </select>
                     {errors.religion && (
                       <p className="text-xs text-red-500">{errors.religion}</p>

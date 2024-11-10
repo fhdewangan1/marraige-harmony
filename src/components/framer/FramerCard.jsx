@@ -90,6 +90,7 @@ const FramerCard = () => {
 
   useEffect(() => {
     fetchUserData();
+    // eslint-disable-next-line
   }, [page, userGender]);
 
   if (error) return <div>{error}</div>;
@@ -117,10 +118,17 @@ const FramerCard = () => {
     }
     if (location) {
       filteredUsers = filteredUsers.filter((user) =>
-        user.location.toLowerCase().includes(location.toLowerCase())
+        user.residence
+          .toLowerCase()
+          .split(",")
+          .some((part) =>
+            part.trim().toLowerCase().includes(location.toLowerCase())
+          )
       );
     }
+
     if (religion) {
+      console.log("filteredUsers :", filteredUsers);
       filteredUsers = filteredUsers.filter((user) =>
         user.religion.toLowerCase().includes(religion.toLowerCase())
       );
@@ -175,39 +183,69 @@ const FramerCard = () => {
               </div>
 
               {/* Age Range Filter */}
-              <div className="flex mb-3">
-                <input
-                  type="number"
-                  placeholder="Min Age"
+              <div className="flex mb-3 position-relative">
+                <select
                   value={minAge}
-                  onChange={(e) => setMinAge(e.target.value)}
-                  className="form-control mr-2 p-2"
-                />
-                <input
-                  type="number"
-                  placeholder="Max Age"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (parseInt(value) <= maxAge) {
+                      setMinAge(value); // Only set minAge if it's <= maxAge
+                    }
+                  }}
+                  className="form-control mr-2 p-2 pr-5"
+                >
+                  {[...Array(43)].map((_, i) => (
+                    <option key={i} value={i + 18}>
+                      {i + 18} years
+                    </option>
+                  ))}
+                </select>{" "}
+                <span className="text-2xl mr-2">-</span>
+                <select
                   value={maxAge}
-                  onChange={(e) => setMaxAge(e.target.value)}
-                  className="form-control p-2"
-                />
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (parseInt(value) >= minAge) {
+                      setMaxAge(value); // Only set maxAge if it's >= minAge
+                    }
+                  }}
+                  className="form-control p-2 pr-5"
+                >
+                  {[...Array(43)].map((_, i) => (
+                    <option key={i} value={i + 18}>
+                      {i + 18} years
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Height Range Filter */}
               <div className="flex mb-3">
-                <input
-                  type="number"
-                  placeholder="Min Height"
+                <select
                   value={minHeight}
                   onChange={(e) => setMinHeight(e.target.value)}
                   className="form-control mr-2 p-2"
-                />
-                <input
-                  type="number"
-                  placeholder="Max Height"
+                >
+                  <option value="">Min Height</option>
+                  {[...Array(7)].map((_, i) => (
+                    <option key={i} value={i + 3}>
+                      {i + 3} ft
+                    </option>
+                  ))}
+                </select>
+                <span className="text-2xl mr-2">-</span>
+                <select
                   value={maxHeight}
                   onChange={(e) => setMaxHeight(e.target.value)}
                   className="form-control p-2"
-                />
+                >
+                  <option value="">Max Height</option>
+                  {[...Array(7)].map((_, i) => (
+                    <option key={i} value={i + 3}>
+                      {i + 3} ft
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Location Filter */}
@@ -223,13 +261,24 @@ const FramerCard = () => {
 
               {/* Religion Filter */}
               <div className="mb-3">
-                <input
-                  type="text"
-                  placeholder="Religion"
+                <select
                   value={religion}
                   onChange={(e) => setReligion(e.target.value)}
                   className="form-control w-full p-2"
-                />
+                >
+                  <option value="">Select Religion</option>
+                  <option value="Hindu">Hindu</option>
+                  <option value="Muslim">Muslim</option>
+                  <option value="Christian">Christian</option>
+                  <option value="Sikh">Sikh</option>
+                  <option value="Parsi">Parsi</option>
+                  <option value="Jain">Jain</option>
+                  <option value="Buddhist">Buddhist</option>
+                  <option value="Jewish">Jewish</option>
+                  <option value="No Religion">No Religion</option>
+                  <option value="Spiritual">Spiritual</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
 
               {/* Clear Search Button */}

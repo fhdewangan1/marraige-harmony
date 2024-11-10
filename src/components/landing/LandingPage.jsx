@@ -134,6 +134,7 @@ const LandingPage = () => {
                 onChange={(e) => setReligion(e.target.value)}
                 className="mt-1 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-pink-600 focus:border-pink-600"
               >
+                <option value="">Select</option>
                 {[
                   "Hindu",
                   "Muslim",

@@ -87,14 +87,6 @@ const UserLifeStyleAndEducation = ({
   };
 
   const handleSubmit = async () => {
-    // Basic validation
-    // for (const field of lifeStyleAndEducationFields) {
-    //   if (!updatedProfile[field.key]) {
-    //     setError(`${field.value} is required.`);
-    //     return; // Stop if validation fails
-    //   }
-    // }
-
     if (!validateFields()) return;
 
     setLoading(true);
@@ -230,20 +222,41 @@ const UserLifeStyleAndEducation = ({
                     className="input-group"
                     style={{ flexDirection: "column" }}
                   >
-                    <Form.Control
-                      type="text"
-                      value={updatedProfile[field.key] || ""}
-                      onChange={(e) =>
-                        handleFieldChange(field.key, e.target.value)
-                      }
-                      placeholder={`Enter ${field.value}`}
-                      className="border-0 rounded-end"
-                      style={{
-                        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                        width: "100%",
-                        marginLeft: "5px", // Slight margin for spacing consistency
-                      }}
-                    />
+                    {["drinking", "smoking"].includes(field.key) ? (
+                      // Dropdown for Drinking and Smoking Habits
+                      <Form.Select
+                        value={updatedProfile[field.key] || ""}
+                        onChange={(e) =>
+                          handleFieldChange(field.key, e.target.value)
+                        }
+                        className="border-0 rounded-end"
+                        style={{
+                          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          width: "100%",
+                          marginLeft: "5px",
+                        }}
+                      >
+                        <option value="">Select {field.value}</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </Form.Select>
+                    ) : (
+                      // Text input for other fields
+                      <Form.Control
+                        type="text"
+                        value={updatedProfile[field.key] || ""}
+                        onChange={(e) =>
+                          handleFieldChange(field.key, e.target.value)
+                        }
+                        placeholder={`Enter ${field.value}`}
+                        className="border-0 rounded-end"
+                        style={{
+                          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          width: "100%",
+                          marginLeft: "5px",
+                        }}
+                      />
+                    )}
                     {errors[field.key] && (
                       <div
                         className="text-danger mt-1"
@@ -282,13 +295,6 @@ const UserLifeStyleAndEducation = ({
             >
               <i className="fas fa-save me-2"></i> Save Changes
             </Button>
-            {/* <Button
-              variant="secondary"
-              onClick={toggleModal}
-              disabled={loading}
-            >
-              <i className="fas fa-times me-2"></i> Cancel
-            </Button> */}
           </Modal.Footer>
         </Modal>
       )}

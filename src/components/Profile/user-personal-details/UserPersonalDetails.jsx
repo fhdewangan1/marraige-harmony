@@ -68,32 +68,25 @@ const UserPersonalDetails = ({
   };
 
   const validateFields = () => {
-    const { userHeight, userWeight, userIncome, ...otherFields } =
-      updatedProfile;
+    const { userHeight, userWeight, ...otherFields } = updatedProfile;
     let errors = {};
 
     if (!updatedProfile.userHeight) {
       errors.userHeight = "value is required";
-    } else if (userHeight > 100) {
+    } else if (userHeight.length > 3) {
       errors.userHeight = "Please enter a valid value of height in centimeter";
     }
 
     if (!updatedProfile.userWeight) {
       errors.userWeight = "value is required.";
-    } else if (userWeight > 100) {
+    } else if (userWeight.length > 3) {
       errors.userWeight = "Please enter a valid value of weight in kilograms";
-    }
-
-    if (!updatedProfile.userIncome) {
-      errors.userIncome = "value is required.";
-    } else if (userIncome > 100) {
-      errors.userIncome = "Please enter a valid value of income in rupees";
     }
 
     // Check if any other field is empty
     for (const key in otherFields) {
       if (!otherFields[key]) {
-        errors[key] = `The field ${key} cannot be empty.`;
+        errors[key] = `The field cannot be empty.`;
       }
     }
 
@@ -247,20 +240,121 @@ const UserPersonalDetails = ({
                     className="input-group"
                     style={{ flexDirection: "column" }}
                   >
-                    <Form.Control
-                      type="text"
-                      value={updatedProfile[field.key] || ""}
-                      onChange={(e) =>
-                        handleFieldChange(field.key, e.target.value)
-                      }
-                      placeholder={`Enter ${field.value}`}
-                      className="border-0 rounded-end"
-                      style={{
-                        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                        marginLeft: "5px",
-                        width: "100%",
-                      }}
-                    />
+                    {[
+                      "maritalStatus",
+                      "isPersonDisabled",
+                      "isUserStayingAlone",
+                      "rashi",
+                      "bloodGroup",
+                      "bodyType",
+                      "gotra",
+                      "manglik",
+                    ].includes(field.key) ? (
+                      <Form.Select
+                        value={updatedProfile[field.key] || ""}
+                        onChange={(e) =>
+                          handleFieldChange(field.key, e.target.value)
+                        }
+                        className="border-0 rounded-end"
+                        style={{
+                          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          marginLeft: "5px",
+                          width: "100%",
+                        }}
+                      >
+                        <option value="">Select {field.value}</option>
+                        {field.key === "gotra" && (
+                          <>
+                            <option value="Viśvāmitra">Viśvāmitra</option>
+                            <option value="Jamadagni">Jamadagni</option>
+                            <option value="Bharadvāja">Bharadvāja</option>
+                            <option value="Bharadvāja">Gautama</option>
+                            <option value="Bharadvāja">Atri</option>
+                            <option value="Bharadvāja">Vasiṣṭha</option>
+                            <option value="Bharadvāja">Kaśyapa</option>
+                            <option value="Bharadvāja">Agastya</option>
+                          </>
+                        )}
+                        {field.key === "manglik" && (
+                          <>
+                            <option value="Manglik">
+                              Manglik (Mangal Dosha)
+                            </option>
+                            <option value="Non-Manglik">Non-Manglik</option>
+                          </>
+                        )}
+                        {field.key === "maritalStatus" && (
+                          <>
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                            <option value="Divorced">Divorced</option>
+                          </>
+                        )}
+                        {field.key === "isPersonDisabled" && (
+                          <>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </>
+                        )}
+                        {field.key === "isUserStayingAlone" && (
+                          <>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </>
+                        )}
+                        {field.key === "rashi" && (
+                          <>
+                            <option value="Mesh">Mesh</option>
+                            <option value="Vrishabha">Vrishabha</option>
+                            <option value="Mithuna">Mithuna</option>
+                            <option value="Karka">Karka</option>
+                            <option value="Simha">Simha</option>
+                            <option value="Kanya">Kanya</option>
+                            <option value="Tula">Tula</option>
+                            <option value="Vrishchika">Vrishchika</option>
+                            <option value="Dhanu">Dhanu</option>
+                            <option value="Makara">Makara</option>
+                            <option value="Meena">Meena</option>
+                          </>
+                        )}
+                        {field.key === "bloodGroup" && (
+                          <>
+                            <option value="A">A+</option>
+                            <option value="A">A-</option>
+                            <option value="B">B+</option>
+                            <option value="B">B-</option>
+                            <option value="AB">AB+</option>
+                            <option value="AB">AB-</option>
+                            <option value="O">O+</option>
+                            <option value="O">O-</option>
+                          </>
+                        )}
+                        {field.key === "bodyType" && (
+                          <>
+                            <option value="Slim">Slim</option>
+                            <option value="Average">Average</option>
+                            <option value="Athletic">Athletic</option>
+                            <option value="Chubby">Chubby</option>
+                            <option value="Obese">Obese</option>
+                          </>
+                        )}
+                      </Form.Select>
+                    ) : (
+                      <Form.Control
+                        type="text"
+                        value={updatedProfile[field.key] || ""}
+                        onChange={(e) =>
+                          handleFieldChange(field.key, e.target.value)
+                        }
+                        placeholder={`Enter ${field.value}`}
+                        className="border-0 rounded-end"
+                        style={{
+                          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          marginLeft: "5px",
+                          width: "100%",
+                        }}
+                      />
+                    )}
                     {errors[field.key] && (
                       <div
                         className="text-danger mt-1"

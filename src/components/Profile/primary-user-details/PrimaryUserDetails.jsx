@@ -3,20 +3,12 @@ import { useForm, Controller } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import AuthHook from "../../../auth/AuthHook";
 
 // Define fields configuration with label, key, and options for easy form generation
 const fields = [
   { label: "First Name", key: "firstName", type: "text" },
   { label: "Last Name", key: "lastName", type: "text" },
-  {
-    label: "Age",
-    key: "age",
-    type: "text",
-    isDisabled: true, // Disable Age field, as it's calculated from DOB
-  },
   {
     label: "Gender",
     key: "gender",
@@ -32,6 +24,12 @@ const fields = [
   },
   { label: "Community", key: "community", type: "text" },
   { label: "Date of Birth", key: "dob", type: "date" },
+  {
+    label: "Age",
+    key: "age",
+    type: "text",
+    isDisabled: true, // Disable Age field, as it's calculated from DOB
+  },
   { label: "Residence", key: "residence", type: "text" },
   { label: "Mobile No", key: "mobileNumber", type: "text", isDisabled: true },
   { label: "Email", key: "mailId", type: "text" },
@@ -50,6 +48,7 @@ const PrimaryUserDetails = ({
   refresAfterUpdate,
   setStatus,
   status,
+  imageUrl,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -60,6 +59,7 @@ const PrimaryUserDetails = ({
     control,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
   } = useForm({
     defaultValues: response || {}, // Setting default values
@@ -87,28 +87,6 @@ const PrimaryUserDetails = ({
 
   // Handle profile image selection
   const handleImageChange = (e) => setProfileImage(e.target.files[0]);
-
-  // Calculate age based on DOB
-  const calculateAge = (dob) => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const month = today.getMonth();
-    if (
-      month < birthDate.getMonth() ||
-      (month === birthDate.getMonth() && today.getDate() < birthDate.getDate())
-    ) {
-      age--;
-    }
-    return age;
-  };
-
-  // Handle DOB change and update age
-  const handleDobChange = (date) => {
-    setValue("dob", date);
-    const age = calculateAge(date);
-    setValue("age", age);
-  };
 
   // Submit profile update request
   const onSubmit = (data) => {
@@ -154,6 +132,41 @@ const PrimaryUserDetails = ({
       });
   };
 
+  // Calculate age based on DOB
+  const calculateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const currentDate = new Date();
+    let age = currentDate.getFullYear() - birthDate.getFullYear();
+    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  };
+
+  // Handle DOB Change: Calculate age automatically
+  const handleDobChange = (e) => {
+    const updatedDob = e.target.value;
+    setValue("dob", updatedDob);
+
+    // Calculate age
+    const age = calculateAge(updatedDob);
+
+    // Check for age restrictions
+    if (age < 18 || age > 60) {
+      setValue("age", "");
+      setError("age", {
+        type: "manual",
+        message: "Age must be between 18 and 60.",
+      });
+    } else {
+      setValue("age", age);
+    }
+  };
+
   // Render individual field using react-hook-form Controller
   const FieldRenderer = ({ field }) => (
     <Form.Group className="mb-3">
@@ -189,15 +202,13 @@ const PrimaryUserDetails = ({
         render={({ field: { onChange, value } }) => {
           if (field.key === "dob") {
             return (
-              <DatePicker
-                selected={value || null}
-                onChange={(date) => {
-                  handleDobChange(date);
-                }}
-                maxDate={maxDate}
-                minDate={minDate}
+              <input
+                type="date"
+                value={value || ""}
+                onChange={handleDobChange} // Use custom DOB change handler
+                disabled={field.isDisabled}
+                placeholder={`Enter ${field.label}`}
                 className="form-control"
-                dateFormat="yyyy/MM/dd"
               />
             );
           }
@@ -225,7 +236,6 @@ const PrimaryUserDetails = ({
 
   return (
     <>
-      {/* Main profile details display */}
       <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
         {mobileNumber === session?.userName && (
           <div className="text-right mb-4">
@@ -271,15 +281,58 @@ const PrimaryUserDetails = ({
             </Modal.Title>
           </Modal.Header>
 
-          {/* Modal body with form fields */}
           <Modal.Body
             className="px-5 py-4"
             style={{ maxHeight: "60vh", overflowY: "auto" }}
           >
+            {/* Display Profile Image Preview in Circular Shape */}
+            <div className="d-flex justify-content-center mb-4">
+              <div
+                className="profile-image-preview"
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  backgroundColor: "#f3f3f3",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={
+                    profileImage
+                      ? URL.createObjectURL(profileImage)
+                      : imageUrl || "/path/to/default-avatar.png"
+                  }
+                  alt="Profile"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            </div>
+
             <Form onSubmit={handleSubmit(onSubmit)}>
               {fields.map((field, index) => (
                 <FieldRenderer key={index} field={field} />
               ))}
+
+              {/* Profile Image Upload */}
+              <Form.Group className="mb-3">
+                <Form.Label className="font-semibold text-base">
+                  Profile Image
+                </Form.Label>
+                <input
+                  type="file"
+                  onChange={handleImageChange}
+                  accept="image/*"
+                  className="form-control"
+                />
+              </Form.Group>
 
               {/* Loading spinner */}
               {loading && (
@@ -291,7 +344,7 @@ const PrimaryUserDetails = ({
               )}
             </Form>
           </Modal.Body>
-          {/* Modal footer with save button */}
+
           <Modal.Footer className="d-flex justify-content-end">
             <Button
               variant="success"

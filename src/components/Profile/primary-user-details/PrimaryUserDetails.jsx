@@ -103,6 +103,7 @@ const PrimaryUserDetails = ({
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [profileImageBlob, setProfileImageBlob] = useState(null);
   const {
     control,
     handleSubmit,
@@ -190,10 +191,10 @@ const PrimaryUserDetails = ({
   const handleSaveCroppedImage = async () => {
     const croppedImageBlob = await createCroppedImage();
     if (croppedImageBlob) {
-      setImagePreview({ croppedImageBlob });
+      setProfileImageBlob(croppedImageBlob); // Save binary blob instead of URL
+      setImagePreview(URL.createObjectURL(croppedImageBlob)); // Display preview
       setIsCropScreenVisible(false);
       setIsModalOpen(true);
-      setImagePreview(URL.createObjectURL(croppedImageBlob));
     }
   };
 
@@ -211,10 +212,12 @@ const PrimaryUserDetails = ({
   const onSubmit = async (data) => {
     setLoading(true);
 
-    const imageBlob = await createCroppedImage();
     const formData = new FormData();
     Object.keys(data).forEach((key) => formData.append(key, data[key]));
-    if (imageBlob) formData.append("profileImage", imageBlob);
+
+    // Attach the binary blob directly to FormData
+    if (profileImageBlob)
+      formData.append("profileImage", profileImageBlob, "profile.jpg");
 
     fetch("https://shaadi-be.fino-web-app.agency/api/v1/auth/update-profile", {
       method: "PUT",
@@ -251,7 +254,6 @@ const PrimaryUserDetails = ({
         );
       });
   };
-
   // Calculate age based on DOB
   const calculateAge = (dob) => {
     const birthDate = new Date(dob);

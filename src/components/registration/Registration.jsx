@@ -1,8 +1,61 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { AxiosConfig } from "../../config/AxiosConfig";
+import Cropper from "react-easy-crop";
+import { motion } from "framer-motion";
+import styled from "styled-components";
+import { AiOutlineClose } from "react-icons/ai";
+
+const FullScreenModal = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const CropContainer = styled.div`
+  position: relative;
+  width: 60vw;
+  height: 90vh;
+  background-color: #a1a1a1;
+
+  @media (max-width: 768px) {
+    width: 90vw;
+  }
+`;
+
+const Button = styled.button`
+  margin-top: 20px;
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+`;
+
+const CloseIcon = styled(AiOutlineClose)`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
+  z-index: 10;
+  width: 30px;
+  height: 30px;
+`;
 
 function Registration() {
   const [formData, setFormData] = useState({
@@ -20,33 +73,34 @@ function Registration() {
     email: "",
     profileImage: null,
   });
-
   const [loading, setLoading] = useState(false);
-  // const [showPassword, setShowPassword] = useState(false);
-  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  // const [passwordError, setPasswordError] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isCropScreenVisible, setIsCropScreenVisible] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
     // Set formData
-    setFormData({
-      ...formData,
-      [name]: type === "file" ? files[0] : value,
-    });
-
     if (type === "file") {
       const file = files[0];
       if (file) {
-        setImagePreview(URL.createObjectURL(file));
+        setImagePreview(URL.createObjectURL(file)); // Set the new image preview
+        setCrop({ x: 0, y: 0 }); // Reset crop position
+        setZoom(1); // Reset zoom
+        setIsCropScreenVisible(true); // Open crop screen on image selection
+        setFormData({ ...formData, profileImage: file }); // Set the profile image in form data
       } else {
         setImagePreview(null);
       }
+    } else {
+      setFormData({ ...formData, [name]: value });
     }
 
     if (name === "dob" && value) {
@@ -94,6 +148,7 @@ function Registration() {
     }
     return age;
   };
+
   const validate = (name, value) => {
     const newErrors = {};
 
@@ -212,6 +267,60 @@ function Registration() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setImagePreview(imageUrl);
+      setIsCropScreenVisible(true);
+    }
+  };
+
+  // Handle image crop
+  const onCropComplete = useCallback((_, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  // Create cropped image blob
+  const createCroppedImage = useCallback(() => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const image = new Image();
+      image.src = imagePreview;
+
+      image.onload = () => {
+        const { width, height } = croppedAreaPixels;
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(
+          image,
+          croppedAreaPixels.x,
+          croppedAreaPixels.y,
+          width,
+          height,
+          0,
+          0,
+          width,
+          height
+        );
+
+        canvas.toBlob((blob) => {
+          resolve(blob);
+        }, "image/jpeg");
+      };
+    });
+  }, [imagePreview, croppedAreaPixels]);
+
+  const handleSaveCroppedImage = async () => {
+    const croppedImageBlob = await createCroppedImage();
+    if (croppedImageBlob) {
+      setFormData({ ...formData, profileImage: croppedImageBlob });
+      setIsCropScreenVisible(false);
+      setImagePreview(URL.createObjectURL(croppedImageBlob));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -219,13 +328,12 @@ function Registration() {
       try {
         setLoading(true);
 
+        const imageBlob = await createCroppedImage();
         const formDataToSend = new FormData();
-        for (const key in formData) {
-          formDataToSend.append(
-            key === "email" ? "userMailId" : key,
-            formData[key]
-          );
-        }
+        Object.entries(formData).forEach(([key, value]) => {
+          formDataToSend.append(key === "email" ? "userMailId" : key, value);
+        });
+        if (imageBlob) formDataToSend.set("profileImage", imageBlob);
 
         await AxiosConfig.post("auth/create-profile", formDataToSend);
 
@@ -260,6 +368,7 @@ function Registration() {
       .replace(/(?:^|\s|-|_)\w/g, (match) => match.toUpperCase())
       .replace(/\s|-|_/g, "");
   }
+
   const handlePascalCaseChange = (e) => {
     const { name, value } = e.target;
     const pascalCaseValue = toPascalCase(value);
@@ -305,7 +414,7 @@ function Registration() {
                       type="file"
                       name="profileImage"
                       accept="image/jpeg"
-                      onChange={handleChange}
+                      onChange={handleImageChange}
                     />
                     <div className="w-20 h-20 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center overflow-hidden">
                       {/* Display uploaded image or a placeholder */}
@@ -329,6 +438,7 @@ function Registration() {
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                         className="w-5 h-5"
+                        onClick={() => setIsCropScreenVisible(true)}
                       >
                         <path
                           strokeLinecap="round"
@@ -635,6 +745,30 @@ function Registration() {
                 </p>
               </form>
             </div>
+
+            {isCropScreenVisible && (
+              <FullScreenModal
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsCropScreenVisible(false)}
+              >
+                <CropContainer onClick={(e) => e.stopPropagation()}>
+                  {/* Close Icon */}
+                  <CloseIcon onClick={() => setIsCropScreenVisible(false)} />
+                  <Cropper
+                    image={imagePreview}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={1}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={onCropComplete}
+                  />
+                </CropContainer>
+                <Button onClick={handleSaveCroppedImage}>Save Image</Button>
+              </FullScreenModal>
+            )}
           </div>
         </div>
       </div>

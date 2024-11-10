@@ -7,13 +7,6 @@ import { Modal, Button, Form, Spinner } from "react-bootstrap";
 
 // Styled components
 const CardContainer = styled.div`
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 50px;
-  transition: transform 0.3s;
-
   &:hover {
     transform: translateY(-5px);
   }
@@ -50,6 +43,12 @@ const UserPersonalDetails = ({
   const { mobileNumber } = useParams();
   const [errors, setErrors] = useState({});
 
+  const manglikOptions = [
+    { value: "Manglik", label: "Manglik" },
+    { value: "Non Manglik", label: "Non Manglik" },
+    { value: "Partial Manglik", label: "Partial Manglik" },
+  ];
+
   const handleFieldChange = (key, value) => {
     setUpdatedProfile((prevProfile) => ({
       ...prevProfile,
@@ -71,22 +70,24 @@ const UserPersonalDetails = ({
     const { userHeight, userWeight, ...otherFields } = updatedProfile;
     let errors = {};
 
-    if (!updatedProfile.userHeight) {
-      errors.userHeight = "value is required";
-    } else if (userHeight.length > 3) {
-      errors.userHeight = "Please enter a valid value of height in centimeter";
+    if (!userHeight) {
+      errors.userHeight = "Height is required";
+    } else if (userHeight < 100 || userHeight > 300) {
+      errors.userHeight = "Please enter a valid height between 100 and 300 cm";
     }
 
-    if (!updatedProfile.userWeight) {
-      errors.userWeight = "value is required.";
-    } else if (userWeight.length > 3) {
-      errors.userWeight = "Please enter a valid value of weight in kilograms";
+    if (!userWeight) {
+      errors.userWeight = "Weight is required.";
+    } else if (userWeight < 20 || userWeight > 300) {
+      errors.userWeight = "Please enter a valid weight between 20 and 300 kg";
     }
 
     // Check if any other field is empty
     for (const key in otherFields) {
       if (!otherFields[key]) {
-        errors[key] = `The field cannot be empty.`;
+        errors[key] = `${
+          personalFields.find((field) => field.key === key)?.value
+        } cannot be empty.`;
       }
     }
 
@@ -99,10 +100,18 @@ const UserPersonalDetails = ({
 
     if (!value) {
       newErrors[key] = `${key} is required`;
-    } else if (key === "userHeight" && value.length > 3) {
-      newErrors[key] = "please enter height in 3 digits in CM";
-    } else if (key === "userWeight" && value.length > 3) {
-      newErrors[key] = "please enter weight in 3 digits in KG";
+    } else if (key === "userHeight") {
+      if (value < 100 || value > 300) {
+        newErrors[key] = "Please enter a height between 100 and 300 cm";
+      } else {
+        delete newErrors[key];
+      }
+    } else if (key === "userWeight") {
+      if (value < 10 || value > 300) {
+        newErrors[key] = "Please enter a weight between 10 and 300 kg";
+      } else {
+        delete newErrors[key];
+      }
     } else {
       delete newErrors[key];
     }
@@ -156,6 +165,7 @@ const UserPersonalDetails = ({
   return (
     <>
       <CardContainer
+        className="bg-white p-6 rounded-lg shadow-lg mb-6"
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
@@ -206,7 +216,11 @@ const UserPersonalDetails = ({
                   paddingLeft: "10px",
                 }}
               >
-                {response && response[field.key]
+                {field.key === "userHeight" && response[field.key]
+                  ? `${response[field.key]} cm`
+                  : field.key === "userWeight" && response[field.key]
+                  ? `${response[field.key]} kg`
+                  : response && response[field.key]
                   ? response[field.key].toString()
                   : "N/A"}
               </span>
@@ -240,16 +254,7 @@ const UserPersonalDetails = ({
                     className="input-group"
                     style={{ flexDirection: "column" }}
                   >
-                    {[
-                      "maritalStatus",
-                      "isPersonDisabled",
-                      "isUserStayingAlone",
-                      "rashi",
-                      "bloodGroup",
-                      "bodyType",
-                      "gotra",
-                      "manglik",
-                    ].includes(field.key) ? (
+                    {field.key === "manglik" ? (
                       <Form.Select
                         value={updatedProfile[field.key] || ""}
                         onChange={(e) =>
@@ -258,87 +263,42 @@ const UserPersonalDetails = ({
                         className="border-0 rounded-end"
                         style={{
                           boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                          marginLeft: "5px",
                           width: "100%",
                         }}
                       >
-                        <option value="">Select {field.value}</option>
-                        {field.key === "gotra" && (
-                          <>
-                            <option value="Viśvāmitra">Viśvāmitra</option>
-                            <option value="Jamadagni">Jamadagni</option>
-                            <option value="Bharadvāja">Bharadvāja</option>
-                            <option value="Bharadvāja">Gautama</option>
-                            <option value="Bharadvāja">Atri</option>
-                            <option value="Bharadvāja">Vasiṣṭha</option>
-                            <option value="Bharadvāja">Kaśyapa</option>
-                            <option value="Bharadvāja">Agastya</option>
-                          </>
-                        )}
-                        {field.key === "manglik" && (
-                          <>
-                            <option value="Manglik">
-                              Manglik (Mangal Dosha)
-                            </option>
-                            <option value="Non-Manglik">Non-Manglik</option>
-                          </>
-                        )}
-                        {field.key === "maritalStatus" && (
-                          <>
-                            <option value="Single">Single</option>
-                            <option value="Married">Married</option>
-                            <option value="Divorced">Divorced</option>
-                          </>
-                        )}
-                        {field.key === "isPersonDisabled" && (
-                          <>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                          </>
-                        )}
-                        {field.key === "isUserStayingAlone" && (
-                          <>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                          </>
-                        )}
-                        {field.key === "rashi" && (
-                          <>
-                            <option value="Mesh">Mesh</option>
-                            <option value="Vrishabha">Vrishabha</option>
-                            <option value="Mithuna">Mithuna</option>
-                            <option value="Karka">Karka</option>
-                            <option value="Simha">Simha</option>
-                            <option value="Kanya">Kanya</option>
-                            <option value="Tula">Tula</option>
-                            <option value="Vrishchika">Vrishchika</option>
-                            <option value="Dhanu">Dhanu</option>
-                            <option value="Makara">Makara</option>
-                            <option value="Meena">Meena</option>
-                          </>
-                        )}
-                        {field.key === "bloodGroup" && (
-                          <>
-                            <option value="A">A+</option>
-                            <option value="A">A-</option>
-                            <option value="B">B+</option>
-                            <option value="B">B-</option>
-                            <option value="AB">AB+</option>
-                            <option value="AB">AB-</option>
-                            <option value="O">O+</option>
-                            <option value="O">O-</option>
-                          </>
-                        )}
-                        {field.key === "bodyType" && (
-                          <>
-                            <option value="Slim">Slim</option>
-                            <option value="Average">Average</option>
-                            <option value="Athletic">Athletic</option>
-                            <option value="Chubby">Chubby</option>
-                            <option value="Obese">Obese</option>
-                          </>
-                        )}
+                        <option value="">Select</option>
+                        {manglikOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
                       </Form.Select>
+                    ) : ["userHeight", "userWeight"].includes(field.key) ? (
+                      <div className="d-flex">
+                        <Form.Control
+                          type="number"
+                          value={updatedProfile[field.key] || ""}
+                          onChange={(e) =>
+                            handleFieldChange(field.key, e.target.value)
+                          }
+                          placeholder={`Enter ${field.value}`}
+                          className="border-0 rounded-start"
+                          style={{
+                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          }}
+                          min={field.key === "userHeight" ? 100 : 20}
+                          max={field.key === "userHeight" ? 300 : 300}
+                        />
+                        <span
+                          className="input-group-text"
+                          style={{
+                            width: "10%",
+                            backgroundColor: "#f1f1f1",
+                          }}
+                        >
+                          {field.key === "userHeight" ? "cm" : "kg"}
+                        </span>
+                      </div>
                     ) : (
                       <Form.Control
                         type="text"
@@ -367,6 +327,7 @@ const UserPersonalDetails = ({
                 </Form.Group>
               ))}
             </Form>
+
             {loading && (
               <div className="d-flex justify-content-center my-3">
                 <Spinner animation="border" variant="primary" />

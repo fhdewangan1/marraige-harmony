@@ -6,20 +6,13 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 
 const CardContainer = styled.div`
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 50px;
-  transition: transform 0.3s;
-
   &:hover {
     transform: translateY(-5px);
   }
 `;
 
 // Fields data
-export const lifeStyleAndEducationFields = [
+const lifeStyleAndEducationFields = [
   { key: "userOccupation", value: "Occupation" },
   { key: "userCurrentLoc", value: "Current Location" },
   { key: "drinking", value: "Drinking Habits" },
@@ -77,8 +70,13 @@ const UserLifeStyleAndEducation = ({
   const validate = (key, value) => {
     let newErrors = { ...errors };
 
+    // Find the label for the current key
+    const fieldLabel = lifeStyleAndEducationFields.find(
+      (field) => field.key === key
+    )?.value;
+
     if (!value) {
-      newErrors[key] = `${key} is required`;
+      newErrors[key] = `${fieldLabel} is required`;
     } else {
       delete newErrors[key];
     }
@@ -134,6 +132,7 @@ const UserLifeStyleAndEducation = ({
   return (
     <>
       <CardContainer
+        className="bg-white p-6 rounded-lg shadow-lg mb-6"
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
@@ -222,8 +221,8 @@ const UserLifeStyleAndEducation = ({
                     className="input-group"
                     style={{ flexDirection: "column" }}
                   >
-                    {["drinking", "smoking"].includes(field.key) ? (
-                      // Dropdown for Drinking and Smoking Habits
+                    {/* Select fields for drinking, smoking, and diet */}
+                    {["drinking", "smoking", "diet"].includes(field.key) ? (
                       <Form.Select
                         value={updatedProfile[field.key] || ""}
                         onChange={(e) =>
@@ -237,8 +236,29 @@ const UserLifeStyleAndEducation = ({
                         }}
                       >
                         <option value="">Select {field.value}</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
+                        {field.key === "drinking" && (
+                          <>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                            <option value="Occasionally">Occasionally</option>
+                          </>
+                        )}
+                        {field.key === "smoking" && (
+                          <>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                            <option value="Occasionally">Occasionally</option>
+                          </>
+                        )}
+                        {field.key === "diet" && (
+                          <>
+                            <option value="Vegetarian">Vegetarian</option>
+                            <option value="Non-Vegetarian">
+                              Non-Vegetarian
+                            </option>
+                            <option value="Eggetarian">Eggetarian</option>
+                          </>
+                        )}
                       </Form.Select>
                     ) : (
                       // Text input for other fields
@@ -269,6 +289,7 @@ const UserLifeStyleAndEducation = ({
                 </Form.Group>
               ))}
             </Form>
+
             {loading ? (
               <div className="d-flex justify-content-center my-3">
                 <Spinner animation="border" variant="primary" />

@@ -176,16 +176,7 @@ const UserFamilyDetails = ({
 
   return (
     <>
-      <div
-        className="card-container"
-        style={{
-          background: "white",
-          borderRadius: "8px",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          padding: "20px",
-          marginBottom: "50px",
-        }}
-      >
+      <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
         {mobileNumber === session?.userName && (
           <div className="d-flex justify-content-end mb-4">
             <Button

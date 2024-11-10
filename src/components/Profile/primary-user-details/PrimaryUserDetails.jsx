@@ -1,9 +1,53 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import AuthHook from "../../../auth/AuthHook";
+import Cropper from "react-easy-crop";
+import { motion } from "framer-motion";
+import styled from "styled-components";
+import { AiOutlineClose } from "react-icons/ai";
+
+const FullScreenModal = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const CropContainer = styled.div`
+  position: relative;
+  width: 60vw;
+  height: 90vh;
+  background-color: #a1a1a1;
+
+  @media (max-width: 768px) {
+    width: 90vw;
+  }
+`;
+
+const CloseIcon = styled(AiOutlineClose)`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
+  z-index: 10;
+  width: 30px;
+  height: 30px;
+`;
 
 // Define fields configuration with label, key, and options for easy form generation
 const fields = [
@@ -52,9 +96,13 @@ const PrimaryUserDetails = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [profileImage, setProfileImage] = useState(null);
   const session = AuthHook();
   const { mobileNumber } = useParams();
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isCropScreenVisible, setIsCropScreenVisible] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const {
     control,
     handleSubmit,
@@ -82,19 +130,91 @@ const PrimaryUserDetails = ({
     }
   }, [response, setValue]);
 
+  useEffect(() => {
+    setImagePreview(imageUrl);
+  }, [imageUrl]);
+
   // Toggle modal visibility
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   // Handle profile image selection
-  const handleImageChange = (e) => setProfileImage(e.target.files[0]);
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setImagePreview(imageUrl);
+      imageOpen();
+    }
+  };
+
+  // Handle image crop
+  const onCropComplete = useCallback((_, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  // Create cropped image blob
+  const createCroppedImage = useCallback(() => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const image = new Image();
+      image.src = imagePreview;
+
+      image.onload = () => {
+        // Calculate width and height based on cropped area or adjust if out of bounds
+        let { x, y, width, height } = croppedAreaPixels;
+
+        if (x + width > image.width) {
+          width = image.width - x;
+        }
+        if (y + height > image.height) {
+          height = image.height - y;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw the cropped area onto the canvas
+        ctx.drawImage(image, x, y, width, height, 0, 0, width, height);
+
+        canvas.toBlob((blob) => {
+          const croppedUrl = URL.createObjectURL(blob);
+          setImagePreview(croppedUrl); // Set preview to cropped image
+          imageOpen();
+          resolve(blob); // Return the blob to handleSubmit for uploading
+        }, "image/jpeg");
+      };
+    });
+  }, [imagePreview, croppedAreaPixels]);
+
+  const handleSaveCroppedImage = async () => {
+    const croppedImageBlob = await createCroppedImage();
+    if (croppedImageBlob) {
+      setImagePreview({ croppedImageBlob });
+      setIsCropScreenVisible(false);
+      setIsModalOpen(true);
+      setImagePreview(URL.createObjectURL(croppedImageBlob));
+    }
+  };
+
+  const imageOpen = () => {
+    if (isCropScreenVisible) {
+      setIsCropScreenVisible(false);
+      setIsModalOpen(true);
+    } else {
+      setIsCropScreenVisible(true);
+      setIsModalOpen(false);
+    }
+  };
 
   // Submit profile update request
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setLoading(true);
 
+    const imageBlob = await createCroppedImage();
     const formData = new FormData();
     Object.keys(data).forEach((key) => formData.append(key, data[key]));
-    if (profileImage) formData.append("profileImage", profileImage);
+    if (imageBlob) formData.append("profileImage", imageBlob);
 
     fetch("https://shaadi-be.fino-web-app.agency/api/v1/auth/update-profile", {
       method: "PUT",
@@ -259,7 +379,13 @@ const PrimaryUserDetails = ({
               <strong className="text-primary text-base mr-4">
                 {field.label}:
               </strong>
-              <span className="text-gray-600 text-base">
+              <span
+                className="text-gray-600 text-base"
+                style={{
+                  wordBreak: "break-word",
+                  overflowWrap: "break-word",
+                }}
+              >
                 {field.key === "mobileNumber" &&
                 session &&
                 response?.mobileNumber === session.userName
@@ -287,32 +413,49 @@ const PrimaryUserDetails = ({
           >
             {/* Display Profile Image Preview in Circular Shape */}
             <div className="d-flex justify-content-center mb-4">
-              <div
-                className="profile-image-preview"
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  borderRadius: "50%",
-                  overflow: "hidden",
-                  backgroundColor: "#f3f3f3",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <img
-                  src={
-                    profileImage
-                      ? URL.createObjectURL(profileImage)
-                      : imageUrl || "/path/to/default-avatar.png"
-                  }
-                  alt="Profile"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
+              <div className="relative">
+                <label htmlFor="profileImage" className="cursor-pointer">
+                  <input
+                    id="profileImage"
+                    className="hidden"
+                    type="file"
+                    name="profileImage"
+                    accept="image/jpeg"
+                    onChange={handleImageChange}
+                  />
+                  <div className="w-20 h-20 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center overflow-hidden">
+                    {/* Display uploaded image or a placeholder */}
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Profile"
+                        className="object-cover w-full h-full"
+                      />
+                    ) : (
+                      <span className="text-gray-500 dark:text-gray-200">
+                        Add Photo
+                      </span>
+                    )}
+                  </div>
+                  {/* Edit icon overlay */}
+                  <div className="absolute bottom-0 right-0 bg-blue-500 dark:bg-blue-700 text-white p-1 rounded-full">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                      onClick={() => imageOpen()} // Only open the crop screen again for the same image
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15.232 5.232l3.536 3.536M7.5 18.5l-4-4 9-9 4 4-9 9zM16.5 10.5l-1.086-1.086"
+                      />
+                    </svg>
+                  </div>
+                </label>
               </div>
             </div>
 
@@ -320,19 +463,6 @@ const PrimaryUserDetails = ({
               {fields.map((field, index) => (
                 <FieldRenderer key={index} field={field} />
               ))}
-
-              {/* Profile Image Upload */}
-              <Form.Group className="mb-3">
-                <Form.Label className="font-semibold text-base">
-                  Profile Image
-                </Form.Label>
-                <input
-                  type="file"
-                  onChange={handleImageChange}
-                  accept="image/*"
-                  className="form-control"
-                />
-              </Form.Group>
 
               {/* Loading spinner */}
               {loading && (
@@ -360,6 +490,32 @@ const PrimaryUserDetails = ({
             </Button>
           </Modal.Footer>
         </Modal>
+      )}
+
+      {/* Modal for crop image */}
+      {isCropScreenVisible && (
+        <FullScreenModal
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => imageOpen()}
+        >
+          <CropContainer onClick={(e) => e.stopPropagation()}>
+            {/* Close Icon */}
+            <CloseIcon onClick={() => imageOpen()} />
+            <Cropper
+              image={imagePreview}
+              crop={crop}
+              zoom={zoom}
+              aspect={1}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropComplete}
+              maxZoom={2} // Limit the max zoom level
+            />
+          </CropContainer>
+          <Button onClick={handleSaveCroppedImage}>Save Image</Button>
+        </FullScreenModal>
       )}
     </>
   );

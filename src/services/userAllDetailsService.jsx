@@ -1,9 +1,4 @@
-import axios from "axios";
 import { AxiosConfig } from "../config/AxiosConfig";
-
-// Define the base URL for your API
-const BASE_URL = "AxiosConfig/user"; // Replace with your actual API URL
-
 // Function to get all user details
 export const getAllUserDetails = async (mobileNumber) => {
   try {

@@ -4,6 +4,7 @@ import { Button, Modal, Form, Spinner, Alert } from "react-bootstrap";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
+import Select from "react-select";
 
 const CardContainer = styled.div`
   &:hover {
@@ -20,6 +21,17 @@ const partnerPreferencesFields = [
   { key: "anyOtherPreferences", value: "Other Preferences" },
 ];
 
+const locationOptions = [
+  { value: "Pune", label: "Pune" },
+  { value: "Hyderabad", label: "Hyderabad" },
+  { value: "Raipur", label: "Raipur" },
+  { value: "Chennai", label: "Chennai" },
+  { value: "Bengaluru", label: "Bengaluru" },
+  { value: "Mumbai", label: "Mumbai" },
+  { value: "Delhi", label: "Delhi" },
+  { value: "Nagpur", label: "Nagpur" },
+];
+
 const UserPartnerPreferences = ({
   response,
   refresAfterUpdate,
@@ -34,10 +46,15 @@ const UserPartnerPreferences = ({
   const session = AuthHook();
   const { mobileNumber } = useParams();
   const [errors, setErrors] = useState({});
+  const [dynamicLocations, setDynamicLocations] = useState([
+    ...locationOptions,
+  ]);
 
-  useEffect(() => {
-    setUpdatedProfile(response || {});
-  }, [response]);
+  const jobOptions = [
+    { value: "Private", label: "Private" },
+    { value: "Government", label: "Government" },
+    { value: "Business", label: "Business" },
+  ];
 
   const handleFieldChange = (key, value) => {
     setUpdatedProfile((prevProfile) => ({
@@ -130,6 +147,10 @@ const UserPartnerPreferences = ({
     }
   };
 
+  useEffect(() => {
+    setUpdatedProfile(response || {});
+  }, [response]);
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mb-5">
       <CardContainer
@@ -210,29 +231,118 @@ const UserPartnerPreferences = ({
                   <Form.Label className="font-weight-bold">
                     {field.value}
                   </Form.Label>
-                  <div
-                    className="input-group"
-                    style={{ flexDirection: "column" }}
-                  >
-                    {/* Check if the field is desiredJobValue to render as dropdown */}
+                  <div className="input-group">
                     {field.key === "desiredJobValue" ? (
-                      <Form.Select
-                        value={updatedProfile[field.key] || ""}
-                        onChange={(e) =>
-                          handleFieldChange(field.key, e.target.value)
+                      <Select
+                        isMulti
+                        options={jobOptions}
+                        value={
+                          updatedProfile[field.key]
+                            ? updatedProfile[field.key]
+                                .split(",")
+                                .map((value) => ({ label: value, value }))
+                            : []
                         }
-                        className="border-0 rounded-end"
+                        onChange={(selectedOptions) => {
+                          const selectedValues = selectedOptions.map(
+                            (option) => option.value
+                          );
+                          handleFieldChange(
+                            field.key,
+                            selectedValues.join(",")
+                          );
+                        }}
+                        className="react-select-container w-100"
+                        classNamePrefix="react-select"
+                      />
+                    ) : field.key === "preferredLocation" ? (
+                      <div
                         style={{
-                          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                          width: "100%",
-                          marginLeft: "5px",
+                          display: "flex",
+                          alignItems: "center",
+                          width: "100%", // Full width of the container
                         }}
                       >
-                        <option value="">Select Job Type</option>
-                        <option value="Government Job">Government Job</option>
-                        <option value="Private Job">Private Job</option>
-                        <option value="Business">Business</option>
-                      </Form.Select>
+                        {/* Dropdown for selecting cities */}
+                        <Select
+                          isMulti
+                          options={[
+                            ...dynamicLocations, // Include dynamic locations in the options
+                            ...(updatedProfile.customLocations
+                              ? updatedProfile.customLocations.map((loc) => ({
+                                  value: loc,
+                                  label: loc,
+                                }))
+                              : []),
+                          ]}
+                          value={
+                            updatedProfile[field.key]
+                              ? updatedProfile[field.key]
+                                  .split(",")
+                                  .map((value) => ({ label: value, value }))
+                              : []
+                          }
+                          onChange={(selectedOptions) => {
+                            const selectedValues = selectedOptions.map(
+                              (option) => option.value
+                            );
+                            handleFieldChange(
+                              field.key,
+                              selectedValues.join(",")
+                            );
+                          }}
+                          className="react-select-container flex-grow-1"
+                          classNamePrefix="react-select"
+                        />
+                        {/* Add City Button with Icon */}
+                        <Button
+                          onClick={() => {
+                            const newLocation = prompt(
+                              "Enter the custom location:"
+                            );
+                            if (
+                              newLocation &&
+                              !updatedProfile[field.key].includes(newLocation)
+                            ) {
+                              handleFieldChange(
+                                field.key,
+                                `${
+                                  updatedProfile[field.key]
+                                    ? updatedProfile[field.key] + ","
+                                    : ""
+                                }${newLocation}`
+                              );
+                              // Add the new location to the dynamic locations for the dropdown
+                              setDynamicLocations((prevLocations) => [
+                                ...prevLocations,
+                                { value: newLocation, label: newLocation },
+                              ]);
+                            } else {
+                              alert(
+                                "Location is either empty or already added."
+                              );
+                            }
+                          }}
+                          style={{
+                            height: "38px", // Button height matches the input field height
+                            color: "#fff", // White text for contrast
+                            display: "flex", // Flex for icon and text alignment
+                            alignItems: "center", // Align items vertically in the button
+                            justifyContent: "center", // Center the icon and text
+                            cursor: "pointer", // Pointer cursor on hover
+                            flexShrink: 0, // Ensure the button doesn't shrink
+                            width: "120px", // Set width to fit your layout or leave it dynamic
+                          }}
+                          className="btn btn-dark"
+                        >
+                          {/* Add Icon */}
+                          <i
+                            className="fas fa-plus"
+                            style={{ marginRight: "5px" }}
+                          ></i>
+                          Add City
+                        </Button>
+                      </div>
                     ) : (
                       <Form.Control
                         type="text"
@@ -262,6 +372,7 @@ const UserPartnerPreferences = ({
                 </Form.Group>
               ))}
             </Form>
+
             {loading ? (
               <div className="d-flex justify-content-center my-3">
                 <Spinner animation="border" variant="primary" />

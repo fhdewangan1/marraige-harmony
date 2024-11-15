@@ -268,7 +268,7 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
                         <span
                           className="input-group-text"
                           style={{
-                            width: "20%",
+                            width: "40%",
                             backgroundColor: "#f1f1f1",
                           }}
                         >
@@ -579,7 +579,7 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
                         <span
                           className="input-group-text"
                           style={{
-                            width: "10%",
+                            width: "20%",
                             backgroundColor: "#f1f1f1",
                           }}
                         >

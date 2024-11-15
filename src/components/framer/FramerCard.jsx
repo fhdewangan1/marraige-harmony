@@ -128,7 +128,6 @@ const FramerCard = () => {
     }
 
     if (religion) {
-      console.log("filteredUsers :", filteredUsers);
       filteredUsers = filteredUsers.filter((user) =>
         user.religion.toLowerCase().includes(religion.toLowerCase())
       );

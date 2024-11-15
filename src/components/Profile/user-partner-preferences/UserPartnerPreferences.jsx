@@ -269,88 +269,88 @@ const UserPartnerPreferences = ({
                         classNamePrefix="react-select"
                       />
                     ) : field.key === "preferredLocation" ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          width: "100%",
-                        }}
-                      >
-                        <Select
-                          isMulti
-                          options={[
-                            ...dynamicLocations, // Include dynamic locations in the options
-                            ...(updatedProfile.customLocations
-                              ? updatedProfile.customLocations.map((loc) => ({
-                                  value: loc,
-                                  label: loc,
-                                }))
-                              : []),
-                          ]}
-                          value={
-                            updatedProfile[field.key]
-                              ? updatedProfile[field.key]
-                                  .split(",")
-                                  .map((value) => ({ label: value, value }))
-                              : []
-                          }
-                          onChange={(selectedOptions) => {
-                            const selectedValues = selectedOptions.map(
-                              (option) => option.value
-                            );
-                            handleFieldChange(
-                              field.key,
-                              selectedValues.join(",")
-                            );
-                          }}
-                          className="react-select-container flex-grow-1"
-                          classNamePrefix="react-select"
-                        />
-                        <Button
-                          onClick={() => {
-                            const newLocation = prompt(
-                              "Enter the custom location:"
-                            );
-                            if (
-                              newLocation &&
-                              !updatedProfile[field.key].includes(newLocation)
-                            ) {
+                      <div className="d-flex flex-column flex-md-row w-100">
+                        <div className="d-flex align-items-center w-100 mb-2 mb-md-0">
+                          <Select
+                            isMulti
+                            options={[
+                              ...dynamicLocations, // Include dynamic locations in the options
+                              ...(updatedProfile.customLocations
+                                ? updatedProfile.customLocations.map((loc) => ({
+                                    value: loc,
+                                    label: loc,
+                                  }))
+                                : []),
+                            ]}
+                            value={
+                              updatedProfile[field.key]
+                                ? updatedProfile[field.key]
+                                    .split(",")
+                                    .map((value) => ({ label: value, value }))
+                                : []
+                            }
+                            onChange={(selectedOptions) => {
+                              const selectedValues = selectedOptions.map(
+                                (option) => option.value
+                              );
                               handleFieldChange(
                                 field.key,
-                                `${
-                                  updatedProfile[field.key]
-                                    ? updatedProfile[field.key] + ","
-                                    : ""
-                                }${newLocation}`
+                                selectedValues.join(",")
                               );
-                              setDynamicLocations((prevLocations) => [
-                                ...prevLocations,
-                                { value: newLocation, label: newLocation },
-                              ]);
-                            } else {
-                              alert(
-                                "Location is either empty or already added."
+                            }}
+                            className="react-select-container flex-grow-1"
+                            classNamePrefix="react-select"
+                          />
+                        </div>
+
+                        {/* Button in the same row on medium and larger screens */}
+                        <div className="w-1/2 w-md-100 mt-2 mt-md-0 ml-auto mr-0 ">
+                          <Button
+                            onClick={() => {
+                              const newLocation = prompt(
+                                "Enter the custom location:"
                               );
-                            }
-                          }}
-                          style={{
-                            height: "38px",
-                            color: "#fff",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            cursor: "pointer",
-                            flexShrink: 0,
-                            width: "120px",
-                          }}
-                          className="btn btn-dark d-block w-100 w-md-auto"
-                        >
-                          <i
-                            className="fas fa-plus"
-                            style={{ marginRight: "5px" }}
-                          ></i>
-                          Add City
-                        </Button>
+                              if (
+                                newLocation &&
+                                !updatedProfile[field.key].includes(newLocation)
+                              ) {
+                                const updatedLocations = updatedProfile[
+                                  field.key
+                                ]
+                                  ? `${
+                                      updatedProfile[field.key]
+                                    },${newLocation}`
+                                  : newLocation;
+                                handleFieldChange(field.key, updatedLocations);
+                                setDynamicLocations((prevLocations) => [
+                                  ...prevLocations,
+                                  { value: newLocation, label: newLocation },
+                                ]);
+                              } else {
+                                alert(
+                                  "Location is either empty or already added."
+                                );
+                              }
+                            }}
+                            style={{
+                              height: "38px",
+                              color: "#fff",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              cursor: "pointer",
+                              flexShrink: 0,
+                              width: "120px",
+                            }}
+                            className="btn btn-dark d-block w-md-auto"
+                          >
+                            <i
+                              className="fas fa-plus"
+                              style={{ marginRight: "5px" }}
+                            ></i>
+                            Add City
+                          </Button>
+                        </div>
                       </div>
                     ) : (
                       <Form.Control

@@ -4,7 +4,6 @@ import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
-import Select from "react-select"; // Import react-select
 
 // Styled components
 const CardContainer = styled.div`
@@ -38,12 +37,6 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
   const session = AuthHook();
   const { mobileNumber } = useParams();
   const [errors, setErrors] = useState({});
-
-  const manglikOptions = [
-    { value: "Manglik", label: "Manglik" },
-    { value: "Non Manglik", label: "Non Manglik" },
-    { value: "Partial Manglik", label: "Partial Manglik" },
-  ];
 
   const handleFieldChange = (key, value) => {
     setUpdatedProfile((prevProfile) => ({

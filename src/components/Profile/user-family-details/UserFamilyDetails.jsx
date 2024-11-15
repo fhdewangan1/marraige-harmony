@@ -74,20 +74,6 @@ const UserFamilyDetails = ({
     return Object.keys(errors).length === 0;
   };
 
-  const handleFieldChange = (key, value) => {
-    setUpdatedProfile((prevProfile) => ({ ...prevProfile, [key]: value }));
-
-    // Apply max value check
-    if (value > MAX_VALUE) {
-      setErrors((prev) => ({
-        ...prev,
-        [key]: `Value must be below ${MAX_VALUE}`,
-      }));
-    } else {
-      setErrors((prev) => ({ ...prev, [key]: "" }));
-    }
-  };
-
   const toggleModal = () => setIsModalOpen((prev) => !prev);
 
   const handleSubmit = () => {
@@ -172,6 +158,31 @@ const UserFamilyDetails = ({
         </div>
       </Form.Group>
     ));
+  };
+
+  const convertToPascalCase = (str) => {
+    return str
+      .split(" ") // Split the input by spaces
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize first letter of each word
+      .join(" "); // Join the words back with spaces
+  };
+
+  const handleFieldChange = (key, value) => {
+    const transformedValue = convertToPascalCase(value);
+    setUpdatedProfile((prevProfile) => ({
+      ...prevProfile,
+      [key]: transformedValue,
+    }));
+
+    // Apply max value check
+    if (transformedValue.length > MAX_VALUE) {
+      setErrors((prev) => ({
+        ...prev,
+        [key]: `Value must be below ${MAX_VALUE}`,
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, [key]: "" }));
+    }
   };
 
   return (

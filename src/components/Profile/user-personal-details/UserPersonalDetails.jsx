@@ -4,6 +4,7 @@ import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
+import Select from "react-select"; // Import react-select
 
 // Styled components
 const CardContainer = styled.div`
@@ -30,12 +31,7 @@ const personalFields = [
   { key: "bodyType", value: "Body Type" },
 ];
 
-const UserPersonalDetails = ({
-  response,
-  refresAfterUpdate,
-  setStatus,
-  status,
-}) => {
+const UserPersonalDetails = ({ response, setStatus, status }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(response || {});
   const [loading, setLoading] = useState(false);
@@ -140,7 +136,6 @@ const UserPersonalDetails = ({
 
       if (data.status === 200 || data.status === 201) {
         setStatus(!status);
-        refresAfterUpdate && refresAfterUpdate(!status);
         Swal.fire(
           "Success!",
           "User details updated successfully!",
@@ -220,6 +215,8 @@ const UserPersonalDetails = ({
                   ? `${response[field.key]} cm`
                   : field.key === "userWeight" && response[field.key]
                   ? `${response[field.key]} kg`
+                  : field.key === "userIncome" && response[field.key]
+                  ? `${response[field.key]} Rs/year`
                   : response && response[field.key]
                   ? response[field.key].toString()
                   : "N/A"}
@@ -254,26 +251,35 @@ const UserPersonalDetails = ({
                     className="input-group"
                     style={{ flexDirection: "column" }}
                   >
-                    {field.key === "manglik" ? (
-                      <Form.Select
-                        value={updatedProfile[field.key] || ""}
-                        onChange={(e) =>
-                          handleFieldChange(field.key, e.target.value)
-                        }
-                        className="border-0 rounded-end"
-                        style={{
-                          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                          width: "100%",
-                        }}
-                      >
-                        <option value="">Select</option>
-                        {manglikOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    ) : ["userHeight", "userWeight"].includes(field.key) ? (
+                    {field.key === "userIncome" ? (
+                      // Monthly Income field with Rs/year
+                      <div className="d-flex">
+                        <Form.Control
+                          type="number"
+                          value={updatedProfile[field.key] || ""}
+                          onChange={(e) =>
+                            handleFieldChange(field.key, e.target.value)
+                          }
+                          placeholder={`Enter ${field.value}`}
+                          className="border-0 rounded-start"
+                          style={{
+                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          }}
+                          min={0}
+                        />
+                        <span
+                          className="input-group-text"
+                          style={{
+                            width: "30%",
+                            backgroundColor: "#f1f1f1",
+                          }}
+                        >
+                          Rs/year
+                        </span>
+                      </div>
+                    ) : field.key === "userHeight" ||
+                      field.key === "userWeight" ? (
+                      // Height and Weight fields remain as they are
                       <div className="d-flex">
                         <Form.Control
                           type="number"
@@ -300,6 +306,7 @@ const UserPersonalDetails = ({
                         </span>
                       </div>
                     ) : (
+                      // Handle other fields as before
                       <Form.Control
                         type="text"
                         value={updatedProfile[field.key] || ""}

@@ -306,6 +306,7 @@ const UserPartnerPreferences = ({
                           className="react-select-container flex-grow-1"
                           classNamePrefix="react-select"
                         />
+
                         <Button
                           onClick={() => {
                             const newLocation = prompt(
@@ -343,7 +344,7 @@ const UserPartnerPreferences = ({
                             flexShrink: 0,
                             width: "120px",
                           }}
-                          className="btn btn-dark"
+                          className="btn btn-dark d-block w-100 w-md-auto"
                         >
                           <i
                             className="fas fa-plus"

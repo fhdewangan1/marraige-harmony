@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
+import Select from "react-select";
 
 const CardContainer = styled.div`
   &:hover {
@@ -34,19 +35,6 @@ const UserLifeStyleAndEducation = ({
   const session = AuthHook();
   const { mobileNumber } = useParams();
   const [errors, setErrors] = useState({});
-
-  useEffect(() => {
-    setUpdatedProfile(response || {});
-  }, [response]);
-
-  const handleFieldChange = (key, value) => {
-    setUpdatedProfile((prevProfile) => ({
-      ...prevProfile,
-      [key]: value,
-    }));
-
-    validate(key, value);
-  };
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -128,6 +116,31 @@ const UserLifeStyleAndEducation = ({
       Swal.fire("Error", "An error occurred. Please try again.", "error");
     }
   };
+
+  const handleFieldChange = (key, value) => {
+    // Apply the Packcal case transformation to text fields
+    if (key !== "drinking" && key !== "smoking" && key !== "diet") {
+      value = value
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
+    }
+
+    // Update the state with the new value
+    setUpdatedProfile((prevProfile) => ({
+      ...prevProfile,
+      [key]: value,
+    }));
+
+    // Validate the field
+    validate(key, value);
+  };
+
+  useEffect(() => {
+    setUpdatedProfile(response || {});
+  }, [response]);
 
   return (
     <>
@@ -221,45 +234,64 @@ const UserLifeStyleAndEducation = ({
                     className="input-group"
                     style={{ flexDirection: "column" }}
                   >
-                    {/* Select fields for drinking, smoking, and diet */}
+                    {/* Use React Select for fields like drinking, smoking, diet */}
                     {["drinking", "smoking", "diet"].includes(field.key) ? (
-                      <Form.Select
-                        value={updatedProfile[field.key] || ""}
-                        onChange={(e) =>
-                          handleFieldChange(field.key, e.target.value)
+                      <Select
+                        value={
+                          updatedProfile[field.key]
+                            ? {
+                                label: updatedProfile[field.key],
+                                value: updatedProfile[field.key],
+                              }
+                            : null
                         }
-                        className="border-0 rounded-end"
-                        style={{
-                          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                          width: "100%",
-                          marginLeft: "5px",
+                        onChange={(selectedOption) =>
+                          handleFieldChange(
+                            field.key,
+                            selectedOption ? selectedOption.value : ""
+                          )
+                        }
+                        options={
+                          field.key === "drinking"
+                            ? [
+                                { label: "Yes", value: "Yes" },
+                                { label: "No", value: "No" },
+                                {
+                                  label: "Occasionally",
+                                  value: "Occasionally",
+                                },
+                              ]
+                            : field.key === "smoking"
+                            ? [
+                                { label: "Yes", value: "Yes" },
+                                { label: "No", value: "No" },
+                                {
+                                  label: "Occasionally",
+                                  value: "Occasionally",
+                                },
+                              ]
+                            : field.key === "diet"
+                            ? [
+                                { label: "Vegetarian", value: "Vegetarian" },
+                                {
+                                  label: "Non-Vegetarian",
+                                  value: "Non-Vegetarian",
+                                },
+                                { label: "Eggetarian", value: "Eggetarian" },
+                              ]
+                            : []
+                        }
+                        className="react-select-container"
+                        classNamePrefix="react-select"
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            borderRadius: "0.375rem",
+                            borderColor: "#ccc",
+                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          }),
                         }}
-                      >
-                        <option value="">Select {field.value}</option>
-                        {field.key === "drinking" && (
-                          <>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                            <option value="Occasionally">Occasionally</option>
-                          </>
-                        )}
-                        {field.key === "smoking" && (
-                          <>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                            <option value="Occasionally">Occasionally</option>
-                          </>
-                        )}
-                        {field.key === "diet" && (
-                          <>
-                            <option value="Vegetarian">Vegetarian</option>
-                            <option value="Non-Vegetarian">
-                              Non-Vegetarian
-                            </option>
-                            <option value="Eggetarian">Eggetarian</option>
-                          </>
-                        )}
-                      </Form.Select>
+                      />
                     ) : (
                       // Text input for other fields
                       <Form.Control
@@ -277,6 +309,7 @@ const UserLifeStyleAndEducation = ({
                         }}
                       />
                     )}
+
                     {errors[field.key] && (
                       <div
                         className="text-danger mt-1"

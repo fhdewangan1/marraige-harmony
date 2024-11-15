@@ -8,6 +8,7 @@ import Cropper from "react-easy-crop";
 import { motion } from "framer-motion";
 import styled from "styled-components";
 import { AiOutlineClose } from "react-icons/ai";
+import ReactSelect from "react-select";
 
 const FullScreenModal = styled(motion.div)`
   position: fixed;
@@ -56,17 +57,27 @@ const fields = [
   {
     label: "Gender",
     key: "gender",
-    type: "select",
+    type: "Select Gender",
     options: ["Male", "Female", "Other"],
   },
-  { label: "Language Known", key: "langKnown", type: "text" },
+  {
+    label: "Language Known",
+    key: "langKnown",
+    type: "Select Language",
+    options: ["English", "Hindi", "Marathi", "Urdu", "Telugu", "Tamil"],
+  },
   {
     label: "Religion",
     key: "religion",
-    type: "select",
+    type: "Select Religion",
     options: ["Hindu", "Muslim", "Christian", "Parsi", "Other"],
   },
-  { label: "Community", key: "community", type: "text" },
+  {
+    label: "Community",
+    key: "community",
+    type: "Select Community",
+    options: ["English", "Hindi", "Marathi", "Urdu", "Telugu", "Tamil"],
+  },
   { label: "Date of Birth", key: "dob", type: "date" },
   {
     label: "Age",
@@ -109,6 +120,7 @@ const PrimaryUserDetails = ({
     handleSubmit,
     setValue,
     setError,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: response || {}, // Setting default values
@@ -463,7 +475,55 @@ const PrimaryUserDetails = ({
 
             <Form onSubmit={handleSubmit(onSubmit)}>
               {fields.map((field, index) => (
-                <FieldRenderer key={index} field={field} />
+                <div key={index} className="mb-4">
+                  {field.type.startsWith("Select") ? (
+                    // Render dropdown for select fields using react-select
+                    <div className="form-group">
+                      <label htmlFor={field.key}>{field.label}</label>
+                      <ReactSelect
+                        id={field.key}
+                        options={field.options.map((option) => ({
+                          value: option,
+                          label: option,
+                        }))}
+                        value={
+                          field.key === "langKnown"
+                            ? (watch(field.key) || "")
+                                .split(", ")
+                                .map((value) => ({
+                                  value,
+                                  label: value,
+                                }))
+                            : {
+                                value: watch(field.key),
+                                label: watch(field.key),
+                              }
+                        } // Bind selected value for language or other fields
+                        onChange={(selectedOption) => {
+                          // If it's the language field, convert the selected values to a comma-separated string
+                          if (field.key === "langKnown") {
+                            const selectedLanguages = selectedOption
+                              .map((option) => option.value)
+                              .join(", ");
+                            setValue(field.key, selectedLanguages); // Set the value as comma-separated string
+                          } else {
+                            // For other select fields, just update the selected value
+                            setValue(
+                              field.key,
+                              selectedOption ? selectedOption.value : ""
+                            );
+                          }
+                        }}
+                        isMulti={field.key === "langKnown"} // Enable multi-select for the "Language Known" field
+                        className="react-select-container mb-2"
+                        classNamePrefix="react-select"
+                      />
+                    </div>
+                  ) : (
+                    // Render other input types using FieldRenderer
+                    <FieldRenderer field={field} />
+                  )}
+                </div>
               ))}
 
               {/* Loading spinner */}

@@ -604,7 +604,7 @@ function Registration() {
                       defaultValue={" "}
                     >
                       <option value=" " disabled>
-                        Select
+                        Select Religion
                       </option>
                       <option value={"Hindu"}>Hindu</option>
                       <option value={"Muslim"}>Muslim</option>

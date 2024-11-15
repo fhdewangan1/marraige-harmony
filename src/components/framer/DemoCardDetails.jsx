@@ -68,11 +68,14 @@ const DemoCardDetails = () => {
             response={userDetails?.response?.userFamilyDetails}
           />
           <h1 className="text-center">Personal Details</h1>
-          <UserPersonalDetails
-            status={status}
-            setStatus={setStatus}
-            response={userDetails?.response?.userPersonalDetails}
-          />
+          {userDetails?.response?.userPersonalDetails && (
+            <UserPersonalDetails
+              status={status}
+              setStatus={setStatus}
+              response={userDetails?.response?.userPersonalDetails}
+            />
+          )}
+
           <h1 className="text-center">Lifestyle and Education</h1>
           <UserLifeStyleAndEducation
             status={status}

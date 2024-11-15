@@ -306,7 +306,6 @@ const UserPartnerPreferences = ({
                           className="react-select-container flex-grow-1"
                           classNamePrefix="react-select"
                         />
-
                         <Button
                           onClick={() => {
                             const newLocation = prompt(

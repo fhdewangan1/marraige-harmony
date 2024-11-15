@@ -56,15 +56,6 @@ const UserPartnerPreferences = ({
     { value: "Business", label: "Business" },
   ];
 
-  const handleFieldChange = (key, value) => {
-    setUpdatedProfile((prevProfile) => ({
-      ...prevProfile,
-      [key]: value,
-    }));
-
-    validate(key, value);
-  };
-
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
     setSuccess(false);
@@ -145,6 +136,28 @@ const UserPartnerPreferences = ({
       setError("An error occurred. Please try again.");
       Swal.fire("Error", "An error occurred. Please try again.", "error");
     }
+  };
+
+  const handleFieldChange = (key, value) => {
+    // Check if the field is a text input (exclude Select fields like job or location)
+    if (key !== "preferredLocation" && key !== "desiredJobValue") {
+      // Apply the transformation to packcal case (first letter capitalized, others lowercase)
+      value = value
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
+    }
+
+    // Update the state with the transformed value
+    setUpdatedProfile((prevProfile) => ({
+      ...prevProfile,
+      [key]: value,
+    }));
+
+    // Validate the updated value
+    validate(key, value);
   };
 
   useEffect(() => {
@@ -260,10 +273,9 @@ const UserPartnerPreferences = ({
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          width: "100%", // Full width of the container
+                          width: "100%",
                         }}
                       >
-                        {/* Dropdown for selecting cities */}
                         <Select
                           isMulti
                           options={[
@@ -294,7 +306,6 @@ const UserPartnerPreferences = ({
                           className="react-select-container flex-grow-1"
                           classNamePrefix="react-select"
                         />
-                        {/* Add City Button with Icon */}
                         <Button
                           onClick={() => {
                             const newLocation = prompt(
@@ -312,7 +323,6 @@ const UserPartnerPreferences = ({
                                     : ""
                                 }${newLocation}`
                               );
-                              // Add the new location to the dynamic locations for the dropdown
                               setDynamicLocations((prevLocations) => [
                                 ...prevLocations,
                                 { value: newLocation, label: newLocation },
@@ -324,18 +334,17 @@ const UserPartnerPreferences = ({
                             }
                           }}
                           style={{
-                            height: "38px", // Button height matches the input field height
-                            color: "#fff", // White text for contrast
-                            display: "flex", // Flex for icon and text alignment
-                            alignItems: "center", // Align items vertically in the button
-                            justifyContent: "center", // Center the icon and text
-                            cursor: "pointer", // Pointer cursor on hover
-                            flexShrink: 0, // Ensure the button doesn't shrink
-                            width: "120px", // Set width to fit your layout or leave it dynamic
+                            height: "38px",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            flexShrink: 0,
+                            width: "120px",
                           }}
                           className="btn btn-dark"
                         >
-                          {/* Add Icon */}
                           <i
                             className="fas fa-plus"
                             style={{ marginRight: "5px" }}

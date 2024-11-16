@@ -7,8 +7,7 @@ import Swal from "sweetalert2";
 import AuthHook from "../../../auth/AuthHook";
 import { FaPencilAlt } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
-import axios from "axios";
-
+import { AxiosConfig } from "../../../config/AxiosConfig";
 const CardContainer = styled(motion.div)`
   display: flex;
   border-radius: 8px;
@@ -213,10 +212,11 @@ const ImageCard = ({ mobileNumber, userDetails }) => {
         formData.append(key, value);
       });
 
-      const res = await axios.put(
-        "https://shaadi-be.fino-web-app.agency/api/v1/auth/update-profile",
-        formData
-      );
+      const res = await AxiosConfig.put("/auth/update-profile", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       if (res.status === 200 || res.status === 201) {
         await Swal.fire("Success!", "Profile updated successfully!", "success");

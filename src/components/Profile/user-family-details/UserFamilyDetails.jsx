@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
+import { AxiosConfig } from "../../../config/AxiosConfig";
 
 const familyFields = [
   { key: "fatherName", value: "Father" },
@@ -76,40 +77,43 @@ const UserFamilyDetails = ({
 
   const toggleModal = () => setIsModalOpen((prev) => !prev);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateFields()) return;
 
     setLoading(true);
-    const apiUrl = response
-      ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-family-details/${mobileNumber}`
-      : `https://shaadi-be.fino-web-app.agency/api/v1/save-user-family-details?mobileNumber=${mobileNumber}`;
 
-    fetch(apiUrl, {
+    const endpoint = response
+      ? `/update-user-family-details/${mobileNumber}`
+      : `/save-user-family-details?mobileNumber=${mobileNumber}`;
+
+    const requestConfig = {
       method: response ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedProfile),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setLoading(false);
-        if (data.status === 200 || data.status === 201) {
-          setStatus(!status);
-          refresAfterUpdate && refresAfterUpdate(!status);
-          Swal.fire(
-            "Success!",
-            "User details updated successfully!",
-            "success"
-          ).then(() => {
-            toggleModal();
-          });
-        } else {
-          Swal.fire("Error", "Failed to update user details", "error");
-        }
-      })
-      .catch(() => {
-        setLoading(false);
-        Swal.fire("Error", "An error occurred. Please try again.", "error");
-      });
+      url: endpoint,
+      data: response ? updatedProfile : { mobileNumber, ...updatedProfile }, // Adjusting payload for POST requests
+    };
+
+    try {
+      const { data } = await AxiosConfig(requestConfig);
+
+      setLoading(false);
+      if (data.status === 200 || data.status === 201) {
+        setStatus(!status);
+        refresAfterUpdate && refresAfterUpdate(!status);
+        Swal.fire(
+          "Success!",
+          "User details updated successfully!",
+          "success"
+        ).then(() => {
+          toggleModal();
+        });
+      } else {
+        Swal.fire("Error", "Failed to update user details", "error");
+      }
+    } catch (error) {
+      console.log("error :", error);
+      setLoading(false);
+      Swal.fire("Error", "An error occurred. Please try again.", "error");
+    }
   };
 
   const renderFamilyFields = () => {

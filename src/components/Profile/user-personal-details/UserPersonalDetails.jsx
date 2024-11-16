@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import Select from "react-select"; // Import react-select
+import { AxiosConfig } from "../../../config/AxiosConfig";
 
 // Styled components
 const CardContainer = styled.div`
@@ -53,10 +54,6 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
 
     validate(key, value);
   };
-
-  useEffect(() => {
-    setUpdatedProfile(response || {});
-  }, [response]);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -119,19 +116,19 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
     if (!validateFields()) return;
 
     setLoading(true);
-    const apiUrl = response
-      ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-personal-details/${mobileNumber}`
-      : `https://shaadi-be.fino-web-app.agency/api/v1/save-user-personal-details?mobileNumber=${mobileNumber}`;
+
+    const endpoint = response
+      ? `/update-user-personal-details/${mobileNumber}`
+      : `/save-user-personal-details?mobileNumber=${mobileNumber}`;
+
+    const requestConfig = {
+      method: response ? "PUT" : "POST",
+      url: endpoint,
+      data: response ? updatedProfile : { mobileNumber, ...updatedProfile }, // Include mobileNumber in POST payload
+    };
 
     try {
-      const res = await fetch(apiUrl, {
-        method: response ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedProfile),
-      });
-      const data = await res.json();
+      const { data } = await AxiosConfig(requestConfig);
       setLoading(false);
 
       if (data.status === 200 || data.status === 201) {
@@ -141,7 +138,7 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
           "User details updated successfully!",
           "success"
         ).then(() => {
-          toggleModal(); // Close modal after success
+          toggleModal(); // Close modal on success
         });
       } else {
         Swal.fire(
@@ -151,11 +148,15 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
         );
       }
     } catch (err) {
-      console.log("err :", err);
+      console.error("Error:", err);
       setLoading(false);
       Swal.fire("Error", "An error occurred. Please try again.", "error");
     }
   };
+
+  useEffect(() => {
+    setUpdatedProfile(response || {});
+  }, [response]);
 
   return (
     <>
@@ -211,12 +212,12 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
                   paddingLeft: "10px",
                 }}
               >
-                {field.key === "userHeight" && response[field.key]
-                  ? `${response[field.key]} cm`
-                  : field.key === "userWeight" && response[field.key]
-                  ? `${response[field.key]} kg`
-                  : response && response[field.key]
-                  ? response[field.key].toString()
+                {field.key === "userHeight" && updatedProfile[field.key]
+                  ? `${updatedProfile[field.key]} cm`
+                  : field.key === "userWeight" && updatedProfile[field.key]
+                  ? `${updatedProfile[field.key]} kg`
+                  : updatedProfile && updatedProfile[field.key] !== undefined
+                  ? updatedProfile[field.key].toString()
                   : "N/A"}
               </span>
             </div>
@@ -254,7 +255,9 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
                       <div className="d-flex">
                         <Form.Control
                           type="number"
-                          value={updatedProfile[field.key] || ""}
+                          value={
+                            (updatedProfile && updatedProfile[field.key]) || ""
+                          }
                           onChange={(e) =>
                             handleFieldChange(field.key, e.target.value)
                           }

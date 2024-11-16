@@ -5,6 +5,7 @@ import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import Select from "react-select";
+import { AxiosConfig } from "../../../config/AxiosConfig";
 
 const CardContainer = styled.div`
   &:hover {
@@ -76,19 +77,19 @@ const UserLifeStyleAndEducation = ({
     if (!validateFields()) return;
 
     setLoading(true);
-    const apiUrl = response
-      ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-life-style-details/${mobileNumber}`
-      : `https://shaadi-be.fino-web-app.agency/api/v1/save-user-life-style?mobileNumber=${mobileNumber}`;
+
+    const endpoint = response
+      ? `/update-user-life-style-details/${mobileNumber}`
+      : `/save-user-life-style?mobileNumber=${mobileNumber}`;
+
+    const requestConfig = {
+      method: response ? "PUT" : "POST",
+      url: endpoint,
+      data: response ? updatedProfile : { mobileNumber, ...updatedProfile }, // Adjust payload for POST requests
+    };
 
     try {
-      const res = await fetch(apiUrl, {
-        method: response ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedProfile),
-      });
-      const data = await res.json();
+      const { data } = await AxiosConfig(requestConfig);
       setLoading(false);
 
       if (data.status === 200 || data.status === 201) {
@@ -110,7 +111,7 @@ const UserLifeStyleAndEducation = ({
         );
       }
     } catch (err) {
-      console.log("err :", err);
+      console.error("Error:", err);
       setLoading(false);
       setError("An error occurred. Please try again.");
       Swal.fire("Error", "An error occurred. Please try again.", "error");

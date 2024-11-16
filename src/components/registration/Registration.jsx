@@ -70,7 +70,7 @@ function Registration() {
     community: "",
     dob: "",
     residence: "",
-    email: "",
+    mailId: "",
     profileImage: null,
   });
   const [loading, setLoading] = useState(false);
@@ -173,8 +173,8 @@ function Registration() {
       }
     }
 
-    if (name === "email" && !value) {
-      newErrors.email = "Email is required";
+    if (name === "mailId" && !value) {
+      newErrors.mailId = "Email is required";
     }
 
     if (name === "age" && !value) {
@@ -232,11 +232,11 @@ function Registration() {
       { key: "community", message: "Community is required" },
       { key: "dob", message: "Date of birth is required" },
       { key: "residence", message: "Residence is required" },
-      { key: "email", message: "Email is required" },
+      { key: "mailId", message: "Email is required" },
       { key: "profileImage", message: "Profile image is required" },
     ];
 
-    const { mobileNumber, email, password, confirmPassword } = formData;
+    const { mobileNumber, mailId, password, confirmPassword } = formData;
 
     // Check for missing required fields
     requiredFields.forEach((field) => {
@@ -250,9 +250,9 @@ function Registration() {
       newErrors.mobileNumber = "Mobile number must be exactly 10 digits.";
     }
 
-    // Validate email pattern
-    if (email && !emailPattern.test(email)) {
-      newErrors.email = "Please enter a valid email address.";
+    // Validate mailId pattern
+    if (mailId && !emailPattern.test(mailId)) {
+      newErrors.mailId = "Please enter a valid mailId address.";
     }
 
     // Check password match
@@ -331,7 +331,7 @@ function Registration() {
         const imageBlob = await createCroppedImage();
         const formDataToSend = new FormData();
         Object.entries(formData).forEach(([key, value]) => {
-          formDataToSend.append(key === "email" ? "userMailId" : key, value);
+          formDataToSend.append(key === "mailId" ? "mailId" : key, value);
         });
         if (imageBlob) formDataToSend.set("profileImage", imageBlob);
 
@@ -502,14 +502,14 @@ function Registration() {
                 <div className="mb-4">
                   <input
                     className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    id="email"
+                    id="mailId"
                     type="email"
                     placeholder="Email"
-                    name="email"
+                    name="mailId"
                     onChange={handleChange}
                   />
-                  {errors.email && (
-                    <p className="text-xs text-red-500">{errors.email}</p>
+                  {errors.mailId && (
+                    <p className="text-xs text-red-500">{errors.mailId}</p>
                   )}
                 </div>
                 {/* Mobile number and gender */}

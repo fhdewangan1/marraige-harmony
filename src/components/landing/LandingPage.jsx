@@ -380,6 +380,13 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+      {/* Footer */}
+      <div className="text-center p-4">
+        @ Copyright {new Date().getFullYear()}{" "}
+        <a href="https://www.intallyshwisdom.in/" target="_blank">
+          IntallyShwisdom
+        </a>
+      </div>
     </>
   );
 };

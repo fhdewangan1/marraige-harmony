@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import styled from "styled-components";
 import { AiOutlineClose } from "react-icons/ai";
 import ReactSelect from "react-select";
+import { AxiosConfig } from "../../../config/AxiosConfig";
 
 const FullScreenModal = styled(motion.div)`
   position: fixed;
@@ -231,40 +232,37 @@ const PrimaryUserDetails = ({
     if (profileImageBlob)
       formData.append("profileImage", profileImageBlob, "profile.jpg");
 
-    fetch("https://shaadi-be.fino-web-app.agency/api/v1/auth/update-profile", {
-      method: "PUT",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setLoading(false);
-        if (data.status === 200 || data.status === 201) {
-          setStatus(!status);
-          refresAfterUpdate && refresAfterUpdate(!status);
-          Swal.fire(
-            "Success!",
-            "Profile updated successfully!",
-            "success"
-          ).then(() => {
+    try {
+      const res = await AxiosConfig.put("/auth/update-profile", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setLoading(false);
+      if (res.status === 200 || res.status === 201) {
+        setStatus(!status);
+        refresAfterUpdate && refresAfterUpdate(!status);
+        Swal.fire("Success!", "Profile updated successfully!", "success").then(
+          () => {
             setIsModalOpen(false);
             window.location.reload();
-          });
-        } else {
-          Swal.fire(
-            "Error!",
-            "Failed to update profile. Please try again.",
-            "error"
-          );
-        }
-      })
-      .catch(() => {
-        setLoading(false);
+          }
+        );
+      } else {
         Swal.fire(
           "Error!",
           "Failed to update profile. Please try again.",
           "error"
         );
-      });
+      }
+    } catch (error) {
+      setLoading(false);
+      Swal.fire(
+        "Error!",
+        "Failed to update profile. Please try again.",
+        "error"
+      ).then(() => console.error("Error updating profile:", error));
+    }
   };
   // Calculate age based on DOB
   const calculateAge = (dob) => {

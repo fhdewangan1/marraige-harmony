@@ -13,7 +13,7 @@ AxiosConfig.interceptors.request.use(
   (config) => {
     const token = "";
     if (token) {
-      // config.headers['Authorization'] = 'Bearer ' + token;
+      config.headers["Authorization"] = "Bearer " + token;
       config.headers["Content-Type"] = "application/json";
     }
 

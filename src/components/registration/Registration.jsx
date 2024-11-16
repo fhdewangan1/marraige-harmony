@@ -178,7 +178,7 @@ function Registration() {
     }
 
     if (name === "age" && !value) {
-      newErrors.age = "Age is required and you can select it from the calender";
+      newErrors.age = "Age must be between 18 and 60";
     }
 
     if (name === "gender" && !value) {
@@ -223,7 +223,7 @@ function Registration() {
       { key: "lastName", message: "Last name is required" },
       {
         key: "age",
-        message: "Age is required and you can select it from the calender",
+        message: "Age must be between 18 and 60",
       },
       { key: "gender", message: "Gender is required" },
       { key: "password", message: "Password is required" },

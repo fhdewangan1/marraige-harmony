@@ -481,7 +481,6 @@ const PrimaryUserDetails = ({
                 </label>
               </div>
             </div>
-
             <Form onSubmit={handleSubmit(onSubmit)}>
               {fields.map((field, index) => (
                 <div key={index} className="mb-4">
@@ -497,12 +496,11 @@ const PrimaryUserDetails = ({
                         }))}
                         value={
                           field.key === "langKnown"
-                            ? (watch(field.key) || "")
-                                .split(", ")
-                                .map((value) => ({
-                                  value,
-                                  label: value,
-                                }))
+                            ? watch(field.key) === "NA" || !watch(field.key)
+                              ? [] // If value is "NA" or empty, set to empty array
+                              : watch(field.key)
+                                  .split(", ")
+                                  .map((value) => ({ value, label: value }))
                             : {
                                 value: watch(field.key),
                                 label: watch(field.key),
@@ -512,9 +510,18 @@ const PrimaryUserDetails = ({
                           // If it's the language field, convert the selected values to a comma-separated string
                           if (field.key === "langKnown") {
                             const selectedLanguages = selectedOption
-                              .map((option) => option.value)
-                              .join(", ");
-                            setValue(field.key, selectedLanguages); // Set the value as comma-separated string
+                              ? selectedOption
+                                  .map((option) => option.value)
+                                  .join(", ")
+                              : ""; // Set to empty string if no languages are selected
+
+                            // If selected value is "NA", set to empty string
+                            setValue(
+                              field.key,
+                              selectedLanguages === "NA"
+                                ? ""
+                                : selectedLanguages
+                            );
                           } else {
                             // For other select fields, just update the selected value
                             setValue(

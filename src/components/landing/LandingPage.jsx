@@ -380,12 +380,27 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
-      {/* Footer */}
-      <div className="text-center p-4">
-        @ Copyright {new Date().getFullYear()}{" "}
-        <a href="https://www.intallyshwisdom.in/" target="_blank">
-          IntallyShwisdom
-        </a>
+      {/* Custom Footer */}
+      <div className="bg-gray-100 py-4 text-center border-t border-gray-300">
+        <div className="text-sm text-dark-900">
+          &copy;
+          {new Date().getFullYear()}
+          <a
+            href="https://www.marriageharmony.in/"
+            target="_blank"
+            className="text-blue-400 hover:text-blue-600 no-underline"
+          >
+            Marriage Harmony
+          </a>{" "}
+          | Made with ❤️ by{" "}
+          <a
+            href="http://www.intallyshwisdom.in"
+            target="_blank"
+            className="text-blue-400 hover:text-blue-600 no-underline"
+          >
+            Intallyshwisdom
+          </a>
+        </div>
       </div>
     </>
   );

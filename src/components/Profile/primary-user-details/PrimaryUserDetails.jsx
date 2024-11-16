@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import styled from "styled-components";
 import { AiOutlineClose } from "react-icons/ai";
 import ReactSelect from "react-select";
-import { AxiosConfig } from "../../../config/AxiosConfig";
+import { ApiUrl } from "../../../config/Config";
 
 const FullScreenModal = styled(motion.div)`
   position: fixed;
@@ -58,8 +58,8 @@ const fields = [
   {
     label: "Gender",
     key: "gender",
-    type: "Select Gender",
-    options: ["Male", "Female", "Other"],
+    type: "text",
+    isDisabled: true,
   },
   {
     label: "Language Known",
@@ -86,7 +86,11 @@ const fields = [
     type: "text",
     isDisabled: true, // Disable Age field, as it's calculated from DOB
   },
-  { label: "Residence", key: "residence", type: "text" },
+  {
+    label: "Enter Location (Area, City, State)",
+    key: "residence",
+    type: "text",
+  },
   { label: "Mobile No", key: "mobileNumber", type: "text", isDisabled: true },
   { label: "Email", key: "mailId", type: "text" },
 ];
@@ -232,37 +236,40 @@ const PrimaryUserDetails = ({
     if (profileImageBlob)
       formData.append("profileImage", profileImageBlob, "profile.jpg");
 
-    try {
-      const res = await AxiosConfig.put("/auth/update-profile", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      setLoading(false);
-      if (res.status === 200 || res.status === 201) {
-        setStatus(!status);
-        refresAfterUpdate && refresAfterUpdate(!status);
-        Swal.fire("Success!", "Profile updated successfully!", "success").then(
-          () => {
+    fetch(`${ApiUrl}/auth/update-profile`, {
+      method: "PUT",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLoading(false);
+        if (data.status === 200 || data.status === 201) {
+          setStatus(!status);
+          refresAfterUpdate && refresAfterUpdate(!status);
+          Swal.fire(
+            "Success!",
+            "Profile updated successfully!",
+            "success"
+          ).then(() => {
             setIsModalOpen(false);
             window.location.reload();
-          }
-        );
-      } else {
+          });
+        } else {
+          Swal.fire(
+            "Error!",
+            "Failed to update profile. Please try again.",
+            "error"
+          );
+        }
+      })
+      .catch(() => {
+        setLoading(false);
         Swal.fire(
           "Error!",
           "Failed to update profile. Please try again.",
           "error"
         );
-      }
-    } catch (error) {
-      setLoading(false);
-      Swal.fire(
-        "Error!",
-        "Failed to update profile. Please try again.",
-        "error"
-      ).then(() => console.error("Error updating profile:", error));
-    }
+      });
   };
   // Calculate age based on DOB
   const calculateAge = (dob) => {
@@ -349,7 +356,11 @@ const PrimaryUserDetails = ({
               type={field.type}
               value={value || ""}
               onChange={(e) => {
-                const updatedValue = toPascalCase(e.target.value); // Convert input to PascalCase
+                // Only apply PascalCase for fields other than email
+                const updatedValue =
+                  field.key === "mailId"
+                    ? e.target.value
+                    : toPascalCase(e.target.value); // Apply PascalCase for non-email fields
                 setValue(field.key, updatedValue);
                 onChange(updatedValue);
               }}

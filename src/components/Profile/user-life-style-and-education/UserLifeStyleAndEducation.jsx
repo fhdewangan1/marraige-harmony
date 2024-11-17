@@ -1,162 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import styled from "styled-components";
+import { useEffect, useState } from "react";
+import { Button, Modal, Form, Spinner, Alert } from "react-bootstrap";
 import Swal from "sweetalert2";
-import { RingLoader } from "react-spinners";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
+import styled from "styled-components";
+import Select from "react-select";
+import { AxiosConfig } from "../../../config/AxiosConfig";
 
-const CardContainer = styled(motion.div)`
-  display: flex;
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 100%;
-  background-color: #fcd5ce;
-  max-height: 350px;
-  margin-bottom: 40px;
-  padding-bottom: 60px;
-`;
-
-const ContentWrapper = styled.div`
-  flex: 2;
-  padding: 30px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  max-height: 250px;
-  overflow-y: auto;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    max-height: 200px;
-    padding: 15px;
-  }
-`;
-
-const Field = styled.div`
-  padding: 10px;
-  border-radius: 4px;
-  color: #1f7a8c;
-  font-size: 20px;
-  word-wrap: break-word;
-
-  @media (max-width: 768px) {
-    font-size: 16px;
-  }
-`;
-
-const ButtonContainer = styled.div`
-  position: absolute;
-  top: 20px;
-  right: 20px;
-
-  @media (max-width: 768px) {
-    top: 10px; /* Adjust top position */
-    right: 10px; /* Adjust right position */
-  }
-`;
-
-
-const Button = styled.button`
-  background-color: #003566;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  font-size: 18px;
-  cursor: pointer;
-
+const CardContainer = styled.div`
   &:hover {
-    background-color: #1f7a8c;
+    transform: translateY(-5px);
   }
-
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%; /* Responsive width */
-  max-width: 800px; /* Maximum width for larger screens */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
-  @media (max-width: 768px) {
-    padding: 15px; /* Adjust padding for mobile */
-  }
-`;
-
-const ModalHeader = styled.h2`
-  margin: 0;
-  margin-bottom: 20px;
-  font-size: 24px; /* Default font size */
-
-  @media (max-width: 768px) {
-    font-size: 20px; /* Smaller font size on mobile */
-  }
-`;
-
-const FormWrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr; /* Single column on mobile */
-  }
-`;
-
-const InputField = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Label = styled.label`
-  margin-bottom: 5px;
-  color: #333;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-
-  @media (max-width: 768px) {
-    font-size: 14px; /* Smaller font size on mobile */
-  }
-`;
-
-const Message = styled.div`
-  margin-top: 15px;
-  font-size: 16px;
-  color: ${({ success }) => (success ? "green" : "red")};
 `;
 
 // Fields data
-export const lifeStyleAndEducationFields = [
-  { key: "userOccupation", value: "Occupation: " },
-  { key: "userCurrentLoc", value: "Current Location: " },
-  { key: "drinking", value: "Drinking Habits: " },
-  { key: "smoking", value: "Smoking Habits: " },
-  { key: "diet", value: "Diet: " },
-  { key: "qualification", value: "Qualification: " },
+const lifeStyleAndEducationFields = [
+  { key: "userOccupation", value: "Occupation" },
+  { key: "userCurrentLoc", value: "Current Location" },
+  { key: "drinking", value: "Drinking Habits" },
+  { key: "smoking", value: "Smoking Habits" },
+  { key: "diet", value: "Diet" },
+  { key: "qualification", value: "Qualification" },
 ];
 
 const UserLifeStyleAndEducation = ({
@@ -168,144 +32,326 @@ const UserLifeStyleAndEducation = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(response || {});
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const session = AuthHook();
   const { mobileNumber } = useParams();
-
-  useEffect(() => {
-    setUpdatedProfile(response || {});
-  }, [response]);
-
-  const handleFieldChange = (key, value) => {
-    setUpdatedProfile((prevProfile) => ({
-      ...prevProfile,
-      [key]: value,
-    }));
-  };
+  const [errors, setErrors] = useState({});
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
-    setSuccess(false);
     setError("");
   };
 
-  const handleSubmit = async () => {
-    // Basic validation
-    for (const field of lifeStyleAndEducationFields) {
-      if (!updatedProfile[field.key]) {
-        setError(`${field.value} is required.`);
-        return; // Stop if validation fails
+  const validateFields = () => {
+    let errors = {};
+
+    // Check if any other field is empty
+    for (const key in updatedProfile) {
+      if (!updatedProfile[key]) {
+        errors[key] = `The field ${key} cannot be empty.`;
       }
     }
 
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validate = (key, value) => {
+    let newErrors = { ...errors };
+
+    // Find the label for the current key
+    const fieldLabel = lifeStyleAndEducationFields.find(
+      (field) => field.key === key
+    )?.value;
+
+    if (!value) {
+      newErrors[key] = `${fieldLabel} is required`;
+    } else {
+      delete newErrors[key];
+    }
+
+    setErrors(newErrors);
+  };
+
+  const handleSubmit = async () => {
+    if (!validateFields()) return;
+
     setLoading(true);
-    const apiUrl = response
-      ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-life-style-details/${mobileNumber}`
-      : `https://shaadi-be.fino-web-app.agency/api/v1/save-user-life-style?mobileNumber=${mobileNumber}`;
+
+    const endpoint = response
+      ? `/update-user-life-style-details/${mobileNumber}`
+      : `/save-user-life-style?mobileNumber=${mobileNumber}`;
+
+    const requestConfig = {
+      method: response ? "PUT" : "POST",
+      url: endpoint,
+      data: response ? updatedProfile : { mobileNumber, ...updatedProfile }, // Adjust payload for POST requests
+    };
 
     try {
-      const res = await fetch(apiUrl, {
-        method: response ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedProfile),
-      });
-      const data = await res.json();
+      const { data } = await AxiosConfig(requestConfig);
       setLoading(false);
 
       if (data.status === 200 || data.status === 201) {
         setStatus(!status);
         refresAfterUpdate && refresAfterUpdate(!status);
-        Swal.fire("Success!", "User details updated successfully!", "success").then(() => {
+        Swal.fire(
+          "Success!",
+          "User details updated successfully!",
+          "success"
+        ).then(() => {
           toggleModal();
         });
       } else {
         setError(data.message || "Failed to update user details");
-        Swal.fire("Error", data.message || "Failed to update user details", "error");
+        Swal.fire(
+          "Error",
+          data.message || "Failed to update user details",
+          "error"
+        );
       }
     } catch (err) {
+      console.error("Error:", err);
       setLoading(false);
       setError("An error occurred. Please try again.");
       Swal.fire("Error", "An error occurred. Please try again.", "error");
     }
   };
 
+  const handleFieldChange = (key, value) => {
+    // Apply the Packcal case transformation to text fields
+    if (key !== "drinking" && key !== "smoking" && key !== "diet") {
+      value = value
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
+    }
+
+    // Update the state with the new value
+    setUpdatedProfile((prevProfile) => ({
+      ...prevProfile,
+      [key]: value,
+    }));
+
+    // Validate the field
+    validate(key, value);
+  };
+
+  useEffect(() => {
+    setUpdatedProfile(response || {});
+  }, [response]);
+
   return (
     <>
       <CardContainer
+        className="bg-white p-6 rounded-lg shadow-lg mb-6"
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
         {mobileNumber === session?.userName && (
-          <ButtonContainer>
-            <Button onClick={toggleModal}>{response ? "Update" : "Add"}</Button>
-          </ButtonContainer>
+          <div className="d-flex justify-content-end mb-4">
+            <Button
+              variant="primary"
+              onClick={toggleModal}
+              style={{
+                padding: "10px 20px",
+                borderRadius: "5px",
+                fontSize: "1rem",
+                fontFamily: "Verdana, sans-serif",
+                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#003566",
+                borderColor: "#003566",
+              }}
+            >
+              <i
+                className="fas fa-pencil-alt me-2"
+                style={{ fontSize: "1.2rem" }}
+              ></i>
+              {response ? "Update" : "Add"}
+            </Button>
+          </div>
         )}
-         <ContentWrapper style={{marginTop:'29px'}}>
+        <div className="grid grid-cols-1 gap-4">
           {lifeStyleAndEducationFields.map((field, index) => (
-            <Field key={index}>
-              {field.value}{" "}
-              <span style={{ color: "#003566" }}>
+            <div
+              key={index}
+              className="mb-2 p-2 d-flex justify-content-between align-items-center border-bottom"
+              style={{ flexWrap: "wrap" }}
+            >
+              <strong
+                className="text-primary"
+                style={{ fontSize: "1rem", fontFamily: "Arial, sans-serif" }}
+              >
+                {field.value}:
+              </strong>
+              <span
+                className="text-dark"
+                style={{
+                  fontSize: "0.9rem",
+                  fontFamily: "Verdana, sans-serif",
+                  paddingLeft: "10px",
+                }}
+              >
                 {response && response[field.key]
                   ? Array.isArray(response[field.key])
                     ? response[field.key].join(", ")
                     : response[field.key]
                   : "N/A"}
               </span>
-            </Field>
+            </div>
           ))}
-        </ContentWrapper>
+        </div>
       </CardContainer>
 
       {isModalOpen && (
-        <ModalOverlay>
-          <ModalContent>
-            <ModalHeader>
-              {response ? "Update Lifestyle and Education Details" : "Add Lifestyle and Education Details"}
-            </ModalHeader>
-            <FormWrapper>
+        <Modal show={isModalOpen} onHide={toggleModal} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>
+              <i className="fas fa-user-edit me-2"></i>
+              {response
+                ? "Update Lifestyle and Education Details"
+                : "Add Lifestyle and Education Details"}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body
+            style={{
+              padding: "30px 50px",
+              maxHeight: "60vh",
+              overflowY: "auto",
+            }}
+          >
+            <Form>
               {lifeStyleAndEducationFields.map((field, index) => (
-                <InputField key={index}>
-                  <Label>{field.value}</Label>
-                  <Input
-                    type="text"
-                    value={updatedProfile[field.key] || ""}
-                    onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                  />
-                </InputField>
+                <Form.Group key={index} className="mb-4">
+                  <Form.Label className="font-weight-bold">
+                    {field.value}
+                  </Form.Label>
+                  <div
+                    className="input-group"
+                    style={{ flexDirection: "column" }}
+                  >
+                    {/* Use React Select for fields like drinking, smoking, diet */}
+                    {["drinking", "smoking", "diet"].includes(field.key) ? (
+                      <Select
+                        value={
+                          updatedProfile[field.key]
+                            ? {
+                                label: updatedProfile[field.key],
+                                value: updatedProfile[field.key],
+                              }
+                            : null
+                        }
+                        onChange={(selectedOption) =>
+                          handleFieldChange(
+                            field.key,
+                            selectedOption ? selectedOption.value : ""
+                          )
+                        }
+                        options={
+                          field.key === "drinking"
+                            ? [
+                                { label: "Yes", value: "Yes" },
+                                { label: "No", value: "No" },
+                                {
+                                  label: "Occasionally",
+                                  value: "Occasionally",
+                                },
+                              ]
+                            : field.key === "smoking"
+                            ? [
+                                { label: "Yes", value: "Yes" },
+                                { label: "No", value: "No" },
+                                {
+                                  label: "Occasionally",
+                                  value: "Occasionally",
+                                },
+                              ]
+                            : field.key === "diet"
+                            ? [
+                                { label: "Vegetarian", value: "Vegetarian" },
+                                {
+                                  label: "Non-Vegetarian",
+                                  value: "Non-Vegetarian",
+                                },
+                                { label: "Eggetarian", value: "Eggetarian" },
+                              ]
+                            : []
+                        }
+                        className="react-select-container"
+                        classNamePrefix="react-select"
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            borderRadius: "0.375rem",
+                            borderColor: "#ccc",
+                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          }),
+                        }}
+                      />
+                    ) : (
+                      // Text input for other fields
+                      <Form.Control
+                        type="text"
+                        value={updatedProfile[field.key] || ""}
+                        onChange={(e) =>
+                          handleFieldChange(field.key, e.target.value)
+                        }
+                        placeholder={`Enter ${field.value}`}
+                        className="border-0 rounded-end"
+                        style={{
+                          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          width: "100%",
+                          marginLeft: "5px",
+                        }}
+                      />
+                    )}
+
+                    {errors[field.key] && (
+                      <div
+                        className="text-danger mt-1"
+                        style={{ fontSize: "0.8rem" }}
+                      >
+                        {errors[field.key]}
+                      </div>
+                    )}
+                  </div>
+                </Form.Group>
               ))}
-            </FormWrapper>
+            </Form>
+
             {loading ? (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100px",
-                }}
-              >
-                <RingLoader color="#003566" size={60} />
+              <div className="d-flex justify-content-center my-3">
+                <Spinner animation="border" variant="primary" />
               </div>
             ) : (
               <>
-                {error && <Message>{error}</Message>}
+                {error && (
+                  <Alert variant="danger" className="d-flex align-items-center">
+                    <i className="fas fa-exclamation-circle me-2"></i> {error}
+                  </Alert>
+                )}
               </>
             )}
-                <Button onClick={handleSubmit} disabled={loading} style={{marginTop:'5px'}}>
-              Save Changes
-            </Button>
+          </Modal.Body>
+          <Modal.Footer>
             <Button
-              onClick={toggleModal}
-              style={{ marginLeft: "5px", marginTop:'10px' }}
+              variant="success"
+              style={{
+                backgroundColor: "rgb(219, 39, 119)",
+                borderColor: "#ec4899",
+              }}
+              onClick={handleSubmit}
               disabled={loading}
             >
-              Cancel
+              <i className="fas fa-save me-2"></i> Save Changes
             </Button>
-          </ModalContent>
-        </ModalOverlay>
+          </Modal.Footer>
+        </Modal>
       )}
     </>
   );

@@ -1,10 +1,8 @@
 import { Card, Typography } from "@mui/material";
-import React from "react";
 
 const FamilyDetails = ({ familyDetails }) => {
-    console.log(familyDetails);
   return (
-    <Card >
+    <Card>
       <Typography>{familyDetails?.familyStatus}</Typography>
     </Card>
   );

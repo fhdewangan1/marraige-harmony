@@ -8,7 +8,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { FaPhone, FaCalendarAlt } from "react-icons/fa"; // Import Font Awesome Icons
 import qs from "qs"; // Import qs for URL encoding
 import { AxiosConfig } from "../../config/AxiosConfig"; // Adjust the path as needed
 import Swal from "sweetalert2"; // Import SweetAlert
@@ -50,7 +50,7 @@ const ForgotPassword = () => {
         qs.stringify(formattedData), // Stringify the data
         {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       );
@@ -87,153 +87,86 @@ const ForgotPassword = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        background:
-          "url('/path/to/your/background/image.jpg') no-repeat center center fixed",
-        backgroundSize: "cover",
-      }}
+    <div
+      className="flex justify-center items-center min-h-screen bg-fixed bg-cover"
+      style={{ backgroundImage: "url('/path/to/your/background/image.jpg')" }}
     >
-      <Container
-        maxWidth="xs"
-        sx={{
-          backdropFilter: "blur(10px)",
-          backgroundColor: "rgba(255, 255, 255, 0.3)",
-          padding: "2rem",
-          borderRadius: "12px",
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{ textAlign: "center", mb: 2, color: "#001d4a" }}
-        >
-          Forgot Password
-        </Typography>
+      <div className="w-11/12 md:w-1/2 lg:w-1/3 py-8">
+        <div className="container bg-white bg-opacity-80 p-6 rounded-lg shadow-md ">
+          <h3 className="text-center mb-4 text-blue-800 font-semibold">
+            Forgot Password
+          </h3>
 
-        {/* Show loading spinner if loading is true */}
-        {loading ? (
-          <CircularProgress sx={{ margin: "2rem 0" }} />
-        ) : (
-          <Box
-            component="form"
+          {loading && (
+            <div className="text-center mb-4">
+              <div className="spinner-border text-blue-800" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          )}
+
+          <form
+            id="forgotPasswordForm"
+            className="space-y-4"
             onSubmit={handleSubmit}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              width: "100%",
-            }}
           >
-            <TextField
-              variant="outlined"
-              label="Mobile Number"
-              name="mobileNumber"
-              value={formData.mobileNumber}
-              onChange={handleChange}
-              fullWidth
-              required
-              sx={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                borderRadius: "8px",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "rgba(0, 0, 0, 0.5)",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#001d4a",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#001d4a",
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "#001d4a",
-                  "&.Mui-focused": {
-                    color: "#001d4a",
-                  },
-                },
-              }}
-            />
-            <TextField
-              variant="outlined"
-              label="Date of Birth"
-              name="dateOfBirth"
-              type="date"
-              value={formData.dateOfBirth}
-              onChange={handleChange}
-              fullWidth
-              required
-              InputLabelProps={{
-                shrink: true,
-              }}
-              sx={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                borderRadius: "8px",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "rgba(0, 0, 0, 0.5)",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#001d4a",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#001d4a",
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "#001d4a",
-                  "&.Mui-focused": {
-                    color: "#001d4a",
-                  },
-                },
-              }}
-            />
-
-            <Button
-              variant="contained"
+            <div className="mb-3">
+              <label htmlFor="mobileNumber" className="block font-medium">
+                Mobile Number
+              </label>
+              <div className="flex items-center border border-gray-300 rounded">
+                <span className="px-2 text-blue-800">
+                  <i className="fas fa-phone-alt"></i>
+                </span>
+                <input
+                  type="tel"
+                  className="p-2 flex-1 rounded outline-none"
+                  id="mobileNumber"
+                  name="mobileNumber"
+                  value={formData.mobileNumber}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+            <div className="mb-3">
+              <label htmlFor="dateOfBirth" className="block font-medium">
+                Date of Birth
+              </label>
+              <div className="flex items-center border border-gray-300 rounded">
+                <span className="px-2 text-blue-800">
+                  <i className="fas fa-calendar-alt"></i>
+                </span>
+                <input
+                  type="date"
+                  className="p-2 flex-1 rounded outline-none"
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+            <button
               type="submit"
-              fullWidth
-              sx={{ backgroundColor: "#001d4a", color: "#fff", mt: 2 }}
+              className="w-full py-2 mt-3 bg-blue-800 text-white rounded hover:bg-blue-700 transition duration-300"
             >
               Send Reset Email
-            </Button>
-          </Box>
-        )}
-
-        <Typography
-          variant="body2"
-          sx={{
-            mt: 2,
-            textAlign: "center",
-            color: "white",
-            fontWeight: "bold",
-            letterSpacing: "0.5px",
-          }}
-        >
-          Remembered your password?{" "}
-          <Link
-            to="/login"
-            style={{
-              color: "blue",
-              textDecoration: "underline",
-              fontWeight: "bold",
-              transition: "color 0.3s",
-            }}
-          >
-            Login here
-          </Link>
-        </Typography>
-      </Container>
-    </Box>
+            </button>
+          </form>
+          <p className="mt-4 text-center text-gray-600">
+            Remembered your password?{" "}
+            <Link
+              to="/login"
+              className="text-blue-500 hover:text-blue-700 text-decoration-none"
+            >
+              Login here
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 

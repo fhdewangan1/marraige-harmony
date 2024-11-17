@@ -1,0 +1,39 @@
+.main-background-image {
+  background-image: url("https://images.pexels.com/photos/5759223/pexels-photo-5759223.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+  background-size: cover;
+  background-position: center;
+  height: 50vh; /* Default height */
+  width: 100%;
+  position: relative;
+  background-repeat: no-repeat;
+  margin: 0; /* Remove margin if necessary */
+}
+
+@media (min-width: 1025px) {
+  .main-background-image {
+    height: 80vh;
+    min-height: 80vh; /* Increase height for larger screens */
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .main-background-image {
+    min-height: 60vh; /* Adjust height for tablets */
+  }
+}
+
+@media (max-width: 768px) {
+  .main-background-image {
+    height: 40vh; /* Adjust height for mobile */
+  }
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+select:focus {
+  outline: none !important;
+}

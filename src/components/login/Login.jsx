@@ -1,24 +1,62 @@
-import React, { useState } from "react";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Container,
-  CircularProgress,
-} from "@mui/material";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { AxiosConfig } from "../../config/AxiosConfig";
-import Swal from "sweetalert2"; // Import SweetAlert
+import Swal from "sweetalert2";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai"; // Import the eye icons
 
 function Login() {
-  const [formData, setFormData] = useState({
-    mobileNumber: "",
-    password: "",
-  });
-  const [loading, setLoading] = useState(false); // Loading state
+  const [formData, setFormData] = useState({ mobileNumber: "", password: "" });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
   const navigate = useNavigate();
+
+  // Function to validate the form fields
+  const validate = (name, value) => {
+    const newErrors = {};
+
+    // Validate Mobile
+    if (name === "mobileNumber") {
+      if (!value) {
+        newErrors.mobileNumber = "Contact is required";
+      } else if (!/^\d{10}$/.test(value)) {
+        newErrors.mobileNumber = "Mobile must be of 10 digits";
+      } else {
+        delete newErrors.mobileNumber; // Remove the error if the field is valid
+      }
+    }
+
+    // Validate Password
+    if (name === "password") {
+      if (!value) {
+        newErrors.password = "Password is required";
+      } else {
+        delete newErrors.password; // Remove the error if the field is valid
+      }
+    }
+
+    setErrors(newErrors);
+    setLoading(false);
+  };
+
+  const validateAll = () => {
+    const newErrors = {};
+
+    if (!formData.mobileNumber) {
+      newErrors.mobileNumber = "Contact is required";
+    } else if (!/^\d{10}$/.test(formData.mobileNumber)) {
+      newErrors.mobileNumber = "Mobile must be a 10-digit number";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+    setLoading(false);
+
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,229 +64,179 @@ function Login() {
       ...formData,
       [name]: value,
     });
+
+    // Validate the specific field that changed
+    validate(name, value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading
-    try {
-      const response = await AxiosConfig.get("/auth/login-profile", {
-        params: formData,
-      });
-      if (response?.data?.statusCode === 200) {
-        localStorage.setItem("userInfo", JSON.stringify(response.data));
+    setLoading(true);
 
-        // Show SweetAlert success notification
-        Swal.fire({
-          title: "Login Successful",
-          text: "You have successfully logged in!",
-          icon: "success",
-          confirmButtonText: "OK",
-        }).then(() => {
-          setLoading(false); // Stop loading
-          navigate("/profiles"); // Navigate to profiles after successful login
+    if (validateAll()) {
+      try {
+        const response = await AxiosConfig.get("/auth/login-profile", {
+          params: formData,
         });
-      } else {
+        if (response?.data?.statusCode === 200) {
+          localStorage.setItem("userInfo", JSON.stringify(response.data));
+
+          Swal.fire({
+            title: "Login Successful",
+            text: "You have successfully logged in!",
+            icon: "success",
+            confirmButtonText: "OK",
+          }).then(() => {
+            setLoading(false);
+            navigate("/profiles");
+          });
+        } else {
+          Swal.fire({
+            title: "Login failed",
+            text: response?.data?.statusMessage,
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Login failed", error);
+        setLoading(false);
+
         Swal.fire({
-          title: "Login failed",
-          text: response?.data?.statusMessage,
+          title: "Login Failed",
+          text: "Please check your credentials and try again.",
           icon: "error",
           confirmButtonText: "OK",
         });
-        setLoading(false);
       }
-    } catch (error) {
-      console.error("Login failed", error);
-      setLoading(false); // Stop loading in case of error
-
-      // Show SweetAlert error notification
-      Swal.fire({
-        title: "Login Failed",
-        text: "Please check your credentials and try again.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
+    } else {
+      setLoading(false);
     }
   };
 
+  // Function to toggle password visibility
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        background:
-          "url('/path/to/your/background/image.jpg') no-repeat center center fixed",
-        backgroundSize: "cover",
-      }}
-    >
-      <Container
-        maxWidth="xs"
-        sx={{
-          backdropFilter: "blur(10px)",
-          backgroundColor: "rgba(255, 255, 255, 0.3)", // Semi-transparent background
-          padding: "2rem",
-          borderRadius: "12px",
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{ textAlign: "center", mb: 2, color: "#001d4a" }}
-        >
-          Welcome to Shubh Shaadi
-        </Typography>
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{ textAlign: "center", mb: 2, color: "#001d4a" }}
-        >
-          Login To Proceed
-        </Typography>
+    <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center items-center">
+      <div className="max-w-screen-xl h-100 m-0 sm:m-10 bg-white shadow-lg sm:rounded-lg flex justify-center flex-1 transition-transform duration-300 ease-in-out transform ">
+        <div className="lg:w-1/2 xl:w-5/12 p-4 sm:p-12">
+          <div className="py-3">
+            <Link to={"/"} className="text-decoration-none flex items-center">
+              <i className="fa-solid fa-arrow-left-long"></i>
+              <span className="ml-3 font-bold text-blue-500 hover:text-blue-700 transition duration-200">
+                Visit Home
+              </span>
+            </Link>
+          </div>
 
-        {/* Show loading spinner if loading is true */}
-        {loading ? (
-          <CircularProgress sx={{ margin: "2rem 0" }} />
-        ) : (
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              width: "100%",
-            }}
-          >
-            <TextField
-              variant="outlined"
-              label="Mobile Number"
-              name="mobileNumber"
-              value={formData.mobileNumber}
-              onChange={handleChange}
-              fullWidth
-              required
-              sx={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)", // Light background for input
-                borderRadius: "8px",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "rgba(0, 0, 0, 0.5)", // Border color
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#001d4a", // Border color on hover
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#001d4a", // Border color when focused
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "#001d4a", // Label color
-                  "&.Mui-focused": {
-                    color: "#001d4a", // Focused label color
-                  },
-                },
-              }}
-            />
-            <TextField
-              variant="outlined"
-              label="Password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              fullWidth
-              required
-              sx={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)", // Light background for input
-                borderRadius: "8px",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "rgba(0, 0, 0, 0.5)", // Border color
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#001d4a", // Border color on hover
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#001d4a", // Border color when focused
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "#001d4a", // Label color
-                  "&.Mui-focused": {
-                    color: "#001d4a", // Focused label color
-                  },
-                },
-              }}
-            />
-            <Button
-              variant="contained"
-              type="submit"
-              fullWidth
-              sx={{ backgroundColor: "#001d4a", color: "#fff", mt: 2 }}
-            >
-              Login
-            </Button>
-          </Box>
-        )}
+          <div className="mt-12 flex flex-col items-center">
+            <div className="w-full flex-1">
+              <h1 className="mb-5 text-2xl xl:text-3xl font-extrabold text-center">
+                Login
+              </h1>
 
-        <Typography
-          variant="body2"
-          sx={{
-            mt: 2,
-            textAlign: "center",
-            color: "white",
-            fontWeight: "bold", // Make the text bold
-            letterSpacing: "0.5px", // Add some letter spacing
+              <div className="mx-auto max-w-xs">
+                <input
+                  className="w-full px-8 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white transition duration-200 ease-in-out"
+                  type="tel"
+                  name="mobileNumber"
+                  onChange={handleChange}
+                  value={formData.mobileNumber}
+                  placeholder="Mobile"
+                />
+                {errors.mobileNumber && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.mobileNumber}
+                  </p>
+                )}
+                <div className="relative mt-4">
+                  <input
+                    className="w-full px-8 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white transition duration-200 ease-in-out "
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    onChange={handleChange}
+                    value={formData.password}
+                    placeholder="Password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-4 text-gray-600 hover:text-gray-800 transition duration-200"
+                    onClick={togglePasswordVisibility} // Toggle visibility on button click
+                  >
+                    {showPassword ? (
+                      <AiFillEyeInvisible size={24} />
+                    ) : (
+                      <AiFillEye size={24} />
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                )}
+                <div className="text-end mt-2">
+                  <Link
+                    className="inline-block text-sm text-blue-500 align-baseline hover:text-blue-800 transition duration-200 text-decoration-none"
+                    to={"/forgot-password"}
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
+                <button
+                  className={`mt-4 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-3 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={handleSubmit}
+                  disabled={loading} // Disable button while loading
+                >
+                  {loading ? (
+                    <div className="loader">Loading...!</div>
+                  ) : (
+                    <>
+                      <svg
+                        className="w-6 h-6 -ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                        <circle cx="8.5" cy="7" r="4" />
+                        <path d="M20 8v6M23 11h-6" />
+                      </svg>
+                      <span className="ml-3">Login</span>
+                    </>
+                  )}
+                </button>
+                <div className="py-3">
+                  <p className="mt-4 text-center text-gray-600">
+                    Don't have an account?{" "}
+                    <Link
+                      to="/register"
+                      className="text-blue-500 hover:text-blue-700 text-decoration-none"
+                    >
+                      Signup Now
+                    </Link>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="flex-1 bg-indigo-100 text-center hidden lg:flex rounded-r-lg"
+          style={{
+            backgroundImage:
+              'url("https://img.freepik.com/free-vector/access-control-system-abstract-concept_335657-3180.jpg?t=st=1729430893~exp=1729434493~hmac=7fb4df841069099c5a8cff04edbf1afcf78e14a9598b7fdf6530e6a76174d40d&w=740")',
+            backgroundPosition: "center",
           }}
-        >
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            style={{
-              color: "blue", // A contrasting color for the link
-              textDecoration: "underline", // Underline the link
-              fontWeight: "bold", // Bold link
-              transition: "color 0.3s", // Smooth transition for hover effect
-            }}
-            // onMouseEnter={(e) => (e.target.style.color = "#ffd700")} // Change color on hover
-            // onMouseLeave={(e) => (e.target.style.color = "#ffcc00")} // Reset color on mouse leave
-          >
-            Register here
-          </Link>
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{
-            mt: 2,
-            textAlign: "center",
-            color: "white",
-            fontWeight: "bold", // Make the text bold
-            letterSpacing: "0.5px", // Add some letter spacing
-          }}
-        >
-          Forgot Password?{" "}
-          <Link
-            to="/forgot-password"
-            style={{
-              color: "blue", // A contrasting color for the link
-              textDecoration: "underline", // Underline the link
-              fontWeight: "bold", // Bold link
-              transition: "color 0.3s", // Smooth transition for hover effect
-            }}
-            // onMouseEnter={(e) => (e.target.style.color = "#ffd700")} // Change color on hover
-            // onMouseLeave={(e) => (e.target.style.color = "#ffcc00")} // Reset color on mouse leave
-          >
-            Click here
-          </Link>
-        </Typography>
-      </Container>
-    </Box>
+        />
+      </div>
+    </div>
   );
 }
 

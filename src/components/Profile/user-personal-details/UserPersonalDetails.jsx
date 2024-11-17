@@ -1,263 +1,501 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import AuthHook from "../../../auth/AuthHook";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { RingLoader } from "react-spinners";
+import { Modal, Button, Form, Spinner } from "react-bootstrap";
+import Select from "react-select"; // Import react-select
+import { AxiosConfig } from "../../../config/AxiosConfig";
 
 // Styled components
-const CardContainer = styled(motion.div)`
-  display: flex;
-  flex-direction: column;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #fcd5ce;
-  padding: 20px;
-  margin-bottom: 40px;
-  max-width: 100%;
-
-  @media (max-width: 768px) {
-    padding: 15px;
-    margin-bottom: 20px;
-  }
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: flex-end; /* Aligns all items to the right */
-  align-items: center;
-  margin-bottom: 20px;
-  width: 100%; /* Ensure it takes full width */
-`;
-
-const ContentWrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Three columns for desktop */
-  gap: 10px;
-  max-height: 300px;
-  overflow-y: auto;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Responsive for mobile */
-  }
-`;
-
-const Field = styled.div`
-  padding: 10px;
-  border-radius: 4px;
-  color: #1f7a8c;
-  font-size: 20px;
-
-  @media (max-width: 768px) {
-    font-size: 16px;
-  }
-`;
-
-
-const Button = styled.button`
-  background-color: #003566;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  font-size: 18px;
-  cursor: pointer;
-
+const CardContainer = styled.div`
   &:hover {
-    background-color: #1f7a8c;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 16px;
-    padding: 8px 16px;
-  }
-`;
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000; /* Adjust as necessary */
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-`;
-
-const ModalHeader = styled.h2`
-  margin: 0 0 20px;
-`;
-
-const FormWrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Three columns for desktop */
-  gap: 10px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Responsive for mobile */
-  }
-`;
-
-const InputField = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Label = styled.label`
-  margin-bottom: 5px;
-  color: #333;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-
-  @media (max-width: 768px) {
-    font-size: 14px;
+    transform: translateY(-5px);
   }
 `;
 
 // Personal Fields
-export const personalFields = [
-  { key: "userHeight", value: "Height: " },
-  { key: "userWeight", value: "Weight: " },
-  { key: "gotra", value: "Gotra: " },
-  { key: "manglik", value: "Manglik: " },
-  { key: "maritalStatus", value: "Marital Status: " },
-  { key: "isPersonDisabled", value: "Is Disabled: " },
-  { key: "userIncome", value: "Monthly Income" },
-  { key: "isUserStayingAlone", value: "Is Staying Alone: " },
-  { key: "hobbies", value: "Hobbies: " },
-  { key: "birthPlace", value: "Birth Place: " },
-  { key: "complexion", value: "Complexion: " },
-  { key: "rashi", value: "Rashi: " },
-  { key: "bloodGroup", value: "Blood Group: " },
-  { key: "bodyType", value: "Body Type: " },
+const personalFields = [
+  { key: "userHeight", value: "Height" },
+  { key: "userWeight", value: "Weight" },
+  { key: "gotra", value: "Gotra" },
+  {
+    key: "manglik",
+    value: "Manglik",
+    options: [
+      { value: "Manglik", label: "Manglik" },
+      { value: "Non Manglik", label: "Non Manglik" },
+      { value: "Partial Manglik", label: "Partial Manglik" },
+    ],
+  },
+  {
+    key: "maritalStatus",
+    value: "Marital Status",
+    options: [
+      { value: "Married", label: "Married" },
+      { value: "Unmarried", label: "Unmarried" },
+      { value: "Divorced", label: "Divorced" },
+    ],
+  },
+  {
+    key: "isPersonDisabled",
+    value: "Is Disabled",
+    options: [
+      { value: "Yes", label: "Yes" },
+      { value: "No", label: "No" },
+    ],
+  },
+  { key: "userIncome", value: "Yearly Income" },
+  {
+    key: "isUserStayingAlone",
+    value: "Is Staying Alone",
+    options: [
+      { value: "Yes", label: "Yes" },
+      { value: "No", label: "No" },
+    ],
+  },
+  { key: "hobbies", value: "Hobbies" },
+  { key: "birthPlace", value: "Birth Place" },
+  {
+    key: "complexion",
+    value: "Complexion",
+    options: [
+      { value: "Fair", label: "Fair" },
+      { value: "Medium", label: "Medium" },
+      { value: "Dusky", label: "Dusky" },
+      { value: "Dark", label: "Dark" },
+      { value: "Very Fair", label: "Very Fair" },
+      { value: "Light Brown", label: "Light Brown" },
+      { value: "Olive", label: "Olive" },
+      { value: "Fair to Medium", label: "Fair to Medium" },
+      { value: "Pale", label: "Pale" },
+    ],
+  },
+  {
+    key: "rashi",
+    value: "Rashi",
+    options: [
+      { value: "Mesh", label: "Mesh (Aries)" },
+      { value: "Vrishabh", label: "Vrishabh (Taurus)" },
+      { value: "Mithun", label: "Mithun (Gemini)" },
+      { value: "Karka", label: "Karka (Cancer)" },
+      { value: "Singh", label: "Singh (Leo)" },
+      { value: "Kanya", label: "Kanya (Virgo)" },
+      { value: "Tula", label: "Tula (Libra)" },
+      { value: "Vrishchik", label: "Vrishchik (Scorpio)" },
+      { value: "Dhanu", label: "Dhanu (Sagittarius)" },
+      { value: "Makar", label: "Makar (Capricorn)" },
+      { value: "Kumbh", label: "Kumbh (Aquarius)" },
+      { value: "Meen", label: "Meen (Pisces)" },
+    ],
+  },
+  {
+    key: "bloodGroup",
+    value: "Blood Group",
+    options: [
+      { value: "A+", label: "A+" },
+      { value: "A-", label: "A-" },
+      { value: "B+", label: "B+" },
+      { value: "B-", label: "B-" },
+      { value: "O+", label: "O+" },
+      { value: "O-", label: "O-" },
+      { value: "AB+", label: "AB+" },
+      { value: "AB-", label: "AB-" },
+    ],
+  },
+  {
+    key: "bodyType",
+    value: "Body Type",
+    options: [
+      { value: "Slim", label: "Slim" },
+      { value: "Athletic", label: "Athletic" },
+      { value: "Average", label: "Average" },
+      { value: "Heavy", label: "Heavy" },
+      { value: "Chubby", label: "Chubby" },
+      { value: "Curvy", label: "Curvy" },
+    ],
+  },
 ];
 
-const UserPersonalDetails = ({ response, refresAfterUpdate, setStatus, status }) => {
+const UserPersonalDetails = ({ response, setStatus, status }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(response || {});
   const [loading, setLoading] = useState(false);
   const session = AuthHook();
   const { mobileNumber } = useParams();
+  const [errors, setErrors] = useState({});
+  const [heightInFeet, setHeightInFeet] = useState(null);
 
   const handleFieldChange = (key, value) => {
     setUpdatedProfile((prevProfile) => ({
       ...prevProfile,
       [key]: value,
     }));
+
+    validate(key, value);
+  };
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
+  const validateFields = () => {
+    const { userHeight, userWeight, ...otherFields } = updatedProfile;
+    let errors = {};
+
+    if (!userHeight) {
+      errors.userHeight = "Height is required";
+    } else if (userHeight < 100 || userHeight > 300) {
+      errors.userHeight = "Please enter a valid height between 100 and 300 cm";
+    }
+
+    if (!userWeight) {
+      errors.userWeight = "Weight is required.";
+    } else if (userWeight < 20 || userWeight > 300) {
+      errors.userWeight = "Please enter a valid weight between 20 and 300 kg";
+    }
+
+    // Check if any other field is empty
+    for (const key in otherFields) {
+      if (!otherFields[key]) {
+        errors[key] = `${
+          personalFields.find((field) => field.key === key)?.value
+        } cannot be empty.`;
+      }
+    }
+
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validate = (key, value) => {
+    let newErrors = { ...errors };
+
+    if (!value) {
+      newErrors[key] = `${key} is required`;
+    } else if (key === "userHeight") {
+      if (value < 100 || value > 300) {
+        newErrors[key] = "Please enter a height between 100 and 300 cm";
+      } else {
+        delete newErrors[key];
+      }
+    } else if (key === "userWeight") {
+      if (value < 10 || value > 300) {
+        newErrors[key] = "Please enter a weight between 10 and 300 kg";
+      } else {
+        delete newErrors[key];
+      }
+    } else {
+      delete newErrors[key];
+    }
+
+    setErrors(newErrors);
+  };
+
+  const handleSubmit = async () => {
+    if (!validateFields()) return;
+
+    setLoading(true);
+
+    const endpoint = response
+      ? `/update-user-personal-details/${mobileNumber}`
+      : `/save-user-personal-details?mobileNumber=${mobileNumber}`;
+
+    const requestConfig = {
+      method: response ? "PUT" : "POST",
+      url: endpoint,
+      data: response ? updatedProfile : { mobileNumber, ...updatedProfile }, // Include mobileNumber in POST payload
+    };
+
+    try {
+      const { data } = await AxiosConfig(requestConfig);
+      setLoading(false);
+
+      if (data.status === 200 || data.status === 201) {
+        setStatus(!status);
+        Swal.fire(
+          "Success!",
+          "User details updated successfully!",
+          "success"
+        ).then(() => {
+          toggleModal(); // Close modal on success
+        });
+      } else {
+        Swal.fire(
+          "Error",
+          data.message || "Failed to update user details",
+          "error"
+        );
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      setLoading(false);
+      Swal.fire("Error", "An error occurred. Please try again.", "error");
+    }
+  };
+  const toPascalCase = (input) => {
+    return input
+      .split(",") // Split by commas first
+      .map(
+        (word) =>
+          word
+            .trim() // Trim any spaces
+            .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase()) // Capitalize first letter of each word
+      )
+      .join(","); // Rejoin by commas
+  };
+  const handleFieldChangeWithFeetConversion = (key, value) => {
+    handleFieldChange(key, value);
+
+    // If the key is 'userHeight', convert cm to feet and set a timeout for 2 seconds
+    if (key === "userHeight") {
+      const heightInFeet = (value * 0.0328084).toFixed(2); // Convert cm to feet using correct factor
+      setHeightInFeet(heightInFeet);
+
+      // Reset the feet value after 2 seconds
+      setTimeout(() => {
+        setHeightInFeet(null);
+      }, 4000);
+    }
   };
 
   useEffect(() => {
     setUpdatedProfile(response || {});
   }, [response]);
 
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
-
-  const handleSubmit = async () => {
-    setLoading(true);
-    const apiUrl = response
-      ? `https://shaadi-be.fino-web-app.agency/api/v1/update-user-personal-details/${mobileNumber}`
-      : `https://shaadi-be.fino-web-app.agency/api/v1/save-user-personal-details?mobileNumber=${mobileNumber}`;
-
-    try {
-      const res = await fetch(apiUrl, {
-        method: response ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedProfile),
-      });
-      const data = await res.json();
-      setLoading(false);
-
-      if (data.status === 200 || data.status === 201) {
-        setStatus(!status);
-        refresAfterUpdate && refresAfterUpdate(!status);
-        Swal.fire("Success!", "User details updated successfully!", "success").then(() => {
-          toggleModal(); // Close modal after success
-        });
-      } else {
-        Swal.fire("Error", data.message || "Failed to update user details", "error");
-      }
-    } catch (err) {
-      setLoading(false);
-      Swal.fire("Error", "An error occurred. Please try again.", "error");
-    }
-  };
-
   return (
     <>
       <CardContainer
+        className="bg-white p-6 rounded-lg shadow-lg mb-6"
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Header>
+        <div className="d-flex justify-content-end mb-4">
           {mobileNumber === session?.userName && (
-            <Button onClick={toggleModal}>{response ? "Update" : "Add"}</Button>
+            <Button
+              variant="primary"
+              onClick={toggleModal}
+              style={{
+                padding: "10px 20px",
+                borderRadius: "5px",
+                fontSize: "1rem",
+                fontFamily: "Verdana, sans-serif",
+                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#003566",
+                borderColor: "#003566",
+              }}
+            >
+              <i
+                className="fas fa-pencil-alt me-2"
+                style={{ fontSize: "1.2rem" }}
+              ></i>
+              {response ? "Update" : "Add"}
+            </Button>
           )}
-        </Header>
-        <ContentWrapper>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4">
           {personalFields.map((field, index) => (
-            <Field key={index}>
-              {field.value}{" "}
-              <span style={{ color: "#003566" }}>
-                {response && response[field.key] ? response[field.key].toString() : "N/A"}
+            <div
+              key={index}
+              className="mb-2 p-2 d-flex justify-content-between align-items-center border-bottom"
+              style={{ flexWrap: "wrap" }}
+            >
+              <strong
+                className="text-primary"
+                style={{ fontSize: "1rem", fontFamily: "Arial, sans-serif" }}
+              >
+                {field.value}:
+              </strong>
+              <span
+                className="text-dark"
+                style={{
+                  fontSize: "0.9rem",
+                  fontFamily: "Verdana, sans-serif",
+                  paddingLeft: "10px",
+                }}
+              >
+                {field.key === "userHeight" && updatedProfile[field.key]
+                  ? `${updatedProfile[field.key]} cm`
+                  : field.key === "userWeight" && updatedProfile[field.key]
+                  ? `${updatedProfile[field.key]} kg`
+                  : updatedProfile && updatedProfile[field.key] !== undefined
+                  ? updatedProfile[field.key]
+                  : "N/A"}
               </span>
-            </Field>
+            </div>
           ))}
-        </ContentWrapper>
+        </div>
       </CardContainer>
 
       {isModalOpen && (
-        <ModalOverlay>
-          <ModalContent>
-            <ModalHeader>{response ? "Update Personal Details" : "Add Personal Details"}</ModalHeader>
-            <FormWrapper>
+        <Modal show={isModalOpen} onHide={toggleModal} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>
+              <i className="fas fa-user-edit me-2"></i>
+              {response ? "Update Personal Details" : "Add Personal Details"}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body
+            style={{
+              padding: "30px 50px",
+              maxHeight: "60vh",
+              overflowY: "auto",
+            }}
+          >
+            <Form>
               {personalFields.map((field, index) => (
-                <InputField key={index}>
-                  <Label>{field.value}</Label>
-                  <Input
-                    type="text"
-                    value={updatedProfile[field.key] || ""}
-                    onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                  />
-                </InputField>
+                <Form.Group key={index} className="mb-4">
+                  <Form.Label className="font-weight-bold">
+                    {field.value}
+                  </Form.Label>
+                  <div
+                    className="input-group"
+                    style={{ flexDirection: "column" }}
+                  >
+                    {/* Handle specific fields with custom rendering */}
+                    {field.key === "userIncome" ? (
+                      <div className="d-flex">
+                        <Form.Control
+                          type="number"
+                          value={updatedProfile[field.key] || ""}
+                          onChange={(e) =>
+                            handleFieldChange(field.key, e.target.value)
+                          }
+                          placeholder={`Enter ${field.value}`}
+                          className="border-0 rounded-start"
+                          style={{
+                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          }}
+                          min={0}
+                        />
+                        <span
+                          className="input-group-text"
+                          style={{
+                            width: "40%",
+                            backgroundColor: "#f1f1f1",
+                          }}
+                        >
+                          Rs/Year
+                        </span>
+                      </div>
+                    ) : field.options ? (
+                      <Select
+                        options={field.options}
+                        value={field.options.find(
+                          (option) => option.value === updatedProfile[field.key]
+                        )}
+                        onChange={(selectedOption) =>
+                          handleFieldChange(field.key, selectedOption.value)
+                        }
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          }),
+                        }}
+                      />
+                    ) : ["userHeight", "userWeight"].includes(field.key) ? (
+                      <div className="d-flex">
+                        <Form.Control
+                          type="number"
+                          value={updatedProfile[field.key] || ""}
+                          onChange={(e) =>
+                            handleFieldChangeWithFeetConversion(
+                              field.key,
+                              e.target.value
+                            )
+                          }
+                          placeholder={`Enter ${field.value}`}
+                          className="border-0 rounded-start"
+                          style={{
+                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          }}
+                          min={field.key === "userHeight" ? 100 : 20}
+                          max={field.key === "userHeight" ? 300 : 300}
+                        />
+                        <span
+                          className="input-group-text"
+                          style={{
+                            width: "20%",
+                            backgroundColor: "#f1f1f1",
+                          }}
+                        >
+                          {field.key === "userHeight" ? "cm" : "kg"}
+                        </span>
+
+                        {/* Show height in feet for 2 seconds */}
+                        {heightInFeet && field.key === "userHeight" && (
+                          <span
+                            className="input-group-text"
+                            style={{
+                              backgroundColor: "#f1f1f1",
+                              width: "auto",
+                              marginLeft: "5px",
+                            }}
+                          >
+                            {heightInFeet} ft
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <Form.Control
+                        type="text"
+                        value={updatedProfile[field.key] || ""}
+                        onChange={(e) => {
+                          const value = [
+                            "gotra",
+                            "hobbies",
+                            "birthPlace",
+                          ].includes(field.key)
+                            ? toPascalCase(e.target.value)
+                            : e.target.value;
+                          handleFieldChange(field.key, value);
+                        }}
+                        placeholder={`Enter ${field.value}`}
+                        className="border-0 rounded-end"
+                        style={{
+                          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                          marginLeft: "5px",
+                          width: "100%",
+                        }}
+                      />
+                    )}
+                    {errors[field.key] && (
+                      <div
+                        className="text-danger mt-1"
+                        style={{ fontSize: "0.8rem" }}
+                      >
+                        {errors[field.key]}
+                      </div>
+                    )}
+                  </div>
+                </Form.Group>
               ))}
-            </FormWrapper>
+            </Form>
 
             {loading && (
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100px" }}>
-                <RingLoader color="#003566" size={60} />
+              <div className="d-flex justify-content-center my-3">
+                <Spinner animation="border" variant="primary" />
               </div>
             )}
-            <Button onClick={handleSubmit} disabled={loading}>
-              Save Changes
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="success"
+              style={{
+                backgroundColor: "rgb(219, 39, 119)",
+                borderColor: "#ec4899",
+              }}
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              <i className="fas fa-save me-2"></i> Save Changes
             </Button>
-            <Button onClick={toggleModal} style={{ marginTop: "10px", marginLeft: '5px' }} disabled={loading}>
-              Cancel
-            </Button>
-          </ModalContent>
-        </ModalOverlay>
+          </Modal.Footer>
+        </Modal>
       )}
     </>
   );

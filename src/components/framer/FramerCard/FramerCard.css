@@ -1,0 +1,121 @@
+.framer-card-wrap {
+  margin-top: 10vh;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+}
+
+.search-input {
+  border-radius: 5px 0 0 5px; /* Rounded corners (left) */
+  box-shadow: none;
+  height: 40px;
+}
+
+.search-input:focus {
+  box-shadow: none !important; /* Ensure no box shadow on focus */
+  border-color: #80bdff; /* Change border color on focus */
+  outline: 0; /* Remove outline on focus */
+}
+
+.clear-button {
+  margin-left: -1px; /* To connect with the input field */
+}
+
+.search-button {
+  height: 40px; /* Match height with input */
+}
+
+/* Ensure consistent height for buttons */
+button {
+  height: 40px; /* Match height with input */
+}
+
+/* Profile Card Styles */
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add transition for hover effect */
+}
+
+.profile-card:hover {
+  transform: translateY(-5px); /* Lift card on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card-img-top {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  width: 100%;
+  height: 400px; /* Fixed height for consistency */
+  object-fit: cover; /* Cover to maintain aspect ratio */
+}
+
+.card-title {
+  font-family: "Poppins", sans-serif;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #003049; /* Color for the title */
+}
+
+.card-text {
+  color: #666; /* Subtle text color */
+}
+
+/* Loading message */
+.loading-message {
+  font-size: 1.5rem;
+  color: #007bff;
+}
+
+/* Error message */
+.error-message {
+  font-size: 1.5rem;
+  color: red;
+}
+
+/* Pagination styles */
+.pagination {
+  margin: 20px 0; /* Space above and below pagination */
+  display: flex; /* Center the pagination items */
+  justify-content: center; /* Center items horizontally */
+}
+
+.page-item {
+  margin: 0 5px;
+}
+
+.page-link {
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.page-link:hover {
+  background-color: #80bdff; /* Hover color */
+  color: white; /* Text color on hover */
+}
+
+.more-details-button {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .profile-card {
+    margin-bottom: 20px;
+  }
+
+  .search-bar {
+    flex-direction: column; /* Stack input and buttons on small screens */
+  }
+
+  .search-button,
+  .clear-button {
+    width: 100%; /* Full width on small screens */
+    margin-top: 10px; /* Space between buttons */
+  }
+}

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Box, Grid, Paper, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { ApiUrl } from "../../config/Config";
 
-const API_BASE_URL = "https://shaadi-be.fino-web-app.agency/api/v1/user/profiles";
-const IMAGE_API_URL = "https://shaadi-be.fino-web-app.agency/api/v1/user/profile-image";
-// const API_BASE_URL = "http://localhost:7878/api/v1/user/profiles";
-// const IMAGE_API_URL = "http://localhost:7878/api/v1/user/profile-image";
+const API_BASE_URL = `${ApiUrl}/user/profiles`;
+const IMAGE_API_URL = `${ApiUrl}/user/profile-image`;
+
 const HARD_CODED_TOKEN =
   "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4ODcxNjQxMjg2IiwiaWF0IjoxNzIzNzg1MDAzLCJleHAiOjE3MjM4NzE0MDN9.U7nAW8r-Ekc3FIBP5rfxixtr5mUM0jWISuqvC1c5NAk";
 

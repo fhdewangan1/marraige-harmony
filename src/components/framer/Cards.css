@@ -1,0 +1,115 @@
+.profile-carousel {
+  padding-top: 50px;
+  padding-left: 50px;
+  padding-right: 50px;
+  background-color: #f9f9f9;
+  font-family: "Roboto", sans-serif;
+  /* Professional font style */
+}
+
+.filters-column {
+  background-color: #ffffff;
+  padding: 20px 15px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  height: 100%;
+}
+
+.vertical-scroll {
+  padding: 20px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.vertical-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.profile-card {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: row;
+  height: auto;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  cursor: pointer;
+  /* overflow: hidden; */
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.profile-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 110px;
+  max-width: 205px;
+}
+
+.card-name {
+  margin: 0;
+  font-size: 2rem;
+  color: #333;
+}
+
+.avatar-placeholder {
+  min-height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.search-input {
+  border-radius: 8px;
+  padding: 8px;
+  width: 100%;
+  border: 1px solid #ddd;
+  transition: border 0.2s;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+}
+
+.clear-button,
+.search-button {
+  margin-top: 5px;
+  border-radius: 8px;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.clear-button:hover,
+.search-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.show-more-btn {
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.show-more-btn:hover {
+  background-color: #004494;
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .profile-image {
+    border-radius: 10px;
+  }
+}

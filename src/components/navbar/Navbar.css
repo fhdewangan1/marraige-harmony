@@ -1,0 +1,119 @@
+/* Navbar styles */
+.responsive-sidebar {
+  position: fixed; /* Position fixed to the viewport */
+  top: 0; /* Align to the top */
+  left: 0; /* Align to the left */
+  width: 100%; /* Sidebar width */
+  height: 100%; /* Full height */
+  background-color: white; /* Use your desired background color */
+  transform: translateX(-100%); /* Initially hide it off-screen */
+  transition: transform 0.3s ease; /* Smooth transition for sliding */
+  z-index: 60; /* Ensure it’s on top of other elements */
+  padding: 20px; /* Add padding for aesthetics */
+}
+
+.responsive-sidebar.open {
+  transform: translateX(0); /* Slide in */
+}
+
+.sidebar-header-wrap {
+  margin-bottom: 20px;
+}
+
+.navbar-brand {
+  font-family: cursive;
+  font-size: 200px;
+  color: var(--third) !important;
+}
+
+/* Optional: Style for the close button */
+.close-button {
+  position: absolute; /* Position the close button */
+  top: 0px; /* Align at the top */
+  right: 20px; /* Align to the right */
+  background: transparent; /* Transparent background */
+  border: none; /* No border */
+  cursor: pointer; /* Pointer cursor */
+  font-size: 34px; /* Adjust size */
+  color: black; /* Color from CSS variables */
+}
+
+/* Styles for mobile menu links */
+.mobile-menu {
+  list-style: none; /* Remove list styling */
+  padding: 0; /* Remove default padding */
+}
+
+.mobile-link {
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Center items vertically */
+  color: black; /* Color from CSS variables */
+  font-size: 1.5rem; /* Adjust font size */
+  padding: 15px; /* Add padding */
+  cursor: pointer; /* Pointer cursor */
+  transition: color 0.3s; /* Smooth color transition */
+}
+
+.mobile-link:hover {
+  color: var(--navbar-hover-color); /* Change color on hover */
+}
+
+.nav-icon,
+.mobile-icon {
+  margin-right: 8px; /* Add some space between icon and text */
+  vertical-align: middle; /* Align icons to the middle (not necessary with flexbox) */
+}
+
+/* Adjust your navbar styles if needed */
+.nav-bg-transparent {
+  position: absolute;
+  width: 100%;
+  z-index: 50;
+  transition: all 0.3s ease;
+  padding: 1rem 0;
+  background-color: transparent;
+  margin-bottom: -60px;
+}
+
+.nav-bg-white {
+  width: 100%;
+  z-index: 50;
+  transition: all 0.3s ease;
+  padding: 1rem 0;
+  background-color: var(--seventh);
+}
+
+.navbar.bg-white {
+  background-color: white !important;
+  transition: all 0.3s ease;
+}
+
+.nav-link {
+  color: var(--third) !important;
+}
+
+.responsive-sidebar .nav-link.active,
+.responsive-sidebar .mobile-link.active {
+  font-weight: bold;
+  color: #007bff; /* This can also be adjusted if necessary */
+}
+
+.navbar-toggler {
+  border: none !important;
+  outline: none !important;
+}
+
+.navbar-toggler-icon {
+  color: var(--third) !important;
+}
+
+.nav-bg-transparent .nav-link {
+  color: var(--third);
+  font-weight: 400;
+}
+
+/* Ensure other links also adapt to navbar color */
+.nav-bg-transparent .nav-link:hover,
+.nav-bg-white .nav-link:hover {
+  color: var(--navbar-hover-color); /* Define hover color for links */
+}

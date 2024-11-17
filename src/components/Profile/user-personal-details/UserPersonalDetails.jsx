@@ -19,17 +19,102 @@ const personalFields = [
   { key: "userHeight", value: "Height" },
   { key: "userWeight", value: "Weight" },
   { key: "gotra", value: "Gotra" },
-  { key: "manglik", value: "Manglik" },
-  { key: "maritalStatus", value: "Marital Status" },
-  { key: "isPersonDisabled", value: "Is Disabled" },
+  {
+    key: "manglik",
+    value: "Manglik",
+    options: [
+      { value: "Manglik", label: "Manglik" },
+      { value: "Non Manglik", label: "Non Manglik" },
+      { value: "Partial Manglik", label: "Partial Manglik" },
+    ],
+  },
+  {
+    key: "maritalStatus",
+    value: "Marital Status",
+    options: [
+      { value: "Married", label: "Married" },
+      { value: "Unmarried", label: "Unmarried" },
+      { value: "Divorced", label: "Divorced" },
+    ],
+  },
+  {
+    key: "isPersonDisabled",
+    value: "Is Disabled",
+    options: [
+      { value: "Yes", label: "Yes" },
+      { value: "No", label: "No" },
+    ],
+  },
   { key: "userIncome", value: "Monthly Income" },
-  { key: "isUserStayingAlone", value: "Is Staying Alone" },
+  {
+    key: "isUserStayingAlone",
+    value: "Is Staying Alone",
+    options: [
+      { value: "Yes", label: "Yes" },
+      { value: "No", label: "No" },
+    ],
+  },
   { key: "hobbies", value: "Hobbies" },
   { key: "birthPlace", value: "Birth Place" },
-  { key: "complexion", value: "Complexion" },
-  { key: "rashi", value: "Rashi" },
-  { key: "bloodGroup", value: "Blood Group" },
-  { key: "bodyType", value: "Body Type" },
+  {
+    key: "complexion",
+    value: "Complexion",
+    options: [
+      { value: "Fair", label: "Fair" },
+      { value: "Medium", label: "Medium" },
+      { value: "Dusky", label: "Dusky" },
+      { value: "Dark", label: "Dark" },
+      { value: "Very Fair", label: "Very Fair" },
+      { value: "Light Brown", label: "Light Brown" },
+      { value: "Olive", label: "Olive" },
+      { value: "Fair to Medium", label: "Fair to Medium" },
+      { value: "Pale", label: "Pale" },
+    ],
+  },
+  {
+    key: "rashi",
+    value: "Rashi",
+    options: [
+      { value: "Mesh", label: "Mesh (Aries)" },
+      { value: "Vrishabh", label: "Vrishabh (Taurus)" },
+      { value: "Mithun", label: "Mithun (Gemini)" },
+      { value: "Karka", label: "Karka (Cancer)" },
+      { value: "Singh", label: "Singh (Leo)" },
+      { value: "Kanya", label: "Kanya (Virgo)" },
+      { value: "Tula", label: "Tula (Libra)" },
+      { value: "Vrishchik", label: "Vrishchik (Scorpio)" },
+      { value: "Dhanu", label: "Dhanu (Sagittarius)" },
+      { value: "Makar", label: "Makar (Capricorn)" },
+      { value: "Kumbh", label: "Kumbh (Aquarius)" },
+      { value: "Meen", label: "Meen (Pisces)" },
+    ],
+  },
+  {
+    key: "bloodGroup",
+    value: "Blood Group",
+    options: [
+      { value: "A+", label: "A+" },
+      { value: "A-", label: "A-" },
+      { value: "B+", label: "B+" },
+      { value: "B-", label: "B-" },
+      { value: "O+", label: "O+" },
+      { value: "O-", label: "O-" },
+      { value: "AB+", label: "AB+" },
+      { value: "AB-", label: "AB-" },
+    ],
+  },
+  {
+    key: "bodyType",
+    value: "Body Type",
+    options: [
+      { value: "Slim", label: "Slim" },
+      { value: "Athletic", label: "Athletic" },
+      { value: "Average", label: "Average" },
+      { value: "Heavy", label: "Heavy" },
+      { value: "Chubby", label: "Chubby" },
+      { value: "Curvy", label: "Curvy" },
+    ],
+  },
 ];
 
 const UserPersonalDetails = ({ response, setStatus, status }) => {
@@ -39,12 +124,7 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
   const session = AuthHook();
   const { mobileNumber } = useParams();
   const [errors, setErrors] = useState({});
-
-  const manglikOptions = [
-    { value: "Manglik", label: "Manglik" },
-    { value: "Non Manglik", label: "Non Manglik" },
-    { value: "Partial Manglik", label: "Partial Manglik" },
-  ];
+  const [heightInFeet, setHeightInFeet] = useState(null);
 
   const handleFieldChange = (key, value) => {
     setUpdatedProfile((prevProfile) => ({
@@ -153,6 +233,31 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
       Swal.fire("Error", "An error occurred. Please try again.", "error");
     }
   };
+  const toPascalCase = (input) => {
+    return input
+      .split(",") // Split by commas first
+      .map(
+        (word) =>
+          word
+            .trim() // Trim any spaces
+            .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase()) // Capitalize first letter of each word
+      )
+      .join(","); // Rejoin by commas
+  };
+  const handleFieldChangeWithFeetConversion = (key, value) => {
+    handleFieldChange(key, value);
+
+    // If the key is 'userHeight', convert cm to feet and set a timeout for 2 seconds
+    if (key === "userHeight") {
+      const heightInFeet = (value * 0.0328084).toFixed(2); // Convert cm to feet using correct factor
+      setHeightInFeet(heightInFeet);
+
+      // Reset the feet value after 2 seconds
+      setTimeout(() => {
+        setHeightInFeet(null);
+      }, 4000);
+    }
+  };
 
   useEffect(() => {
     setUpdatedProfile(response || {});
@@ -250,14 +355,12 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
                     className="input-group"
                     style={{ flexDirection: "column" }}
                   >
-                    {/* Handle Monthly Income field to show Rs/ Year */}
+                    {/* Handle specific fields with custom rendering */}
                     {field.key === "userIncome" ? (
                       <div className="d-flex">
                         <Form.Control
                           type="number"
-                          value={
-                            (updatedProfile && updatedProfile[field.key]) || ""
-                          }
+                          value={updatedProfile[field.key] || ""}
                           onChange={(e) =>
                             handleFieldChange(field.key, e.target.value)
                           }
@@ -278,281 +381,12 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
                           Rs/Year
                         </span>
                       </div>
-                    ) : field.key === "manglik" ? (
+                    ) : field.options ? (
                       <Select
-                        options={manglikOptions}
-                        value={manglikOptions.find(
+                        options={field.options}
+                        value={field.options.find(
                           (option) => option.value === updatedProfile[field.key]
                         )}
-                        onChange={(selectedOption) =>
-                          handleFieldChange(field.key, selectedOption.value)
-                        }
-                        styles={{
-                          control: (provided) => ({
-                            ...provided,
-                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                          }),
-                        }}
-                      />
-                    ) : field.key === "maritalStatus" ? (
-                      <Select
-                        options={[
-                          { value: "Married", label: "Married" },
-                          { value: "Unmarried", label: "Unmarried" },
-                          { value: "Divorced", label: "Divorced" },
-                        ]}
-                        value={["Married", "Unmarried", "Divorced"]
-                          .map((option) => ({
-                            value: option,
-                            label: option,
-                          }))
-                          .find(
-                            (option) =>
-                              option.value === updatedProfile[field.key]
-                          )}
-                        onChange={(selectedOption) =>
-                          handleFieldChange(field.key, selectedOption.value)
-                        }
-                        styles={{
-                          control: (provided) => ({
-                            ...provided,
-                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                          }),
-                        }}
-                      />
-                    ) : field.key === "isStayingAlone" ? (
-                      <Select
-                        options={[
-                          { value: "Yes", label: "Yes" },
-                          { value: "No", label: "No" },
-                        ]}
-                        value={["Yes", "No"]
-                          .map((option) => ({
-                            value: option,
-                            label: option,
-                          }))
-                          .find(
-                            (option) =>
-                              option.value === updatedProfile[field.key]
-                          )}
-                        onChange={(selectedOption) =>
-                          handleFieldChange(field.key, selectedOption.value)
-                        }
-                        styles={{
-                          control: (provided) => ({
-                            ...provided,
-                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                          }),
-                        }}
-                      />
-                    ) : field.key === "isPersonDisabled" ? (
-                      <Select
-                        options={[
-                          { value: "Yes", label: "Yes" },
-                          { value: "No", label: "No" },
-                        ]}
-                        value={["Yes", "No"]
-                          .map((option) => ({
-                            value: option,
-                            label: option,
-                          }))
-                          .find(
-                            (option) =>
-                              option.value === updatedProfile[field.key]
-                          )}
-                        onChange={(selectedOption) =>
-                          handleFieldChange(field.key, selectedOption.value)
-                        }
-                        styles={{
-                          control: (provided) => ({
-                            ...provided,
-                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                          }),
-                        }}
-                      />
-                    ) : field.key === "isUserStayingAlone" ? (
-                      <Select
-                        options={[
-                          { value: "Yes", label: "Yes" },
-                          { value: "No", label: "No" },
-                        ]}
-                        value={["Yes", "No"]
-                          .map((option) => ({
-                            value: option,
-                            label: option,
-                          }))
-                          .find(
-                            (option) =>
-                              option.value === updatedProfile[field.key]
-                          )}
-                        onChange={(selectedOption) =>
-                          handleFieldChange(field.key, selectedOption.value)
-                        }
-                        styles={{
-                          control: (provided) => ({
-                            ...provided,
-                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                          }),
-                        }}
-                      />
-                    ) : field.key === "rashi" ? (
-                      <Select
-                        options={[
-                          { value: "Mesh", label: "Mesh (Aries)" },
-                          { value: "Vrishabh", label: "Vrishabh (Taurus)" },
-                          { value: "Mithun", label: "Mithun (Gemini)" },
-                          { value: "Karka", label: "Karka (Cancer)" },
-                          { value: "Singh", label: "Singh (Leo)" },
-                          { value: "Kanya", label: "Kanya (Virgo)" },
-                          { value: "Tula", label: "Tula (Libra)" },
-                          { value: "Vrishchik", label: "Vrishchik (Scorpio)" },
-                          { value: "Dhanu", label: "Dhanu (Sagittarius)" },
-                          { value: "Makar", label: "Makar (Capricorn)" },
-                          { value: "Kumbh", label: "Kumbh (Aquarius)" },
-                          { value: "Meen", label: "Meen (Pisces)" },
-                        ]}
-                        value={[
-                          "Mesh",
-                          "Vrishabh",
-                          "Mithun",
-                          "Karka",
-                          "Singh",
-                          "Kanya",
-                          "Tula",
-                          "Vrishchik",
-                          "Dhanu",
-                          "Makar",
-                          "Kumbh",
-                          "Meen",
-                        ]
-                          .map((option) => ({
-                            value: option,
-                            label: option,
-                          }))
-                          .find(
-                            (option) =>
-                              option.value === updatedProfile[field.key]
-                          )}
-                        onChange={(selectedOption) =>
-                          handleFieldChange(field.key, selectedOption.value)
-                        }
-                        styles={{
-                          control: (provided) => ({
-                            ...provided,
-                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                          }),
-                        }}
-                      />
-                    ) : field.key === "bloodGroup" ? (
-                      <Select
-                        options={[
-                          { value: "A+", label: "A+" },
-                          { value: "A-", label: "A-" },
-                          { value: "B+", label: "B+" },
-                          { value: "B-", label: "B-" },
-                          { value: "O+", label: "O+" },
-                          { value: "O-", label: "O-" },
-                          { value: "AB+", label: "AB+" },
-                          { value: "AB-", label: "AB-" },
-                        ]}
-                        value={[
-                          "A+",
-                          "A-",
-                          "B+",
-                          "B-",
-                          "O+",
-                          "O-",
-                          "AB+",
-                          "AB-",
-                        ]
-                          .map((option) => ({
-                            value: option,
-                            label: option,
-                          }))
-                          .find(
-                            (option) =>
-                              option.value === updatedProfile[field.key]
-                          )}
-                        onChange={(selectedOption) =>
-                          handleFieldChange(field.key, selectedOption.value)
-                        }
-                        styles={{
-                          control: (provided) => ({
-                            ...provided,
-                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                          }),
-                        }}
-                      />
-                    ) : field.key === "bodyType" ? (
-                      <Select
-                        options={[
-                          { value: "Slim", label: "Slim" },
-                          { value: "Athletic", label: "Athletic" },
-                          { value: "Average", label: "Average" },
-                          { value: "Heavy", label: "Heavy" },
-                          { value: "Chubby", label: "Chubby" },
-                          { value: "Curvy", label: "Curvy" },
-                        ]}
-                        value={[
-                          "Slim",
-                          "Athletic",
-                          "Average",
-                          "Heavy",
-                          "Chubby",
-                          "Curvy",
-                        ]
-                          .map((option) => ({
-                            value: option,
-                            label: option,
-                          }))
-                          .find(
-                            (option) =>
-                              option.value === updatedProfile[field.key]
-                          )}
-                        onChange={(selectedOption) =>
-                          handleFieldChange(field.key, selectedOption.value)
-                        }
-                        styles={{
-                          control: (provided) => ({
-                            ...provided,
-                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                          }),
-                        }}
-                      />
-                    ) : field.key === "complexion" ? (
-                      <Select
-                        options={[
-                          { value: "Fair", label: "Fair" },
-                          { value: "Wheatish", label: "Wheatish" },
-                          { value: "Medium", label: "Medium" },
-                          { value: "Dusky", label: "Dusky" },
-                          { value: "Dark", label: "Dark" },
-                          { value: "Very Fair", label: "Very Fair" },
-                          { value: "Light Brown", label: "Light Brown" },
-                          { value: "Olive", label: "Olive" },
-                          { value: "Fair to Medium", label: "Fair to Medium" },
-                          { value: "Pale", label: "Pale" },
-                        ]}
-                        value={[
-                          "Fair",
-                          "Wheatish",
-                          "Medium",
-                          "Dusky",
-                          "Dark",
-                          "Very Fair",
-                          "Light Brown",
-                          "Olive",
-                          "Fair to Medium",
-                          "Pale",
-                        ]
-                          .map((option) => ({
-                            value: option,
-                            label: option,
-                          }))
-                          .find(
-                            (option) =>
-                              option.value === updatedProfile[field.key]
-                          )}
                         onChange={(selectedOption) =>
                           handleFieldChange(field.key, selectedOption.value)
                         }
@@ -569,7 +403,10 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
                           type="number"
                           value={updatedProfile[field.key] || ""}
                           onChange={(e) =>
-                            handleFieldChange(field.key, e.target.value)
+                            handleFieldChangeWithFeetConversion(
+                              field.key,
+                              e.target.value
+                            )
                           }
                           placeholder={`Enter ${field.value}`}
                           className="border-0 rounded-start"
@@ -588,14 +425,35 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
                         >
                           {field.key === "userHeight" ? "cm" : "kg"}
                         </span>
+
+                        {/* Show height in feet for 2 seconds */}
+                        {heightInFeet && field.key === "userHeight" && (
+                          <span
+                            className="input-group-text"
+                            style={{
+                              backgroundColor: "#f1f1f1",
+                              width: "auto",
+                              marginLeft: "5px",
+                            }}
+                          >
+                            {heightInFeet} ft
+                          </span>
+                        )}
                       </div>
                     ) : (
                       <Form.Control
                         type="text"
                         value={updatedProfile[field.key] || ""}
-                        onChange={(e) =>
-                          handleFieldChange(field.key, e.target.value)
-                        }
+                        onChange={(e) => {
+                          const value = [
+                            "gotra",
+                            "hobbies",
+                            "birthPlace",
+                          ].includes(field.key)
+                            ? toPascalCase(e.target.value)
+                            : e.target.value;
+                          handleFieldChange(field.key, value);
+                        }}
                         placeholder={`Enter ${field.value}`}
                         className="border-0 rounded-end"
                         style={{

@@ -10,6 +10,7 @@ import { getAllUserDetails } from "../../services/userAllDetailsService";
 import { getProfileImage } from "../../services/userAllDetailsService";
 import "./CommonStyles.css";
 import ImageCard from "../Profile/primary-user-details/ImageCard";
+import { Accordion } from "react-bootstrap";
 
 const DemoCardDetails = () => {
   const { mobileNumber } = useParams();
@@ -53,41 +54,71 @@ const DemoCardDetails = () => {
       return (
         <>
           <ImageCard mobileNumber={mobileNumber} userDetails={userDetails} />
-          <h1 className="text-center">Primary Details</h1>
-          <PrimaryUserDetails
-            status={status}
-            setStatus={setStatus}
-            response={userDetails?.response}
-            mobileNumber={mobileNumber}
-            imageUrl={profileImage}
-          />
-          <h1 className="text-center">Family Details</h1>
-          <UserFamilyDetails
-            status={status}
-            setStatus={setStatus}
-            response={userDetails?.response?.userFamilyDetails}
-          />
-          <h1 className="text-center">Personal Details</h1>
-          {userDetails?.response?.userPersonalDetails && (
-            <UserPersonalDetails
-              status={status}
-              setStatus={setStatus}
-              response={userDetails?.response?.userPersonalDetails}
-            />
-          )}
+          <Accordion defaultActiveKey="0">
+            {/* Primary Details */}
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Primary Details</Accordion.Header>
+              <Accordion.Body>
+                <PrimaryUserDetails
+                  status={status}
+                  setStatus={setStatus}
+                  response={userDetails?.response}
+                  mobileNumber={mobileNumber}
+                  imageUrl={profileImage}
+                />
+              </Accordion.Body>
+            </Accordion.Item>
 
-          <h1 className="text-center">Lifestyle and Education</h1>
-          <UserLifeStyleAndEducation
-            status={status}
-            setStatus={setStatus}
-            response={userDetails?.response?.userLifeStyleAndEducation}
-          />
-          <h1 className="text-center">Partner Preferences</h1>
-          <UserPartnerPreferences
-            status={status}
-            setStatus={setStatus}
-            response={userDetails?.response?.userPartnerPreferences}
-          />
+            {/* Family Details */}
+            <Accordion.Item eventKey="1">
+              <Accordion.Header>Family Details</Accordion.Header>
+              <Accordion.Body>
+                <UserFamilyDetails
+                  status={status}
+                  setStatus={setStatus}
+                  response={userDetails?.response?.userFamilyDetails}
+                />
+              </Accordion.Body>
+            </Accordion.Item>
+
+            {/* Personal Details */}
+            <Accordion.Item eventKey="2">
+              <Accordion.Header>Personal Details</Accordion.Header>
+              <Accordion.Body>
+                {userDetails?.response?.userPersonalDetails && (
+                  <UserPersonalDetails
+                    status={status}
+                    setStatus={setStatus}
+                    response={userDetails?.response?.userPersonalDetails}
+                  />
+                )}
+              </Accordion.Body>
+            </Accordion.Item>
+
+            {/* Lifestyle and Education */}
+            <Accordion.Item eventKey="3">
+              <Accordion.Header>Lifestyle and Education</Accordion.Header>
+              <Accordion.Body>
+                <UserLifeStyleAndEducation
+                  status={status}
+                  setStatus={setStatus}
+                  response={userDetails?.response?.userLifeStyleAndEducation}
+                />
+              </Accordion.Body>
+            </Accordion.Item>
+
+            {/* Partner Preferences */}
+            <Accordion.Item eventKey="4">
+              <Accordion.Header>Partner Preferences</Accordion.Header>
+              <Accordion.Body>
+                <UserPartnerPreferences
+                  status={status}
+                  setStatus={setStatus}
+                  response={userDetails?.response?.userPartnerPreferences}
+                />
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
         </>
       );
     }

@@ -219,7 +219,7 @@ const FramerCard = () => {
               </div>
 
               {/* Height Range Filter */}
-              <div className="flex mb-3">
+              {/* <div className="flex mb-3">
                 <select
                   value={minHeight}
                   onChange={(e) => setMinHeight(e.target.value)}
@@ -245,7 +245,7 @@ const FramerCard = () => {
                     </option>
                   ))}
                 </select>
-              </div>
+              </div> */}
 
               {/* Location Filter */}
               <div className="mb-3">

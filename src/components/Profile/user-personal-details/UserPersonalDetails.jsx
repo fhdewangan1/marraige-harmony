@@ -45,7 +45,7 @@ const personalFields = [
       { value: "No", label: "No" },
     ],
   },
-  { key: "userIncome", value: "Monthly Income" },
+  { key: "userIncome", value: "Yearly Income" },
   {
     key: "isUserStayingAlone",
     value: "Is Staying Alone",
@@ -322,7 +322,7 @@ const UserPersonalDetails = ({ response, setStatus, status }) => {
                   : field.key === "userWeight" && updatedProfile[field.key]
                   ? `${updatedProfile[field.key]} kg`
                   : updatedProfile && updatedProfile[field.key] !== undefined
-                  ? updatedProfile[field.key].toString()
+                  ? updatedProfile[field.key]
                   : "N/A"}
               </span>
             </div>

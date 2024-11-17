@@ -1,0 +1,16 @@
+.react-datepicker-wrapper {
+  display: block !important;
+}
+.react-datepicker-wrapper input {
+  --tw-ring-opacity: 0 !important;
+}
+
+.react-datepicker__current-month {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .login-link {
+    margin-bottom: 100px;
+  }
+}

@@ -7,6 +7,9 @@ import Cropper from "react-easy-crop";
 import { motion } from "framer-motion";
 import styled from "styled-components";
 import { AiOutlineClose } from "react-icons/ai";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "./Registration.css";
 
 const FullScreenModal = styled(motion.div)`
   position: fixed;
@@ -84,6 +87,13 @@ function Registration() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const navigate = useNavigate();
   const [profileImageBlob, setProfileImageBlob] = useState(null);
+  const [startDate, setStartDate] = useState();
+
+  const minDate = new Date();
+  minDate.setFullYear(minDate.getFullYear() - 60); // 60 years ago
+
+  const maxDate = new Date();
+  maxDate.setFullYear(maxDate.getFullYear() - 18); // 18 years ago
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -131,23 +141,7 @@ function Registration() {
         [name]: value,
       }));
     }
-
     validate(name, value); // Validate other fields
-  };
-
-  // Calculate age based on dob
-  const calculateAge = (dob) => {
-    const birthDate = new Date(dob);
-    const currentDate = new Date();
-    let age = currentDate.getFullYear() - birthDate.getFullYear();
-    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())
-    ) {
-      age--;
-    }
-    return age;
   };
 
   const validate = (name, value) => {
@@ -381,6 +375,30 @@ function Registration() {
     handleChange({ target: { name, value: pascalCaseValue } });
   };
 
+  const handleDateChange = (date) => {
+    setStartDate(date); // Update selected date
+
+    const dob = date; // Keep the date as a Date object
+    const age = calculateAge(dob); // Calculate age based on Date object
+
+    setFormData({
+      ...formData,
+      dob, // Store the Date object
+      age, // Set the age based on DOB
+    });
+  };
+
+  const calculateAge = (dob) => {
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--; // Adjust age if the birthday hasn't occurred yet this year
+    }
+    return age;
+  };
+
   return (
     <div style={{ maxHeight: "90vh" }}>
       <div className="mx-auto">
@@ -557,43 +575,44 @@ function Registration() {
                   </div>
                 </div>
 
-                {/* Date of birth and age */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
-                  <div>
-                    <input
-                      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      id="dob"
-                      type="date"
-                      name="dob"
-                      onChange={handleChange}
-                      value={formData.dob}
-                    />
-                    {errors.dob && (
-                      <p className="text-xs text-red-500">{errors.dob}</p>
-                    )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4 w-100">
+                  {/* Date Picker with Custom Input */}
+                  <div className="w-full">
+                    {/* Date Picker */}
+                    <div className=" w-full">
+                      <DatePicker
+                        selected={startDate}
+                        onChange={handleDateChange}
+                        showYearDropdown
+                        showMonthDropdown
+                        scrollableMonthDropdown
+                        scrollableYearDropdown
+                        dateFormat="MM/dd/yyyy"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholderText="Select Date of Birth"
+                        minDate={minDate}
+                        maxDate={maxDate}
+                        yearDropdownItemNumber={50}
+                      />
+                    </div>
                   </div>
-                  <div>
+
+                  {/* Age Display */}
+                  <div className="w-full">
                     <select
                       className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       id="age"
                       name="age"
                       value={formData.age}
-                      disabled // Age is auto-calculated, so it's disabled
+                      disabled
                     >
                       <option value="" disabled>
                         Select Age
                       </option>
-                      {Array.from({ length: 43 }, (_, i) => i + 18).map(
-                        (age) => (
-                          <option key={age} value={age}>
-                            {age}
-                          </option>
-                        )
+                      {formData.age && (
+                        <option value={formData.age}>{formData.age}</option>
                       )}
                     </select>
-                    {errors.age && (
-                      <p className="text-xs text-red-500">{errors.age}</p>
-                    )}
                   </div>
                 </div>
 
@@ -738,7 +757,7 @@ function Registration() {
                   </button>
                 </div>
 
-                <p className="mt-4 text-center text-gray-600">
+                <p className="login-link mt-4 text-center text-gray-600">
                   Already have an account?{" "}
                   <Link
                     to="/login"

@@ -381,21 +381,25 @@ const LandingPage = () => {
         </div>
       </section>
       {/* Custom Footer */}
-      <div className="bg-gray-100 py-4 text-center border-t border-gray-300">
+      <div className="footer-custom bg-gray-100 py-4 text-center border-t border-gray-300">
         <div className="text-sm text-dark-900">
-          &copy;
-          {new Date().getFullYear()}
+          &copy; {new Date().getFullYear()}
           <a
             href="https://www.marriageharmony.in/"
             target="_blank"
+            rel="noopener noreferrer"
             className="text-blue-400 hover:text-blue-600 no-underline"
           >
             Marriage Harmony
-          </a>{" "}
-          | Made with ❤️ by{" "}
+          </a>
+          <span className="hidden sm:inline"> | </span>{" "}
+          {/* Show separator inline on larger screens */}
+          <br className="sm:hidden" /> {/* Add a line break on small screens */}
+          Made with ❤️ by{" "}
           <a
             href="http://www.intallyshwisdom.in"
             target="_blank"
+            rel="noopener noreferrer"
             className="text-blue-400 hover:text-blue-600 no-underline"
           >
             Intallyshwisdom

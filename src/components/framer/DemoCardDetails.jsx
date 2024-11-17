@@ -85,13 +85,11 @@ const DemoCardDetails = () => {
             <Accordion.Item eventKey="2">
               <Accordion.Header>Personal Details</Accordion.Header>
               <Accordion.Body>
-                {userDetails?.response?.userPersonalDetails && (
-                  <UserPersonalDetails
-                    status={status}
-                    setStatus={setStatus}
-                    response={userDetails?.response?.userPersonalDetails}
-                  />
-                )}
+                <UserPersonalDetails
+                  status={status}
+                  setStatus={setStatus}
+                  response={userDetails?.response?.userPersonalDetails}
+                />
               </Accordion.Body>
             </Accordion.Item>
 

@@ -83,6 +83,7 @@ function Registration() {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const navigate = useNavigate();
+  const [profileImageBlob, setProfileImageBlob] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -315,12 +316,12 @@ function Registration() {
   const handleSaveCroppedImage = async () => {
     const croppedImageBlob = await createCroppedImage();
     if (croppedImageBlob) {
+      setProfileImageBlob(croppedImageBlob);
       setFormData({ ...formData, profileImage: croppedImageBlob });
       setIsCropScreenVisible(false);
       setImagePreview(URL.createObjectURL(croppedImageBlob));
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -328,13 +329,16 @@ function Registration() {
       try {
         setLoading(true);
 
-        const imageBlob = await createCroppedImage();
         const formDataToSend = new FormData();
         Object.entries(formData).forEach(([key, value]) => {
           formDataToSend.append(key === "mailId" ? "mailId" : key, value);
         });
-        if (imageBlob) formDataToSend.set("profileImage", imageBlob);
-
+        if (profileImageBlob)
+          formDataToSend.append(
+            "profileImage",
+            profileImageBlob,
+            "profile.jpg"
+          );
         await AxiosConfig.post("auth/create-profile", formDataToSend);
 
         setLoading(false);

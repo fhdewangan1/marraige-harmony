@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { AxiosConfig } from "../../config/AxiosConfig";
 import Swal from "sweetalert2";
 import AuthHook from "../../auth/AuthHook";
@@ -11,12 +12,17 @@ function ChangePassword() {
     confirmNewPassword: "",
   });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState({
+    oldPassword: false,
+    newPassword: false,
+    confirmNewPassword: false,
+  });
+
   const navigate = useNavigate();
 
   // Get the user session
   const session = AuthHook();
   const mobileNumber = session?.userName; // Use the userName from the session
-  // const mobileNumber = 1234567890; // Use the userName from the session
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,6 +30,13 @@ function ChangePassword() {
       ...formData,
       [name]: value,
     });
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPassword((prevState) => ({
+      ...prevState,
+      [field]: !prevState[field],
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -108,52 +121,47 @@ function ChangePassword() {
             Change Your Password!
           </p>
           <hr className="w-full md:w-2/4 mx-auto" />
-          <div className="mt-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Old Password
-            </label>
-            <input
-              className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
-              name="oldPassword"
-              type="password"
-              value={formData.oldPassword}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mt-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              New Password
-            </label>
-            <input
-              className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
-              name="newPassword"
-              type="password"
-              value={formData.newPassword}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mt-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Confirm New Password
-            </label>
-            <input
-              className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
-              name="confirmNewPassword"
-              type="password"
-              value={formData.confirmNewPassword}
-              onChange={handleChange}
-            />
-          </div>
+          {["oldPassword", "newPassword", "confirmNewPassword"].map((field) => (
+            <div key={field} className="mt-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                {field === "oldPassword"
+                  ? "Old Password"
+                  : field === "newPassword"
+                  ? "New Password"
+                  : "Confirm New Password"}
+              </label>
+              <div className="relative">
+                <input
+                  className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
+                  name={field}
+                  type={showPassword[field] ? "text" : "password"}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  placeholder={
+                    field === "oldPassword"
+                      ? "Enter your old password"
+                      : field === "newPassword"
+                      ? "Enter your new password"
+                      : "Confirm your new password"
+                  }
+                />
+                <span
+                  onClick={() => togglePasswordVisibility(field)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 cursor-pointer"
+                >
+                  {showPassword[field] ? <AiFillEyeInvisible /> : <AiFillEye />}
+                </span>
+              </div>
+            </div>
+          ))}
           <div className="mt-8">
             <button
               className="bg-gray-700 text-white font-bold py-2 px-4 w-full rounded hover:bg-gray-600"
               type="submit"
+              disabled={loading}
             >
-              Change Password
+              {loading ? "Changing Password..." : "Change Password"}
             </button>
-          </div>
-          <div className="mt-4 flex items-center justify-between">
-            <span className="border-b w-full md:w-full"></span>
           </div>
         </form>
       </div>

@@ -2,7 +2,6 @@ import { useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { AxiosConfig } from "../../config/AxiosConfig";
 import Cropper from "react-easy-crop";
 import { motion } from "framer-motion";
 import styled from "styled-components";
@@ -10,6 +9,8 @@ import { AiOutlineClose } from "react-icons/ai";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./Registration.css";
+import { ApiUrl } from "../../config/Config";
+import axios from "axios";
 
 const FullScreenModal = styled(motion.div)`
   position: fixed;
@@ -86,7 +87,6 @@ function Registration() {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const navigate = useNavigate();
-  const [profileImageBlob, setProfileImageBlob] = useState(null);
   const [startDate, setStartDate] = useState();
 
   const minDate = new Date();
@@ -310,7 +310,6 @@ function Registration() {
   const handleSaveCroppedImage = async () => {
     const croppedImageBlob = await createCroppedImage();
     if (croppedImageBlob) {
-      setProfileImageBlob(croppedImageBlob);
       setFormData({ ...formData, profileImage: croppedImageBlob });
       setIsCropScreenVisible(false);
       setImagePreview(URL.createObjectURL(croppedImageBlob));
@@ -324,16 +323,24 @@ function Registration() {
         setLoading(true);
 
         const formDataToSend = new FormData();
+
+        // Process each field before appending
         Object.entries(formData).forEach(([key, value]) => {
-          formDataToSend.append(key === "mailId" ? "mailId" : key, value);
+          if (key === "dob" && value) {
+            // Format the DOB to yyyy-MM-dd
+            const formattedDob = new Date(value).toISOString().split("T")[0];
+            formDataToSend.append(key, formattedDob);
+          } else {
+            formDataToSend.append(key, value);
+          }
         });
-        if (profileImageBlob)
-          formDataToSend.append(
-            "profileImage",
-            profileImageBlob,
-            "profile.jpg"
-          );
-        await AxiosConfig.post("auth/create-profile", formDataToSend);
+
+        // Append profileImage if available
+        // if (profileImageBlob) {
+        //   formDataToSend.append("profileImage", profileImageBlob, "profile.jpg");
+        // }
+
+        await axios.post(`${ApiUrl}/auth/create-profile`, formDataToSend);
 
         setLoading(false);
 
@@ -346,7 +353,7 @@ function Registration() {
           navigate("/login");
         });
       } catch (error) {
-        console.log("error :", error);
+        console.error("Error:", error);
         setLoading(false);
         Swal.fire({
           title: "Error!",

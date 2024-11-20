@@ -796,7 +796,12 @@ function Registration() {
                     onCropComplete={onCropComplete}
                   />
                 </CropContainer>
-                <Button onClick={handleSaveCroppedImage}>Save Image</Button>
+                <Button
+                  style={{ marginTop: "-100px", zIndex: "100" }}
+                  onClick={handleSaveCroppedImage}
+                >
+                  Save Image
+                </Button>
               </FullScreenModal>
             )}
           </div>

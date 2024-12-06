@@ -360,7 +360,7 @@ const LandingPage = () => {
                 {showContactDetails && (
                   <div className="mt-4 p-2 bg-purple-100 rounded">
                     <h5 className="text-lg font-semibold">Contact Details:</h5>
-                    <p className="text-gray-700">Phone: +91 7000186765</p>
+                    {/* <p className="text-gray-700">Phone: +91 7000186765</p> */}
                     <p className="text-gray-700">
                       Email:
                       <span
@@ -395,15 +395,7 @@ const LandingPage = () => {
           <span className="hidden sm:inline"> | </span>{" "}
           {/* Show separator inline on larger screens */}
           <br className="sm:hidden" /> {/* Add a line break on small screens */}
-          Made with ❤️ by{" "}
-          <a
-            href="http://www.intallyshwisdom.in"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-600 no-underline"
-          >
-            Intallyshwisdom
-          </a>
+          Made with ❤️
         </div>
       </div>
     </>
